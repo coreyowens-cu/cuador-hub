@@ -650,7 +650,12 @@ function PasswordGate({ onUnlock }) {
 }
 
 export default function MarketingHub() {
-  const [unlocked, setUnlocked] = useState(() => sessionStorage.getItem("ch-auth") === "1");
+  const [unlocked, setUnlocked] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("ch-auth") === "1") {
+      setUnlocked(true);
+    }
+  }, []);
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   // Core state
