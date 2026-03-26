@@ -650,12 +650,16 @@ function PasswordGate({ onUnlock }) {
 }
 
 export default function MarketingHub() {
+  const [mounted, setMounted] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
+
   useEffect(() => {
-    if (typeof window !== "undefined" && sessionStorage.getItem("ch-auth") === "1") {
-      setUnlocked(true);
-    }
+    setMounted(true);
+    if (sessionStorage.getItem("ch-auth") === "1") setUnlocked(true);
   }, []);
+
+  // Don't render anything until client is mounted (prevents SSR mismatch)
+  if (!mounted) return null;
   if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   // Core state
@@ -706,6 +710,8 @@ export default function MarketingHub() {
   // Load
   useEffect(() => {
     (async () => {
+      // Small delay to ensure window.storage is injected
+      await new Promise(r => setTimeout(r, 50));
       try {
         const [s, i, n, u, g, co, br, tm, ca] = await Promise.all([
           window.storage.get("ns-strategy", true),
