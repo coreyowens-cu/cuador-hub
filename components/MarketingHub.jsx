@@ -633,19 +633,7 @@ export default function MarketingHub() {
           window.storage.get("ns-concepts", true),
         ]);
         if (s) setStrategy(JSON.parse(s.value));
-        if (i) {
-          const loaded = JSON.parse(i.value);
-          // Re-inject HTML concepts for default initiatives if missing
-          const withConcepts = loaded.map(init => {
-            if (!init.htmlConcept) {
-              // Find matching concept by placeholder comment in source
-              const match = Object.entries(DEFAULT_CONCEPTS).find(([k]) => init.id === 'init-h2h' && k === '__CONCEPT_0__' || init.id === 'init-buddrops' && k === '__CONCEPT_1__' || init.id === 'init-hashnotes' && k === '__CONCEPT_2__' || init.id === 'init-hq' && k === '__CONCEPT_3__' || init.id === 'init-hc-social' && k === '__CONCEPT_4__');
-              if (match) return { ...init, htmlConcept: match[1], htmlConceptName: init.htmlConceptName };
-            }
-            return init;
-          });
-          setInitiatives(withConcepts);
-        }
+        if (i) setInitiatives(JSON.parse(i.value));
         if (n) setNotes(JSON.parse(n.value));
         if (g) setGanttHtml(g.value);
         if (co) setCompany(JSON.parse(co.value));
@@ -747,6 +735,9 @@ export default function MarketingHub() {
   const saveFile = (id, url, name) => { setInitiatives(p => p.map(x => x.id !== id ? x : { ...x, fileUrl: url, fileName: name })); setFileModal(null); };
   const saveConceptHtml = (id, html, name) => { setInitiatives(p => p.map(x => x.id !== id ? x : { ...x, htmlConcept: html, htmlConceptName: name })); setConceptUpload(null); };
   const addInit = (init) => { setInitiatives(p => [...p, init]); setShowAddInit(false); };
+  const deleteInit = (id) => setInitiatives(p => p.filter(x => x.id !== id));
+  const updateInit = (id, updates) => setInitiatives(p => p.map(x => x.id === id ? { ...x, ...updates } : x));
+  const deleteCampaign = (id) => setCampaigns(p => p.filter(x => x.id !== id));
   const saveStrategy = (s) => { setStrategy(s); setShowEditStrategy(false); };
   const saveCampaignAsInit = (init) => { setInitiatives(p => [...p, init]); };
 
@@ -1038,7 +1029,18 @@ export default function MarketingHub() {
 
                             {/* Footer actions */}
                             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid var(--border2)", paddingTop: 10, marginTop: 4 }}>
-                              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{init.owner}</div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{init.owner}</div>
+                                {canEdit && (
+                                  <div style={{ display: "flex", gap: 4 }}>
+                                    <button onClick={() => { setShowAddInit(init.id); }} title="Edit"
+                                      style={{ fontSize: 10, padding: "2px 7px", borderRadius: 5, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", cursor: "pointer" }}>✏</button>
+                                    <button onClick={() => { if (confirm(`Delete "${init.title}"?`)) deleteInit(init.id); }} title="Delete"
+                                      style={{ fontSize: 10, padding: "2px 7px", borderRadius: 5, border: "1px solid rgba(224,123,106,.3)", background: "transparent", color: "#e07b6a", cursor: "pointer" }}>✕</button>
+                                  </div>
+                                )}
+                              </div>
+                              </div>
                               <div style={{ display: "flex", gap: 6 }}>
                                 {(hasConcept || isLoadingConcept) ? (
                                   <button onClick={() => hasConcept ? setConceptModal(init.id) : null} style={{
@@ -1085,7 +1087,7 @@ export default function MarketingHub() {
                   </div>
                   {canEdit && <button className="btn btn-gold" style={{ marginTop: 8 }} onClick={() => setShowCampaignModal(true)}>+ New Brief</button>}
                 </div>
-                <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} fullWidth />
+                <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} onDelete={canEdit ? deleteCampaign : null} fullWidth />
               </div>
             )}
 
@@ -1500,7 +1502,18 @@ export default function MarketingHub() {
       {fileModal && <FileUploadModal initiative={initiatives.find(i => i.id === fileModal)} onClose={() => setFileModal(null)} onSave={(url, name) => saveFile(fileModal, url, name)} />}
       {conceptModal && (() => { const init = initiatives.find(i => i.id === conceptModal); return init ? <ConceptViewerModal init={init} onClose={() => setConceptModal(null)} onUpload={() => { setConceptModal(null); setConceptUpload(init.id); }} /> : null; })()}
       {conceptUpload && <ConceptHtmlUploadModal initName={initiatives.find(i => i.id === conceptUpload)?.title || ""} onClose={() => setConceptUpload(null)} onSave={(html, name) => saveConceptHtml(conceptUpload, html, name)} />}
-      {showAddInit && <AddInitiativeModal pillars={strategy.pillars} brands={brands} preselectedBrand={null} onClose={() => setShowAddInit(false)} onSave={addInit} />}
+      {showAddInit && <AddInitiativeModal
+        pillars={strategy.pillars} brands={brands} preselectedBrand={null}
+        existing={typeof showAddInit === "string" ? initiatives.find(i => i.id === showAddInit) : null}
+        onClose={() => setShowAddInit(false)}
+        onSave={init => {
+          if (typeof showAddInit === "string") {
+            updateInit(showAddInit, init);
+            setShowAddInit(false);
+          } else {
+            addInit(init);
+          }
+        }} />}
       {showAddBrandInit && <AddInitiativeModal pillars={strategy.pillars} brands={brands} preselectedBrand={showAddBrandInit} onClose={() => setShowAddBrandInit(null)} onSave={init => { addInit(init); setShowAddBrandInit(null); }} />}
       {showBriefUpload && <BriefUploadModal brandId={showBriefUpload} brand={brands[showBriefUpload]} pillars={strategy.pillars} onClose={() => setShowBriefUpload(null)} onSave={init => { addInit(init); setShowBriefUpload(null); }} />}
       {showEditStrategy && <EditStrategyModal strategy={strategy} onClose={() => setShowEditStrategy(false)} onSave={saveStrategy} />}
@@ -2810,7 +2823,7 @@ function ChannelsPanel({ initiatives, pillars, pillarAccents, onInitClick, hlIni
 // ════════════════════════════════════════════════════════════════════════════
 // CAMPAIGNS PANEL
 // ════════════════════════════════════════════════════════════════════════════
-function CampaignsPanel({ campaigns, onNew, onSelect, fullWidth }) {
+function CampaignsPanel({ campaigns, onNew, onSelect, onDelete, fullWidth }) {
   const counts = { idea: 0, brief: 0, approved: 0 };
   campaigns.forEach(c => { if (counts[c.status] !== undefined) counts[c.status]++; });
 
@@ -2893,7 +2906,13 @@ function CampaignsPanel({ campaigns, onNew, onSelect, fullWidth }) {
               <div key={c.id} className="cmp-card" style={{ borderLeftColor: sc }} onClick={() => onSelect(c)}>
                 <div className="cmp-card-top">
                   <div className="cmp-card-title">{c.title}</div>
-                  <div className={`cmp-status ${c.status}`}>{c.status}</div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <div className={`cmp-status ${c.status}`}>{c.status}</div>
+                    {onDelete && (
+                      <button onClick={e => { e.stopPropagation(); if (confirm(`Delete "${c.title}"?`)) onDelete(c.id); }}
+                        style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, border: "1px solid rgba(224,123,106,.3)", background: "transparent", color: "#e07b6a", cursor: "pointer", lineHeight: 1 }}>✕</button>
+                    )}
+                  </div>
                 </div>
                 <div className="cmp-card-desc">{c.brief?.objective || c.concept}</div>
                 <div className="cmp-card-foot">
@@ -3384,15 +3403,20 @@ function FileUploadModal({ initiative, onClose, onSave }) {
 // ════════════════════════════════════════════════════════════════════════════
 // ADD INITIATIVE — with integrated brief upload that auto-fills the form
 // ════════════════════════════════════════════════════════════════════════════
-function AddInitiativeModal({ pillars, brands, preselectedBrand, onClose, onSave }) {
+function AddInitiativeModal({ pillars, brands, preselectedBrand, existing, onClose, onSave }) {
   const brandList = brands ? Object.values(brands) : [];
+  const isEditing = !!existing;
 
-  const [f, setF] = useState({
-    title: "", description: "", owner: "",
-    channel: CHANNELS[0],
-    brandId: preselectedBrand || null,
-    startDate: "", endDate: "", revolving: false,
-  });
+  const [f, setF] = useState(() => ({
+    title: existing?.title || "",
+    description: existing?.description || "",
+    owner: existing?.owner || "",
+    channel: existing?.channel || CHANNELS[0],
+    brandId: existing?.brandId || preselectedBrand || null,
+    startDate: existing?.startDate || "",
+    endDate: existing?.endDate || "",
+    revolving: existing?.revolving || false,
+  }));
   const s = (k, v) => setF(p => ({ ...p, [k]: v }));
   const selectedBrand = f.brandId ? brandList.find(b => b.id === f.brandId) : null;
   const accentColor = selectedBrand?.color || "var(--gold)";
@@ -3482,7 +3506,7 @@ function AddInitiativeModal({ pillars, brands, preselectedBrand, onClose, onSave
     <div className="overlay" onClick={onClose}>
       <div className="modal wide" onClick={e => e.stopPropagation()} style={{ maxWidth: 860 }}>
         <div className="mhdr" style={{ borderTop: `2px solid ${accentColor}`, borderRadius: "16px 16px 0 0" }}>
-          <div className="mtitle">New Initiative</div>
+          <div className="mtitle">{isEditing ? "Edit Initiative" : "New Initiative"}</div>
           <button className="mclose" onClick={onClose}>×</button>
         </div>
 
@@ -3637,7 +3661,7 @@ function AddInitiativeModal({ pillars, brands, preselectedBrand, onClose, onSave
         <div className="mfoot">
           <button className="btn" onClick={onClose}>Cancel</button>
           <button className="btn btn-gold" disabled={!f.title.trim()} onClick={handleSave}>
-            Add Initiative{briefFile ? " + Brief" : ""}{conceptHtml ? " + Concept" : ""}
+            {isEditing ? "Save Changes" : `Add Initiative${briefFile ? " + Brief" : ""}${conceptHtml ? " + Concept" : ""}`}
           </button>
         </div>
       </div>
