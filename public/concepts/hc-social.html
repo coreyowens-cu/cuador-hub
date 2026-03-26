@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Head Change · Social Media Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Grotesk:wght@300;400;500;600&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a08;
+    --surface: #111110;
+    --card: #161614;
+    --card2: #1a1a17;
+    --border: #2a2a24;
+    --border2: #333328;
+    --gold: #D4A843;
+    --gold2: #F0C060;
+    --rust: #C4622A;
+    --cream: #F0EAD8;
+    --sage: #7A8C6E;
+    --text: #C8C0A8;
+    --dim: #9a9080;
+    --muted: #4a4840;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,10,8,0.95);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 56px;
+  }
+  .nav-left { display: flex; align-items: center; gap: 20px; }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 5px; color: var(--gold); }
+  .nav-divider { width: 1px; height: 20px; background: var(--border2); }
+  .nav-title { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-pill { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 12px; border: 1px solid var(--border2); color: var(--dim); border-radius: 20px; }
+  .nav-pill.active { border-color: var(--gold); color: var(--gold); background: rgba(212,168,67,0.06); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column; justify-content: center;
+    padding: 100px 80px 80px; position: relative; overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-texture {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle at 1px 1px, rgba(212,168,67,0.08) 1px, transparent 0);
+    background-size: 32px 32px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%);
+  }
+
+  .hero-glow {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 50% 60% at 85% 20%, rgba(212,168,67,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 15% 85%, rgba(196,98,42,0.05) 0%, transparent 60%);
+  }
+
+  .hero-kicker {
+    font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 28px; display: flex; align-items: center; gap: 14px; position: relative;
+  }
+  .hero-kicker span { width: 48px; height: 1px; background: var(--gold); display: block; }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 8vw, 110px);
+    font-weight: 900; line-height: 0.92;
+    color: var(--cream); position: relative;
+    margin-bottom: 12px;
+  }
+  .hero-headline .alt {
+    font-style: italic; color: var(--gold); font-weight: 400;
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 16px; color: var(--dim); max-width: 520px;
+    margin-top: 28px; line-height: 1.7; position: relative;
+    padding-left: 24px; border-left: 2px solid var(--border2);
+  }
+
+  .hero-meta {
+    display: flex; gap: 40px; margin-top: 56px; position: relative;
+    padding-top: 40px; border-top: 1px solid var(--border);
+  }
+  .hm-item { display: flex; flex-direction: column; gap: 4px; }
+  .hm-val { font-family: 'Bebas Neue', sans-serif; font-size: 38px; color: var(--gold); line-height: 1; }
+  .hm-key { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+  /* ── SECTIONS ── */
+  .section { padding: 80px; border-bottom: 1px solid var(--border); }
+
+  .sec-label {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .sec-label::after { content: ''; flex: 0 0 32px; height: 1px; background: var(--gold); }
+
+  .sec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 4vw, 52px); font-weight: 700;
+    color: var(--cream); line-height: 1.1; margin-bottom: 20px;
+  }
+  .sec-title em { font-style: italic; color: var(--gold); }
+
+  .sec-lead {
+    font-size: 15px; color: var(--dim); max-width: 640px;
+    line-height: 1.8; margin-bottom: 48px; font-style: italic;
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* ── PARTNER BLOCK ── */
+  .partner-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .partner-block::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--rust), transparent);
+  }
+  .partner-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
+  .partner-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .partner-name {
+    font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700;
+    color: var(--cream); margin-bottom: 16px; line-height: 1.1;
+  }
+  .partner-name em { font-style: italic; color: var(--gold); }
+  .partner-desc { font-size: 13px; color: var(--dim); line-height: 1.8; margin-bottom: 20px; }
+  .partner-roles { display: flex; flex-direction: column; gap: 10px; }
+  .partner-role {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 12px; color: var(--text); padding: 12px 16px;
+    background: var(--card2); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+  }
+  .pr-title { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  .pr-desc { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .partner-divider { width: 1px; background: var(--border2); }
+
+  /* ── PILLAR CARDS ── */
+  .pillars-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 2px; }
+  .pillars-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+
+  .pillar-card {
+    background: var(--card); border: 1px solid var(--border);
+    padding: 36px 32px; position: relative; overflow: hidden;
+    transition: border-color 0.25s, background 0.25s; cursor: default;
+  }
+  .pillar-card:hover { border-color: var(--border2); background: var(--card2); }
+
+  .pillar-card::after {
+    content: attr(data-num);
+    font-family: 'Bebas Neue', sans-serif; font-size: 160px;
+    color: rgba(212,168,67,0.03);
+    position: absolute; bottom: -32px; right: -8px;
+    line-height: 1; user-select: none; pointer-events: none;
+  }
+
+  .pc-num { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 4px; color: var(--gold); margin-bottom: 14px; }
+  .pc-icon { font-size: 28px; margin-bottom: 14px; }
+  .pc-title {
+    font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700;
+    color: var(--cream); margin-bottom: 10px; line-height: 1.2;
+  }
+  .pc-title em { font-style: italic; color: var(--gold); }
+  .pc-purpose { font-size: 11px; color: var(--dim); line-height: 1.7; margin-bottom: 18px; }
+
+  .pc-formats { display: flex; flex-direction: column; gap: 6px; }
+  .pc-format {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; color: var(--text);
+    padding: 7px 10px;
+    background: rgba(0,0,0,0.2); border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .pc-format-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; }
+  .pc-format-who { font-size: 9px; color: var(--dim); margin-left: auto; text-transform: uppercase; letter-spacing: 1px; }
+
+  .pc-tone { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .pc-tone-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .pc-tone-text { font-size: 11px; color: var(--dim); font-style: italic; line-height: 1.5; font-family: 'Playfair Display', serif; }
+
+  /* ── HASH CLUB CTA ── */
+  .cta-hero {
+    background: var(--card); border: 1px solid rgba(212,168,67,0.3);
+    padding: 52px; position: relative; overflow: hidden; text-align: center;
+  }
+  .cta-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(212,168,67,0.05) 0%, transparent 70%);
+  }
+  .cta-hero-inner { position: relative; }
+  .cta-eyebrow { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+  .cta-main {
+    font-family: 'Playfair Display', serif; font-size: clamp(28px, 4vw, 48px);
+    font-style: italic; color: var(--cream); line-height: 1.2; margin-bottom: 20px;
+  }
+  .cta-sub { font-size: 14px; color: var(--dim); max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+  .cta-variations { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); overflow: hidden; }
+  .cv-row { display: grid; grid-template-columns: 220px 1fr; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  .cv-row:last-child { border-bottom: none; }
+  .cv-row:hover { background: rgba(212,168,67,0.02); }
+  .cv-type { padding: 16px 20px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); border-right: 1px solid var(--border); display: flex; align-items: center; background: var(--card); }
+  .cv-cta { padding: 16px 24px; font-family: 'Playfair Display', serif; font-style: italic; font-size: 14px; color: var(--cream); display: flex; align-items: center; line-height: 1.5; }
+
+  /* ── CONTENT TYPES GRID ── */
+  .content-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .content-type {
+    background: var(--card); border: 1px solid var(--border); padding: 22px;
+    border-radius: 2px; transition: all 0.2s; position: relative;
+  }
+  .content-type:hover { border-color: rgba(212,168,67,0.4); background: var(--card2); }
+  .content-type.new { border-color: rgba(212,168,67,0.15); }
+  .content-type .ct-icon { font-size: 22px; margin-bottom: 10px; }
+  .content-type .ct-name { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); margin-bottom: 8px; font-weight: 600; }
+  .content-type .ct-who { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; }
+  .content-type .ct-desc { font-size: 11px; color: var(--dim); line-height: 1.65; }
+  .new-badge { display: inline-block; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; background: rgba(212,168,67,0.15); color: var(--gold); border: 1px solid rgba(212,168,67,0.3); padding: 2px 7px; border-radius: 20px; margin-bottom: 10px; }
+
+  /* ── CONTENT FORMATS ── */
+  .formats-table { border: 1px solid var(--border); overflow: hidden; }
+  .ft-header {
+    display: grid; grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr;
+    background: var(--card); border-bottom: 1px solid var(--border);
+  }
+  .ft-row {
+    display: grid; grid-template-columns: 2fr 1fr 1.5fr 1fr 1.5fr;
+    border-bottom: 1px solid var(--border); transition: background 0.15s;
+  }
+  .ft-row:last-child { border-bottom: none; }
+  .ft-row:hover { background: rgba(212,168,67,0.02); }
+  .ft-cell { padding: 14px 20px; font-size: 12px; color: var(--dim); border-right: 1px solid var(--border); }
+  .ft-cell:last-child { border-right: none; }
+  .ft-header .ft-cell { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .ft-name { color: var(--cream); font-weight: 500; }
+  .ft-badge {
+    display: inline-block; font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 20px; white-space: nowrap;
+  }
+  .ft-badge.video { background: rgba(196,98,42,0.15); color: #E07040; border: 1px solid rgba(196,98,42,0.3); }
+  .ft-badge.photo { background: rgba(122,140,110,0.15); color: var(--sage); border: 1px solid rgba(122,140,110,0.3); }
+  .ft-badge.graphic { background: rgba(212,168,67,0.12); color: var(--gold); border: 1px solid rgba(212,168,67,0.3); }
+  .ft-badge.carousel { background: rgba(100,120,180,0.12); color: #8090C0; border: 1px solid rgba(100,120,180,0.25); }
+  .who-tag { display: flex; flex-wrap: wrap; gap: 4px; }
+  .wt { font-size: 9px; padding: 2px 6px; border: 1px solid var(--border2); color: var(--dim); border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; }
+  .wt.sl { border-color: rgba(196,98,42,0.4); color: #c06040; }
+  .wt.vid { border-color: rgba(122,140,110,0.4); color: var(--sage); }
+  .wt.hc { border-color: rgba(212,168,67,0.4); color: var(--gold); }
+
+  /* ── CADENCE CALENDAR ── */
+  .cadence-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+  .cadence-week {
+    background: var(--card); border: 1px solid var(--border); padding: 28px;
+  }
+  .cw-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .cw-days { display: flex; flex-direction: column; gap: 0; }
+  .cw-day { display: flex; align-items: stretch; border-bottom: 1px solid var(--border); }
+  .cw-day:last-child { border-bottom: none; }
+  .cw-dayname { width: 80px; padding: 14px 12px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); border-right: 1px solid var(--border); display: flex; align-items: center; flex-shrink: 0; }
+  .cw-content { padding: 10px 14px; flex: 1; display: flex; align-items: center; gap: 10px; }
+  .cw-post { flex: 1; }
+  .cw-post-type { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--cream); font-weight: 500; margin-bottom: 2px; }
+  .cw-post-desc { font-size: 11px; color: var(--dim); line-height: 1.4; }
+  .cw-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .cw-dot.gold { background: var(--gold); }
+  .cw-dot.rust { background: var(--rust); }
+  .cw-dot.sage { background: var(--sage); }
+  .cw-dot.muted { background: var(--muted); }
+  .cw-empty { padding: 12px 14px; font-size: 11px; color: var(--muted); font-style: italic; display: flex; align-items: center; }
+
+  .cadence-legend { background: var(--card); border: 1px solid var(--border); padding: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .cl-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .cl-item { display: flex; align-items: flex-start; gap: 14px; }
+  .cl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .cl-info { flex: 1; }
+  .cl-name { font-size: 11px; color: var(--cream); font-weight: 500; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 1px; }
+  .cl-desc { font-size: 11px; color: var(--dim); line-height: 1.5; }
+
+  /* ── GRID MIX ── */
+  .mix-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; }
+  .mix-item { background: var(--card); border: 1px solid var(--border); padding: 24px 20px; text-align: center; position: relative; overflow: hidden; }
+  .mix-item::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
+  .mix-item.p1::after { background: var(--gold); }
+  .mix-item.p2::after { background: var(--rust); }
+  .mix-item.p3::after { background: var(--sage); }
+  .mix-item.p4::after { background: #7070a0; }
+  .mix-item.p5::after { background: var(--muted); }
+  .mix-pct { font-family: 'Bebas Neue', sans-serif; font-size: 44px; line-height: 1; margin-bottom: 8px; }
+  .mix-item.p1 .mix-pct { color: var(--gold); }
+  .mix-item.p2 .mix-pct { color: var(--rust); }
+  .mix-item.p3 .mix-pct { color: var(--sage); }
+  .mix-item.p4 .mix-pct { color: #7070a0; }
+  .mix-item.p5 .mix-pct { color: var(--muted); }
+  .mix-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--dim); line-height: 1.5; }
+
+  /* ── TONE RULES ── */
+  .tone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+  .tone-col { background: var(--card); border: 1px solid var(--border); padding: 36px; }
+  .tone-col-title { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .tone-col.do .tone-col-title { color: var(--gold); }
+  .tone-col.dont .tone-col-title { color: #884444; }
+  .tone-item { padding: 10px 0; border-bottom: 1px solid rgba(42,42,36,0.5); display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--dim); line-height: 1.5; }
+  .tone-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .tone-item::before { flex-shrink: 0; font-size: 12px; margin-top: 1px; }
+  .tone-col.do .tone-item::before { content: '✓'; color: var(--gold); }
+  .tone-col.dont .tone-item::before { content: '✕'; color: #884444; }
+
+  /* ── CAPTION EXAMPLES ── */
+  .caption-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .caption-card {
+    background: var(--card); border: 1px solid var(--border); padding: 28px;
+    position: relative; overflow: hidden;
+  }
+  .caption-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); }
+  .cc-type { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .cc-pillar { font-size: 10px; color: var(--muted); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+  .cc-text { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--cream); line-height: 1.7; font-style: italic; margin-bottom: 14px; }
+  .cc-tags { font-size: 11px; color: var(--dim); line-height: 1.6; }
+  .cc-cta { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 11px; color: var(--gold); font-style: italic; font-family: 'Playfair Display', serif; line-height: 1.5; }
+
+  /* ── PRODUCTION WORKFLOW ── */
+  .workflow { display: flex; gap: 0; border: 1px solid var(--border); overflow: hidden; }
+  .wf-step { flex: 1; padding: 28px 24px; border-right: 1px solid var(--border); position: relative; }
+  .wf-step:last-child { border-right: none; }
+  .wf-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; color: rgba(212,168,67,0.12); margin-bottom: 10px; }
+  .wf-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--cream); margin-bottom: 8px; font-weight: 600; }
+  .wf-who { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); margin-bottom: 10px; }
+  .wf-desc { font-size: 11px; color: var(--dim); line-height: 1.7; }
+
+  /* ── MEASUREMENT ── */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+  .kpi-card { background: var(--card); border: 1px solid var(--border); padding: 28px 24px; }
+  .kpi-icon { font-size: 24px; margin-bottom: 12px; }
+  .kpi-name { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .kpi-desc { font-size: 12px; color: var(--dim); line-height: 1.6; }
+  .kpi-target { margin-top: 12px; font-size: 11px; color: var(--text); padding-top: 10px; border-top: 1px solid var(--border); }
+  .kpi-target span { color: var(--gold); font-weight: 600; }
+
+  /* ── QUOTE ── */
+  .pull-quote {
+    border-left: 3px solid var(--gold); padding: 24px 40px; margin: 40px 0;
+    background: rgba(212,168,67,0.03);
+  }
+  .pull-quote p { font-family: 'Playfair Display', serif; font-size: 24px; font-style: italic; color: var(--cream); line-height: 1.5; }
+  .pull-quote cite { display: block; margin-top: 12px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-style: normal; }
+
+  /* ── DIVIDER ── */
+  .divider { display: flex; align-items: center; gap: 20px; margin: 48px 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+
+  /* ── MISC ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+  .note-box {
+    background: rgba(212,168,67,0.05); border: 1px solid rgba(212,168,67,0.2);
+    padding: 20px 24px; border-radius: 2px; margin-top: 24px;
+    font-size: 12px; color: var(--dim); line-height: 1.7;
+  }
+  .note-box strong { color: var(--gold); }
+
+  footer {
+    padding: 52px 80px; display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--border);
+  }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 7px; color: var(--gold); }
+  .footer-meta { font-size: 10px; color: var(--muted); letter-spacing: 2px; text-align: right; line-height: 1.9; text-transform: uppercase; }
+
+  /* ── FADE IN ── */
+  .fade-in { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 960px) {
+    .section, .hero { padding: 40px 24px; }
+    .pillars-grid, .pillars-grid-2, .mix-row, .cadence-wrap, .tone-grid, .caption-grid, .kpi-grid, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .workflow, .ft-header, .ft-row { flex-direction: column; display: flex; }
+    .partner-grid { grid-template-columns: 1fr; }
+    nav { padding: 0 20px; }
+    footer { flex-direction: column; gap: 24px; padding: 32px 24px; text-align: left; }
+    .hero-meta { flex-direction: column; gap: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <span class="nav-logo">HC</span>
+    <div class="nav-divider"></div>
+    <span class="nav-title">Social Strategy</span>
+  </div>
+  <div class="nav-right">
+    <span class="nav-pill active">Instagram</span>
+    <span class="nav-pill">2025</span>
+    <span class="nav-pill">Internal</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-texture"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-kicker"><span></span>Instagram Social Strategy · 2025</div>
+  <h1 class="hero-headline">
+    Craft the<br>
+    <span class="alt">culture.</span>
+  </h1>
+  <p class="hero-sub">A slow, intentional content strategy for Head Change — built around 5 pillars, a clear visual rhythm, and two production partners who understand what this brand is.</p>
+  <div class="hero-meta">
+    <div class="hm-item"><div class="hm-val">1–2×</div><div class="hm-key">Posts per week</div></div>
+    <div class="hm-item"><div class="hm-val">5</div><div class="hm-key">Content pillars</div></div>
+    <div class="hm-item"><div class="hm-val">2</div><div class="hm-key">Production partners</div></div>
+    <div class="hm-item"><div class="hm-val">1</div><div class="hm-key">Primary platform</div></div>
+  </div>
+</section>
+
+<!-- NORTH STAR -->
+<section class="section fade-in">
+  <div class="sec-label">North Star</div>
+  <h2 class="sec-title">Brand Awareness <em>First</em></h2>
+  <p class="sec-lead">Before followers. Before conversions. Before virality. The goal right now is singular: make Head Change the name people associate with quality, craft, and concentrate culture in Missouri — and eventually everywhere.</p>
+  <div class="pull-quote">
+    <p>"For the heads, but welcoming to the curious."</p>
+    <cite>Head Change brand positioning</cite>
+  </div>
+  <div class="grid-3">
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-left:3px solid var(--gold);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;">What we're building</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.7;">A <strong style="color:var(--text)">recognizable visual identity</strong> and voice on Instagram that signals craft and authority to anyone who encounters HC for the first time.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-left:3px solid var(--rust);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-bottom:10px;">What we're not doing</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.7;">Chasing trends, posting daily for the sake of it, using hype language, or treating Instagram like an ad channel. <strong style="color:var(--text)">Quality over quantity, always.</strong></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-left:3px solid var(--sage);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--sage);margin-bottom:10px;">How we measure it</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.7;">Profile visits, reach, saves, shares, and follower growth. Not likes. The audience we want <strong style="color:var(--text)">saves and sends</strong> — they don't just double-tap.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HASH CLUB CTA -->
+<section class="section fade-in">
+  <div class="sec-label">Universal CTA</div>
+  <h2 class="sec-title">Every Post. <em>Every Time.</em></h2>
+  <p class="sec-lead">No matter what pillar a post belongs to — process, education, culture, or community — every single piece of HC content ends with the same quiet invitation: join the Hash Club.</p>
+
+  <div class="cta-hero">
+    <div class="cta-hero-inner">
+      <div class="cta-eyebrow">The Standing Call to Action</div>
+      <div class="cta-main">"Join the Hash Club. Link in bio."</div>
+      <div class="cta-sub">Every caption. Every Reel description. Every Story swipe-up. The Hash Club (Hash Notes loyalty program) is the destination — social is the on-ramp.</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top: 24px;">
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-top:3px solid var(--gold);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Why it goes on everything</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.8;">Every post is a first impression for someone. The CTA converts curious scrollers into Hash Notes members — the only channel HC fully owns. Don't waste the impression.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-top:3px solid var(--rust);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--rust);margin-bottom:12px;">How it stays on-brand</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.8;">One line. Never pushy. Always at the end, after the content earns it. The CTA is a whisper — not a shout. The post does the work. The CTA just opens the door.</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);padding:28px;border-top:3px solid var(--sage);">
+      <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--sage);margin-bottom:12px;">What it leads to</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.8;">Hash Notes sign-up → scan products → earn points → redeem at webstore. One CTA, the entire loyalty ecosystem behind it. Social feeds the machine.</div>
+    </div>
+  </div>
+
+  <div class="divider"><span>CTA Variations by Post Type</span></div>
+
+  <div class="cta-variations">
+    <div class="cv-row">
+      <div class="cv-type">Process / Product Post</div>
+      <div class="cv-cta">"Scan this batch in Hash Notes and log your session. Join the Hash Club → link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Education Post</div>
+      <div class="cv-cta">"Save this. Then join the Hash Club and start logging what you're learning. Link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Interview / Culture Post</div>
+      <div class="cv-cta">"This is the culture. Join the Hash Club and be part of it. Link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Merch / Webstore Drop</div>
+      <div class="cv-cta">"Hash Club members get first access. Join before the next drop. Link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Loyalty / Points Reminder</div>
+      <div class="cv-cta">"Not in the Hash Club yet? You're leaving points on the table. Link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Collab Post</div>
+      <div class="cv-cta">"Two brands, one culture. Join the Hash Club and stay in the loop. Link in bio."</div>
+    </div>
+    <div class="cv-row">
+      <div class="cv-type">Sesh / Event Post</div>
+      <div class="cv-cta">"Hash Club members get early access to the next sesh. Join the club. Link in bio."</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTION PARTNERS -->
+<section class="section fade-in">
+  <div class="sec-label">Production Team</div>
+  <h2 class="sec-title">Who's <em>Making</em> This</h2>
+  <p class="sec-lead">Two partners. Two distinct roles. One cohesive visual language. Studio Linear handles campaign strategy and creative direction. Local videography handles on-the-ground production.</p>
+  <div class="partner-block">
+    <div class="partner-grid">
+      <div>
+        <div class="partner-label">Campaign Strategy & Creative Direction</div>
+        <div class="partner-name">Studio <em>Linear</em></div>
+        <div class="partner-desc">Studio Linear leads campaign ideation, creative strategy, and overall visual direction for Head Change's social presence. They bring the framework — we bring the culture. Together they build campaigns that feel authentic to the scene while reaching beyond it.</div>
+        <div class="partner-roles">
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Campaign Strategy</div>
+              <div class="pr-desc">Monthly and quarterly campaign themes, content calendars, and pillar assignments aligned with product launches, events, and culture moments.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Creative Direction</div>
+              <div class="pr-desc">Visual mood, aesthetic briefs, shot lists, and art direction for all major content shoots. Ensures grid cohesion and brand consistency.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Content Review & QC</div>
+              <div class="pr-desc">Reviews all content before publishing. Final say on whether something is on-brand, on-tone, and ready to post.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Analytics & Reporting</div>
+              <div class="pr-desc">Monthly performance reports with reach, saves, profile visits, and follower growth. Adjusts strategy accordingly.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="border-left: 1px solid var(--border2); padding-left: 48px;">
+        <div class="partner-label">On-the-Ground Production</div>
+        <div class="partner-name">Local <em>Videography</em></div>
+        <div class="partner-desc">A local videography partner embedded in Missouri's culture — someone who understands the scene, can move quickly, and captures authentic moments without making them feel produced. This is not a commercial video crew. This is a storyteller with a lens.</div>
+        <div class="partner-roles">
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Video Production</div>
+              <div class="pr-desc">Short-form Reels, process documentation, ambient clips, slow-motion product footage, and event coverage at quarterly sesh events.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Interview Capture</div>
+              <div class="pr-desc">Films hash maker interviews, founder story content, and culture-adjacent features. Unpolished, honest, real.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Event Coverage</div>
+              <div class="pr-desc">Full content day at every quarterly sesh. Photo + video. Raw footage delivered to Studio Linear for editing and repurposing.</div>
+            </div>
+          </div>
+          <div class="partner-role">
+            <div>
+              <div class="pr-title">Product Macro Shots</div>
+              <div class="pr-desc">Close-up product photography and video — trichomes, melt, texture, color. The visual language of concentrate culture.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note-box"><strong>Collaboration model:</strong> Studio Linear sets the creative brief. Local videography executes the shoot. Raw assets return to Studio Linear for editing, captioning, and scheduling. HC approves before anything goes live. Every piece of content passes through this pipeline.</div>
+</section>
+
+<!-- CONTENT PILLARS -->
+<section class="section fade-in">
+  <div class="sec-label">Content Pillars</div>
+  <h2 class="sec-title">Five Pillars. <em>One Voice.</em></h2>
+  <p class="sec-lead">Every piece of content belongs to one of five pillars. This keeps the feed balanced, intentional, and visually cohesive — while serving different audience segments without losing the thread.</p>
+
+  <div class="pillars-grid" style="margin-bottom: 2px;">
+    <div class="pillar-card" data-num="1">
+      <div class="pc-num">Pillar 01</div>
+      <div class="pc-icon">🎙</div>
+      <div class="pc-title">Hash Makers &<br><em>Industry Voices</em></div>
+      <div class="pc-purpose">Humanize the scene. Show the people behind the process — their ethos, how they came up, what quality actually means to them. This is the soul of the feed.</div>
+      <div class="pc-formats">
+        <div class="pc-format"><span class="pc-format-dot"></span>Hash Maker Interview (Reel)<span class="pc-format-who">Videographer</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Brand Founder Story<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Quote-Driven Portrait Still<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Long-form cut (YouTube/Link in Bio)<span class="pc-format-who">Both</span></div>
+      </div>
+      <div class="pc-tone"><div class="pc-tone-label">Tone</div><div class="pc-tone-text">Respectful. Unpolished. No influencer energy. Let them talk.</div></div>
+    </div>
+
+    <div class="pillar-card" data-num="2">
+      <div class="pc-num">Pillar 02</div>
+      <div class="pc-icon">🧪</div>
+      <div class="pc-title">Behind the<br><em>Process</em></div>
+      <div class="pc-purpose">Celebrate the craft. Manufacturing posts, process documentation, macro product shots — this is where the artistry lives. Educate without gatekeeping.</div>
+      <div class="pc-formats">
+        <div class="pc-format"><span class="pc-format-dot"></span>Manufacturing Process Clip<span class="pc-format-who">Videographer</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Packaging Appreciation Post<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Macro Product Shot<span class="pc-format-who">Videographer</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Slow-motion ambient clip<span class="pc-format-who">Videographer</span></div>
+      </div>
+      <div class="pc-tone"><div class="pc-tone-label">Tone</div><div class="pc-tone-text">Silent or minimal audio. Let the visuals do the work. Ritual and repetition.</div></div>
+    </div>
+
+    <div class="pillar-card" data-num="3">
+      <div class="pc-num">Pillar 03</div>
+      <div class="pc-icon">📚</div>
+      <div class="pc-title"><em>How to Hash</em><br>Education Series</div>
+      <div class="pc-purpose">Grow the audience without alienating newcomers. Education without ego. Short, clear, calm. This content widens the funnel while protecting the culture.</div>
+      <div class="pc-formats">
+        <div class="pc-format"><span class="pc-format-dot"></span>How to Hash Explainer Reel<span class="pc-format-who">Both</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Tools Explained Carousel<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Hash vs. Rosin Breakdown<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Temperature / Terpene Guide<span class="pc-format-who">Studio Linear</span></div>
+      </div>
+      <div class="pc-tone"><div class="pc-tone-label">Tone</div><div class="pc-tone-text">Simple language. No shame. Calm delivery. Highly saveable.</div></div>
+    </div>
+  </div>
+
+  <div class="pillars-grid-2">
+    <div class="pillar-card" data-num="4">
+      <div class="pc-num">Pillar 04</div>
+      <div class="pc-icon">🎨</div>
+      <div class="pc-title">Culture &<br><em>Community</em></div>
+      <div class="pc-purpose">Glass artists, meme culture, sesh recaps, community moments. Show hash culture as an ecosystem — not a silo. Build the world around the product.</div>
+      <div class="pc-formats">
+        <div class="pc-format"><span class="pc-format-dot"></span>Hash Meme / Culture Humor<span class="pc-format-who">HC / Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Sesh Recap Content<span class="pc-format-who">Videographer</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Glass Artist / Tool Maker Feature<span class="pc-format-who">Both</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Psychedelic / Abstract Visual<span class="pc-format-who">Studio Linear</span></div>
+      </div>
+      <div class="pc-tone"><div class="pc-tone-label">Tone</div><div class="pc-tone-text">Loose, native, fun. Insider humor that doesn't exclude. Community-first.</div></div>
+    </div>
+
+    <div class="pillar-card" data-num="5">
+      <div class="pc-num">Pillar 05</div>
+      <div class="pc-icon">🛒</div>
+      <div class="pc-title">Brand & <em>Ecosystem</em><br>Reminders</div>
+      <div class="pc-purpose">Subtle, on-brand touchpoints for loyalty, the webstore, and Hash Notes. Never loud. Never salesy. Woven into the feed naturally — not bolted on as ads.</div>
+      <div class="pc-formats">
+        <div class="pc-format"><span class="pc-format-dot"></span>Hash Notes Loyalty Nudge<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Webstore / Merch Drop<span class="pc-format-who">Studio Linear</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Product Launch Announcement<span class="pc-format-who">Both</span></div>
+        <div class="pc-format"><span class="pc-format-dot"></span>Event Sign-up / Sesh Invite<span class="pc-format-who">Studio Linear</span></div>
+      </div>
+      <div class="pc-tone"><div class="pc-tone-label">Tone</div><div class="pc-tone-text">Confident, not pushy. The brand is the draw. Let it speak quietly.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT TYPES GRID -->
+<section class="section fade-in">
+  <div class="sec-label">Content Types</div>
+  <h2 class="sec-title">Everything We <em>Post</em></h2>
+  <p class="sec-lead">The full library of specific content formats — pulled from the five pillars and mapped to the production team. This is what ends up on the grid.</p>
+  <div class="content-grid">
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 01</div>
+      <div class="ct-icon">🎥</div>
+      <div class="ct-name">Hash Maker Interview</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Long and short-form conversations with makers. Who they are, how they came up, what quality means to them. Unpolished, honest, real.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 01</div>
+      <div class="ct-icon">🧑‍🏭</div>
+      <div class="ct-name">Brand Founder Story</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">HC origin story told authentically. Why it was built, the mission, the culture it came from. One-time flagship piece — but evergreen.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 02</div>
+      <div class="ct-icon">🏭</div>
+      <div class="ct-name">Manufacturing Post</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span></div>
+      <div class="ct-desc">Raw documentation of the production process. Ambient clips, process sequences, ritual and repetition. No talking required.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 02</div>
+      <div class="ct-icon">📦</div>
+      <div class="ct-name">Packaging Appreciation</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Celebrate the design details — label breakdowns, tier hierarchy, terpene callouts. The product before it's opened.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 02</div>
+      <div class="ct-icon">📸</div>
+      <div class="ct-name">Macro Product Shot</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span></div>
+      <div class="ct-desc">Close-up photography of trichomes, melt, texture, color. The visual language of concentrate culture. No caption needed.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 03</div>
+      <div class="ct-icon">📚</div>
+      <div class="ct-name">How to Hash Series</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span> <span class="wt vid">Videographer</span></div>
+      <div class="ct-desc">Hash vs rosin, how to dab, tools explained, temperature, common mistakes. No shame, no ego. Short, saveable, calm delivery.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 04</div>
+      <div class="ct-icon">😂</div>
+      <div class="ct-name">Hash Memes</div>
+      <div class="ct-who"><span class="wt hc">HC Team</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Culture-native humor. Shareable, inside-culture content that rewards the heads who get it without alienating new fans.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 04</div>
+      <div class="ct-icon">🎉</div>
+      <div class="ct-name">Sesh Recap Content</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Event photo dumps, testimonials, behind-the-scenes from quarterly sesh events. One event fuels 30+ days of content.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 04</div>
+      <div class="ct-icon">🔬</div>
+      <div class="ct-name">Glass / Tool Maker Feature</div>
+      <div class="ct-who"><span class="wt vid">Videographer</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Spotlight glass artists, tool makers, storage innovators. Builds credibility through cross-pollination. Hash culture as an ecosystem.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 04</div>
+      <div class="ct-icon">🎨</div>
+      <div class="ct-name">Abstract / Experimental</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Psychedelic-adjacent visuals, digital art, altered-state creativity. Keeps the feed visually unexpected and the cultural lens wide.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 05</div>
+      <div class="ct-icon">🏅</div>
+      <div class="ct-name">Loyalty / Hash Notes Nudge</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Point updates, tier progress, redemption nudges. Keeps the loyalty loop active between purchases — subtle, never salesy.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 05</div>
+      <div class="ct-icon">🛒</div>
+      <div class="ct-name">Webstore / Merch Drop</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">New merch drops, dab essentials, starter kits. On-brand and quiet. The store is an extension of the culture — not an ad break.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 05</div>
+      <div class="ct-icon">🏅</div>
+      <div class="ct-name">Loyalty / Hash Notes Nudge</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Point updates, tier progress, redemption reminders. Keeps the loyalty loop active between purchases. Subtle and on-brand — never feels like a notification.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 05</div>
+      <div class="ct-icon">🛒</div>
+      <div class="ct-name">Merch Drop</div>
+      <div class="ct-who"><span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">New merch and dab essentials announced through the feed. Drop model — limited runs tied to strain releases and seasonal moments. Hash Club members get early access.</div>
+    </div>
+
+    <div class="content-type new">
+      <div class="new-badge">Pillar 04</div>
+      <div class="ct-icon">🤝</div>
+      <div class="ct-name">Collab Post</div>
+      <div class="ct-who"><span class="wt hc">HC Team</span> <span class="wt sl">Studio Linear</span></div>
+      <div class="ct-desc">Brand and culture collaborations — glass artists, tool makers, other cannabis brands aligned with HC's ethos. Builds credibility and cross-audience reach without compromising the feed.</div>
+    </div>
+
+  </div>
+</section>
+<section class="section fade-in">
+  <div class="sec-label">Content Formats</div>
+  <h2 class="sec-title">The Full <em>Format Library</em></h2>
+  <p class="sec-lead">Every format mapped to a pillar, a production owner, and a platform placement. This is what the team pulls from when building the monthly content calendar.</p>
+  <div class="formats-table">
+    <div class="ft-header">
+      <div class="ft-cell">Format</div>
+      <div class="ft-cell">Type</div>
+      <div class="ft-cell">Pillar</div>
+      <div class="ft-cell">Placement</div>
+      <div class="ft-cell">Production Lead</div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Hash Maker Interview</span></div>
+      <div class="ft-cell"><span class="ft-badge video">Video</span></div>
+      <div class="ft-cell">People & Voices</div>
+      <div class="ft-cell">Reel + Grid</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Brand Founder Story</span></div>
+      <div class="ft-cell"><span class="ft-badge video">Video</span></div>
+      <div class="ft-cell">People & Voices</div>
+      <div class="ft-cell">Reel + Story</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Manufacturing Process Clip</span></div>
+      <div class="ft-cell"><span class="ft-badge video">Video</span></div>
+      <div class="ft-cell">Behind the Process</div>
+      <div class="ft-cell">Reel + Grid</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Macro Product Shot</span></div>
+      <div class="ft-cell"><span class="ft-badge photo">Photo</span></div>
+      <div class="ft-cell">Behind the Process</div>
+      <div class="ft-cell">Grid + Story</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Packaging Appreciation</span></div>
+      <div class="ft-cell"><span class="ft-badge photo">Photo</span></div>
+      <div class="ft-cell">Behind the Process</div>
+      <div class="ft-cell">Grid + Carousel</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">How to Hash Explainer</span></div>
+      <div class="ft-cell"><span class="ft-badge video">Video</span></div>
+      <div class="ft-cell">Education</div>
+      <div class="ft-cell">Reel + Save</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt sl">Studio Linear</span><span class="wt vid">Videographer</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Tools / Temp Guide Carousel</span></div>
+      <div class="ft-cell"><span class="ft-badge carousel">Carousel</span></div>
+      <div class="ft-cell">Education</div>
+      <div class="ft-cell">Grid + Save</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Hash Meme</span></div>
+      <div class="ft-cell"><span class="ft-badge graphic">Graphic</span></div>
+      <div class="ft-cell">Culture</div>
+      <div class="ft-cell">Grid + Story + Share</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt hc">HC Team</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Sesh Recap Content</span></div>
+      <div class="ft-cell"><span class="ft-badge video">Video</span></div>
+      <div class="ft-cell">Culture</div>
+      <div class="ft-cell">Reel + Grid + Story</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Glass / Tool Maker Feature</span></div>
+      <div class="ft-cell"><span class="ft-badge photo">Photo</span></div>
+      <div class="ft-cell">Culture</div>
+      <div class="ft-cell">Grid + Carousel</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt vid">Videographer</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Loyalty / Hash Notes Nudge</span></div>
+      <div class="ft-cell"><span class="ft-badge graphic">Graphic</span></div>
+      <div class="ft-cell">Brand & Ecosystem</div>
+      <div class="ft-cell">Story + Grid</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Merch Drop</span></div>
+      <div class="ft-cell"><span class="ft-badge photo">Photo</span></div>
+      <div class="ft-cell">Brand & Ecosystem</div>
+      <div class="ft-cell">Grid + Story + CTA</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+    <div class="ft-row">
+      <div class="ft-cell"><span class="ft-name">Collab Post</span></div>
+      <div class="ft-cell"><span class="ft-badge photo">Photo</span></div>
+      <div class="ft-cell">Culture</div>
+      <div class="ft-cell">Grid + Story + Tag</div>
+      <div class="ft-cell"><div class="who-tag"><span class="wt hc">HC Team</span><span class="wt sl">Studio Linear</span></div></div>
+    </div>
+  </div>
+  <div class="note-box" style="margin-top:16px;"><strong>Hash Club CTA on every row:</strong> Every format listed above ends with a "Join the Hash Club → link in bio" call to action. The wording shifts slightly per post type but the destination is always the same — Hash Notes sign-up.</div>
+</section>
+
+<!-- CONTENT FORMATS TABLE -->
+
+<!-- GRID MIX -->
+<section class="section fade-in">
+  <div class="sec-label">Grid Rhythm</div>
+  <h2 class="sec-title">Visual <em>Mix</em></h2>
+  <p class="sec-lead">At any given time scrolling the HC grid, this is roughly what someone should see. Not a formula — a feeling. Curated, not commercial.</p>
+  <div class="mix-row">
+    <div class="mix-item p1"><div class="mix-pct">30%</div><div class="mix-label">Process / Macro / Texture</div></div>
+    <div class="mix-item p2"><div class="mix-pct">25%</div><div class="mix-label">People — Portraits & Interviews</div></div>
+    <div class="mix-item p3"><div class="mix-pct">20%</div><div class="mix-label">Education — How to Hash</div></div>
+    <div class="mix-item p4"><div class="mix-pct">15%</div><div class="mix-label">Culture / Glass / Community</div></div>
+    <div class="mix-item p5"><div class="mix-pct">10%</div><div class="mix-label">Brand & Ecosystem Reminders</div></div>
+  </div>
+  <div class="note-box" style="margin-top:16px;"><strong>Rule of thumb:</strong> No two consecutive posts should be from the same pillar. No more than one brand/ecosystem reminder post per 5 posts. If it feels like an ad feed, something's wrong.</div>
+</section>
+
+<!-- POSTING CADENCE -->
+<section class="section fade-in">
+  <div class="sec-label">Posting Cadence</div>
+  <h2 class="sec-title">1–2× Per Week. <em>On Purpose.</em></h2>
+  <p class="sec-lead">Posting less but better. Every post should be something worth stopping for. These sample weeks show how the pillars rotate across a two-week cycle.</p>
+  <div class="cadence-wrap">
+    <div>
+      <div class="cadence-week">
+        <div class="cw-title">Week A — Culture & Process</div>
+        <div class="cw-days">
+          <div class="cw-day">
+            <div class="cw-dayname">Mon</div>
+            <div class="cw-content"><div class="cw-dot gold"></div><div class="cw-post"><div class="cw-post-type">Macro Product Shot</div><div class="cw-post-desc">Trichome close-up — new batch. No caption needed beyond the visual.</div></div></div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Tue</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Wed</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Thu</div>
+            <div class="cw-content"><div class="cw-dot rust"></div><div class="cw-post"><div class="cw-post-type">Hash Maker Interview Reel</div><div class="cw-post-desc">60–90 sec cut. One maker, one question: "What does quality mean to you?"</div></div></div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Fri</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Sat</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Sun</div>
+            <div class="cw-empty">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cadence-week">
+        <div class="cw-title">Week B — Education & Culture</div>
+        <div class="cw-days">
+          <div class="cw-day">
+            <div class="cw-dayname">Mon</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Tue</div>
+            <div class="cw-content"><div class="cw-dot sage"></div><div class="cw-post"><div class="cw-post-type">How to Hash Carousel</div><div class="cw-post-desc">Hash vs. Rosin — 5 slides, plain language, saveable format.</div></div></div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Wed</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Thu</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Fri</div>
+            <div class="cw-content"><div class="cw-dot muted"></div><div class="cw-post"><div class="cw-post-type">Hash Meme or Culture Post</div><div class="cw-post-desc">Friday energy. Culture-native humor or a glass artist spotlight.</div></div></div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Sat</div>
+            <div class="cw-empty">—</div>
+          </div>
+          <div class="cw-day">
+            <div class="cw-dayname">Sun</div>
+            <div class="cw-empty">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"><span>Post Type Legend</span></div>
+
+  <div class="cadence-legend">
+    <div class="cl-title">Color Key</div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--gold)"></div><div class="cl-info"><div class="cl-name">Process / Product</div><div class="cl-desc">Macro photography, manufacturing clips, product shots. Primarily handled by local videographer.</div></div></div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--rust)"></div><div class="cl-info"><div class="cl-name">People & Voices</div><div class="cl-desc">Interviews, founder story, maker features. Joint production — videographer captures, Studio Linear edits.</div></div></div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--sage)"></div><div class="cl-info"><div class="cl-name">Education</div><div class="cl-desc">How to Hash series, carousels, explainers. Primarily designed by Studio Linear.</div></div></div>
+    <div class="cl-item"><div class="cl-dot" style="background:var(--muted)"></div><div class="cl-info"><div class="cl-name">Culture & Community</div><div class="cl-desc">Memes, recaps, glass features, abstract visuals. Mixed production — depends on format.</div></div></div>
+  </div>
+</section>
+
+<!-- PRODUCTION WORKFLOW -->
+<section class="section fade-in">
+  <div class="sec-label">Production Pipeline</div>
+  <h2 class="sec-title">How Content <em>Gets Made</em></h2>
+  <p class="sec-lead">From idea to published post — every piece of content moves through this workflow. Studio Linear leads, local videography executes in the field, HC approves.</p>
+  <div class="workflow">
+    <div class="wf-step">
+      <div class="wf-num">01</div>
+      <div class="wf-title">Brief</div>
+      <div class="wf-who">Studio Linear</div>
+      <div class="wf-desc">Monthly content brief outlining upcoming posts, pillar assignments, shot lists, and creative direction. Shared with HC and videography 2–3 weeks ahead.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">02</div>
+      <div class="wf-title">Shoot</div>
+      <div class="wf-who">Videographer + HC</div>
+      <div class="wf-desc">On-location production — facility visits, maker interviews, event coverage, product macro sessions. Raw footage and photos delivered within 48 hrs.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">03</div>
+      <div class="wf-title">Edit</div>
+      <div class="wf-who">Studio Linear</div>
+      <div class="wf-desc">Video editing, graphic design, caption writing, and hashtag strategy. Captions written in HC voice. All content formatted for grid, Reel, and Story placement.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">04</div>
+      <div class="wf-title">Review</div>
+      <div class="wf-who">HC Team</div>
+      <div class="wf-desc">Final review and approval before anything goes live. HC signs off on every post. Turnaround target: 24–48 hrs from submission.</div>
+    </div>
+    <div class="wf-step">
+      <div class="wf-num">05</div>
+      <div class="wf-title">Publish</div>
+      <div class="wf-who">Studio Linear</div>
+      <div class="wf-desc">Scheduled and published at optimal times. Stories and supplemental content deployed. Performance tracked from day one.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TONE & VOICE -->
+<section class="section fade-in">
+  <div class="sec-label">Voice & Tone</div>
+  <h2 class="sec-title">How HC <em>Sounds</em></h2>
+  <p class="sec-lead">The voice is connoisseur authority without clinical distance. Sensory, precise, confident. Still human. Still Missouri.</p>
+  <div class="tone-grid" style="margin-bottom: 32px;">
+    <div class="tone-col do">
+      <div class="tone-col-title">We do this</div>
+      <div class="tone-item">Use sensory, texture-forward language — "terpy," "melt," "clean finish"</div>
+      <div class="tone-item">Let the product and the people speak — minimal copy on strong visuals</div>
+      <div class="tone-item">Write captions that feel like one head talking to another</div>
+      <div class="tone-item">Acknowledge the craft, the process, the obsession behind the product</div>
+      <div class="tone-item">Use silence and space — white space in design, pauses in video</div>
+      <div class="tone-item">Lean into Missouri pride without making it a gimmick</div>
+      <div class="tone-item">End every single post with "Join the Hash Club → link in bio"</div>
+    </div>
+    <div class="tone-col dont">
+      <div class="tone-col-title">We don't do this</div>
+      <div class="tone-item">Use hype words — "fire," "🔥🔥🔥," "game changer," "slaps"</div>
+      <div class="tone-item">Post daily for the sake of the algorithm</div>
+      <div class="tone-item">Sound like a dispensary ad or a brand account on autopilot</div>
+      <div class="tone-item">Explain things in a condescending way to new users</div>
+      <div class="tone-item">Chase audio trends or meme formats that don't fit the aesthetic</div>
+      <div class="tone-item">Mix in unrelated culture content just to seem relatable</div>
+    </div>
+  </div>
+
+  <div class="divider"><span>Caption Examples</span></div>
+
+  <div class="caption-grid" style="grid-template-columns: repeat(3,1fr);">
+    <div class="caption-card">
+      <div class="cc-type">Process Post</div>
+      <div class="cc-pillar">Pillar 02 · Behind the Process</div>
+      <div class="cc-text">"Wash. Dry. Press. Store. There's nothing fast about doing this right."</div>
+      <div class="cc-tags">#headchange #hashmaking #rosin #710 #concentrateculture</div>
+      <div class="cc-cta">Join the Hash Club → link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="cc-type">Education Post</div>
+      <div class="cc-pillar">Pillar 03 · How to Hash</div>
+      <div class="cc-text">"Live rosin ≠ live resin. We know. Save this so you never mix them up again."</div>
+      <div class="cc-tags">#howto hash #concentrates101 #headchange710 #dablife #education</div>
+      <div class="cc-cta">Join the Hash Club and start logging what you're learning. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="cc-type">Interview Post</div>
+      <div class="cc-pillar">Pillar 01 · People & Voices</div>
+      <div class="cc-text">"He's been washing for 12 years. He still double-checks the water temp every time. That's what this is."</div>
+      <div class="cc-tags">#hashmaker #craftcannabis #headchange #710culture #missouri</div>
+      <div class="cc-cta">This is the culture. Join the Hash Club. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="cc-type">Loyalty Reminder</div>
+      <div class="cc-pillar">Pillar 05 · Brand & Ecosystem</div>
+      <div class="cc-text">"Every scan, every session note, every photo — they all count. Your points don't expire. Your tier keeps climbing."</div>
+      <div class="cc-tags">#hashnotes #hashclub #headchange710 #loyalty #concentrateculture</div>
+      <div class="cc-cta">Not in the Hash Club yet? You're leaving points on the table. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="cc-type">Merch Drop</div>
+      <div class="cc-pillar">Pillar 05 · Brand & Ecosystem</div>
+      <div class="cc-text">"New drop. Limited run. HC heads only — you know what it is. Grab it before it's gone."</div>
+      <div class="cc-tags">#headchange #hcmerch #710 #concentrateculture #limiteddrop</div>
+      <div class="cc-cta">Hash Club members get first access. Join before the next drop. Link in bio.</div>
+    </div>
+    <div class="caption-card">
+      <div class="cc-type">Collab Post</div>
+      <div class="cc-pillar">Pillar 04 · Culture & Community</div>
+      <div class="cc-text">"Two brands, one obsession with craft. This collab made sense the moment we saw what they were building."</div>
+      <div class="cc-tags">#headchange #collab #710culture #craftcannabis #missouri</div>
+      <div class="cc-cta">Two brands, one culture. Join the Hash Club and stay in the loop. Link in bio.</div>
+    </div>
+  </div>
+</section>
+
+<!-- MEASUREMENT -->
+<section class="section fade-in">
+  <div class="sec-label">Measurement</div>
+  <h2 class="sec-title">What We <em>Track</em></h2>
+  <p class="sec-lead">Brand awareness is the goal right now — so we track metrics that tell us if people are noticing, remembering, and coming back. Not vanity numbers.</p>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">👁</div>
+      <div class="kpi-name">Reach</div>
+      <div class="kpi-desc">Total unique accounts who see HC content each month. Primary awareness signal. Are we getting in front of new people?</div>
+      <div class="kpi-target">Watch for: <span>month-over-month growth</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🔖</div>
+      <div class="kpi-name">Saves</div>
+      <div class="kpi-desc">Saves signal that content is genuinely valuable — especially education posts and product shots. High saves = HC is a reference, not just a scroll.</div>
+      <div class="kpi-target">Best indicator of: <span>educational content quality</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📤</div>
+      <div class="kpi-name">Shares / Sends</div>
+      <div class="kpi-desc">When someone shares an HC post, that's endorsement — especially in the concentrate community. Memes and education posts drive this most.</div>
+      <div class="kpi-target">Best indicator of: <span>cultural resonance</span></div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">👤</div>
+      <div class="kpi-name">Profile Visits</div>
+      <div class="kpi-desc">Are people curious enough to click through after seeing a post? Profile visits tell us if content is making people want to know more about HC.</div>
+      <div class="kpi-target">Tracked alongside: <span>follower conversion rate</span></div>
+    </div>
+  </div>
+  <div class="note-box" style="margin-top:16px;"><strong>Monthly reporting:</strong> Studio Linear delivers a one-page performance snapshot at the start of each month covering the prior month's reach, saves, shares, follower growth, and top-performing content. HC uses this to inform which pillars to double down on and where to adjust.</div>
+</section>
+
+<footer>
+  <div class="footer-logo">HEAD CHANGE</div>
+  <div class="footer-meta">
+    Instagram Social Strategy · 2025<br>
+    In Partnership with Studio Linear<br>
+    Confidential · Internal Use Only
+  </div>
+</footer>
+
+<script>
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

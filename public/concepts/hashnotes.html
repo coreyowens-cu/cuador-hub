@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HashNotes — Head Change 710</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+
+/* ─── BRAND TOKENS (matched to headchange710.com) ──────────────── */
+:root {
+  /* Site uses pure/near-pure black */
+  --bg:          #000000;
+  --bg2:         #080808;
+  --surface:     #0e0e0e;
+  --surface2:    #141414;
+  --surface3:    #1c1c1c;
+  --border:      #1a1a1a;
+  --border2:     #242424;
+  --border3:     #303030;
+
+  /* White-metal gold from logo treatment */
+  --gold:        #c8a84b;
+  --gold-lt:     #dfc06e;
+  --gold-dim:    #6e5a20;
+  --gold-xdim:   #2e2510;
+  --gold-glow:   rgba(200,168,75,.10);
+  --gold-glow2:  rgba(200,168,75,.18);
+
+  /* Typography */
+  --white:       #f0ede8;
+  --text:        #888480;
+  --muted:       #404040;
+
+  /* Accent */
+  --green:       #4a9a68;
+
+  /* HC710 font stack */
+  --font-display: 'Bebas Neue', 'Arial Black', sans-serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+
+  --nav-h: 72px;
+  --max-w: 1280px;
+  --r:     10px;
+  --r-lg:  16px;
+  --ease:  cubic-bezier(.4,0,.2,1);
+}
+
+/* ─── RESET ─────────────────────────────────────────────────────── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+/* Grain — exactly as HC710 site */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.028'/%3E%3C/svg%3E");
+}
+
+/* ─── NAV ───────────────────────────────────────────────────────── */
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  background:rgba(0,0,0,.95);
+  backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{
+  max-width:var(--max-w);margin:0 auto;
+  padding:0 32px;height:var(--nav-h);
+  display:flex;align-items:center;justify-content:space-between;gap:24px;
+}
+.nav-brand{display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.nav-logo{height:22px;width:auto;filter:brightness(1)}
+.nav-sub{
+  font-family:var(--font-mono);font-size:7px;
+  letter-spacing:3.5px;text-transform:uppercase;color:var(--gold);
+}
+.nav-links{
+  display:flex;align-items:center;gap:2px;flex:1;justify-content:center;
+}
+.nav-link{
+  padding:8px 16px;background:none;border:none;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--muted);
+  transition:color .2s;white-space:nowrap;cursor:pointer;
+}
+.nav-link:hover{color:var(--text)}
+.nav-link.active{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.pts-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 14px;border-radius:100px;
+  background:var(--gold-glow);border:1px solid var(--gold-dim);
+  cursor:pointer;transition:background .2s;
+}
+.pts-pill:hover{background:var(--gold-glow2)}
+.pts-num{font-family:var(--font-display);font-size:17px;color:var(--gold);letter-spacing:1px}
+.pts-lbl{font-family:var(--font-mono);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-dim)}
+.nav-av{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,#2e2610,#111);
+  border:1.5px solid var(--gold-dim);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:14px;color:var(--gold);
+  cursor:pointer;
+}
+/* The signature drip — pulled from HC710 exactly */
+.nav-drip{
+  width:100%;overflow:hidden;line-height:0;
+  pointer-events:none;
+}
+.nav-drip img{width:100%;display:block;height:20px;object-fit:cover;object-position:top;opacity:.7}
+
+/* Hamburger */
+.hamburger{
+  display:none;flex-direction:column;gap:5px;
+  background:none;border:none;padding:4px;
+}
+.hamburger span{
+  display:block;width:22px;height:1.5px;background:var(--text);
+  transition:all .25s;
+}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+.mob-menu{
+  display:none;position:fixed;
+  top:var(--nav-h);left:0;right:0;z-index:499;
+  background:rgba(0,0,0,.98);border-bottom:1px solid var(--border);
+  padding:20px 32px 28px;flex-direction:column;gap:2px;
+  animation:mobIn .22s ease;
+}
+.mob-menu.open{display:flex}
+@keyframes mobIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.mob-link{
+  padding:13px 0;background:none;border:none;border-bottom:1px solid var(--border);
+  font-family:var(--font-mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-align:left;transition:color .2s;cursor:pointer;
+}
+.mob-link:last-child{border-bottom:none}
+.mob-link:hover{color:var(--text)}
+.mob-link.active{color:var(--gold)}
+
+/* ─── PAGE SYSTEM ───────────────────────────────────────────────── */
+.page{display:none;min-height:100vh;animation:pgIn .28s ease}
+.page.active{display:block}
+@keyframes pgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.wrap{max-width:var(--max-w);margin:0 auto;padding:0 32px}
+.wrap-sm{max-width:720px;margin:0 auto;padding:0 32px}
+.wrap-md{max-width:960px;margin:0 auto;padding:0 32px}
+
+/* ─── TYPE SYSTEM ───────────────────────────────────────────────── */
+.eyebrow{
+  font-family:var(--font-mono);font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);
+}
+.display{
+  font-family:var(--font-display);color:var(--white);
+  line-height:.95;letter-spacing:1.5px;
+}
+.body-copy{font-size:15px;line-height:1.75;color:var(--text)}
+
+/* ─── SHARED COMPONENTS ─────────────────────────────────────────── */
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:4px 10px;border-radius:4px;border:1px solid;
+  font-family:var(--font-mono);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;
+}
+.tag-rosin{color:var(--gold);border-color:rgba(200,168,75,.3);background:rgba(200,168,75,.06)}
+.tag-resin{color:#72b860;border-color:rgba(114,184,96,.3);background:rgba(114,184,96,.06)}
+.tag-badder{color:#9e78d0;border-color:rgba(158,120,208,.3);background:rgba(158,120,208,.06)}
+.tag-gold{color:var(--gold);border-color:var(--gold-dim);background:var(--gold-glow)}
+.tag-green{color:var(--green);border-color:rgba(74,154,104,.3);background:rgba(74,154,104,.08)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 32px;border:none;border-radius:6px;
+  font-family:var(--font-display);font-size:17px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{background:var(--gold-lt);transform:translateY(-1px);box-shadow:0 10px 32px var(--gold-glow2)}
+.btn-outline{background:transparent;border:1px solid var(--border3);color:var(--text);font-size:12px;letter-spacing:2px}
+.btn-outline:hover{border-color:var(--gold-dim);color:var(--gold)}
+.btn-sm{padding:10px 22px;font-size:14px;letter-spacing:1.5px}
+.btn-full{width:100%;justify-content:center}
+.btn-ghost{
+  background:var(--surface);border:1px solid var(--border2);color:var(--text);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:2px;
+}
+.btn-ghost:hover{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-glow)}
+
+.rule{height:1px;background:var(--border);margin:48px 0}
+
+/* ─── HOME PAGE ─────────────────────────────────────────────────── */
+#page-home{padding-top:0}
+
+/* Full-bleed hero — exact HC710 pattern */
+.hero{
+  position:relative;
+  min-height:100svh;
+  display:flex;align-items:center;
+  overflow:hidden;
+}
+.hero-photo{
+  position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1603910522284-04a4d9af1c0e?w=1600&q=60') center/cover no-repeat;
+  opacity:.12;
+}
+.hero-vignette{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(to right, rgba(0,0,0,.96) 0%, rgba(0,0,0,.7) 50%, rgba(0,0,0,.5) 100%),
+    linear-gradient(to top, rgba(0,0,0,.8) 0%, transparent 50%);
+}
+.hero-body{
+  position:relative;z-index:1;
+  max-width:var(--max-w);margin:0 auto;
+  padding:140px 32px 100px;
+  display:grid;grid-template-columns:1fr 480px;gap:80px;align-items:center;
+}
+.hero-left{}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:12px;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);margin-bottom:20px;
+}
+.hero-eyebrow::before{content:'';width:40px;height:1px;background:var(--gold)}
+.hero-h{
+  font-family:var(--font-display);
+  font-size:clamp(64px,9vw,110px);
+  color:var(--white);line-height:.92;
+  letter-spacing:2px;margin-bottom:24px;
+}
+.hero-h em{color:var(--gold);font-style:normal}
+.hero-p{
+  font-size:16px;line-height:1.75;color:var(--text);
+  max-width:460px;margin-bottom:36px;
+}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:60px}
+.hero-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+  border-radius:var(--r);overflow:hidden;
+  max-width:420px;
+}
+.hs-cell{background:var(--surface);padding:18px 14px;text-align:center}
+.hs-v{font-family:var(--font-display);font-size:28px;color:var(--gold);display:block;letter-spacing:1px}
+.hs-l{font-family:var(--font-mono);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:3px;display:block}
+
+/* Hero right card */
+.hero-card{
+  background:rgba(14,14,14,.9);
+  border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:28px;
+  backdrop-filter:blur(10px);
+  position:relative;
+}
+.hero-card::before{
+  content:'';position:absolute;inset:-1px;border-radius:var(--r-lg);
+  background:linear-gradient(135deg,rgba(200,168,75,.15) 0%,transparent 55%);
+  pointer-events:none;
+}
+.hc-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.hc-prod{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:var(--r);padding:18px;margin-bottom:12px;
+}
+.hc-prod-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.hc-prod-name{font-family:var(--font-display);font-size:26px;color:var(--white);letter-spacing:.5px}
+.hc-prod-score{font-family:var(--font-mono);font-size:10px;color:var(--gold)}
+.hc-prod-batch{font-family:var(--font-mono);font-size:8.5px;color:var(--muted);margin-bottom:12px}
+.hc-terps{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.hc-terp{padding:3px 8px;background:var(--surface3);border-radius:3px;font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.hc-thc{display:flex;align-items:center;gap:10px}
+.hc-thc-lbl{font-family:var(--font-mono);font-size:9px;color:var(--muted);width:36px}
+.hc-thc-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.hc-thc-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px}
+.hc-thc-val{font-family:var(--font-mono);font-size:9px;color:var(--gold);width:28px;text-align:right}
+.hc-pts{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--gold-glow);border:1px solid var(--gold-dim);
+  border-radius:var(--r);
+}
+.hc-pts-left{display:flex;align-items:center;gap:10px}
+.hc-pts-n{font-family:var(--font-display);font-size:30px;color:var(--gold);letter-spacing:1px}
+.hc-pts-info{font-family:var(--font-mono);font-size:8px;line-height:1.8}
+.hc-pts-info .t{color:var(--gold);letter-spacing:1px}
+.hc-pts-info .s{color:var(--gold-dim)}
+
+/* "Flavorful AF" section — copied HC710 tone */
+.brand-statement{
+  padding:120px 0;border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.bs-inner{
+  max-width:var(--max-w);margin:0 auto;padding:0 32px;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
+}
+.bs-photo{
+  border-radius:var(--r-lg);overflow:hidden;
+  border:1px solid var(--border2);
+}
+.bs-photo img{
+  width:100%;height:480px;object-fit:cover;
+  object-position:center 20%;opacity:.75;
+  transition:opacity .4s;
+}
+.bs-photo:hover img{opacity:.9}
+.bs-text{}
+.bs-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.bs-h{font-family:var(--font-display);font-size:clamp(40px,5vw,68px);color:var(--white);line-height:.95;letter-spacing:1.5px;margin-bottom:20px}
+.bs-p{font-size:15px;line-height:1.8;color:var(--text);margin-bottom:32px}
+.bs-quote{
+  padding:20px 24px;
+  border-left:3px solid var(--gold);
+  background:var(--surface);
+  border-radius:0 var(--r) var(--r) 0;
+  font-family:var(--font-mono);font-size:11px;color:var(--text);
+  line-height:1.8;font-style:italic;margin-bottom:32px;
+}
+
+/* How it works */
+.how{padding:100px 0;background:var(--bg)}
+.how-inner{max-width:var(--max-w);margin:0 auto;padding:0 32px}
+.how-head{margin-bottom:56px}
+.how-steps{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  position:relative;
+}
+.how-steps::before{
+  content:'';
+  position:absolute;top:28px;left:calc(12.5% + 14px);right:calc(12.5% + 14px);
+  height:1px;background:linear-gradient(90deg,var(--gold-dim),var(--gold-dim));
+  pointer-events:none;
+}
+.how-step{
+  padding:0 16px;
+  position:relative;
+  text-align:center;
+}
+.how-num-wrap{
+  width:56px;height:56px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;position:relative;z-index:1;
+  transition:all .2s;
+}
+.how-step:hover .how-num-wrap{border-color:var(--gold-dim);background:var(--gold-glow)}
+.how-num{font-family:var(--font-display);font-size:22px;color:var(--gold);letter-spacing:1px}
+.how-icon{font-size:26px;margin-bottom:12px}
+.how-title{font-family:var(--font-display);font-size:22px;color:var(--white);letter-spacing:1px;margin-bottom:8px}
+.how-desc{font-size:13px;line-height:1.65;color:var(--text)}
+
+/* Tiers */
+.tiers{padding:80px 0;background:var(--surface)}
+.tiers-inner{max-width:var(--max-w);margin:0 auto;padding:0 32px}
+.tier-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:12px;margin-top:48px;
+}
+.tier-card{
+  background:var(--bg);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:28px 20px;
+  text-align:center;transition:all .22s;
+}
+.tier-card:hover{border-color:var(--gold-dim);transform:translateY(-4px);box-shadow:0 24px 48px rgba(0,0,0,.5)}
+.tier-card.current{
+  background:linear-gradient(135deg,#100d02,#1a1500,#0d0a01);
+  border-color:var(--gold-dim);
+}
+.t-icon{font-size:34px;display:block;margin-bottom:14px}
+.t-name{font-family:var(--font-display);font-size:24px;color:var(--white);letter-spacing:1.5px;margin-bottom:4px}
+.t-pts{font-family:var(--font-mono);font-size:8.5px;color:var(--gold);letter-spacing:1px;margin-bottom:16px}
+.t-perks{font-size:12px;line-height:1.75;color:var(--text)}
+.t-credit{font-family:var(--font-display);font-size:30px;color:var(--gold);margin-top:16px;letter-spacing:1px}
+
+/* CTA — second photo section (matches HC710 two-image layout) */
+.cta-band{
+  position:relative;overflow:hidden;
+  padding:100px 0;
+  border-top:1px solid var(--border);
+}
+.cta-band-photo{
+  position:absolute;inset:0;
+  background:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=60') center/cover no-repeat;
+  opacity:.08;
+}
+.cta-band-vignette{
+  position:absolute;inset:0;
+  background:linear-gradient(to bottom,var(--bg) 0%,transparent 20%,transparent 80%,var(--bg) 100%);
+}
+.cta-band-body{
+  position:relative;z-index:1;
+  max-width:var(--max-w);margin:0 auto;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;gap:60px;
+}
+.ctab-left{max-width:540px}
+.ctab-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.ctab-h{font-family:var(--font-display);font-size:clamp(40px,5vw,64px);color:var(--white);line-height:.95;letter-spacing:1.5px;margin-bottom:16px}
+.ctab-p{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:28px}
+.ctab-form{display:flex;gap:10px}
+.ctab-input{
+  flex:1;padding:14px 18px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border3);
+  border-radius:6px;color:var(--white);
+  font-family:var(--font-body);font-size:14px;
+  outline:none;transition:border-color .2s;min-width:0;
+}
+.ctab-input::placeholder{color:var(--muted)}
+.ctab-input:focus{border-color:var(--gold-dim);background:rgba(200,168,75,.04)}
+.ctab-right{
+  font-family:var(--font-display);font-size:96px;
+  color:var(--gold-xdim);line-height:1;letter-spacing:3px;
+  user-select:none;flex-shrink:0;
+}
+
+/* Footer — matches HC710 */
+.footer{
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  padding:60px 0 0;
+}
+.footer-inner{
+  max-width:var(--max-w);margin:0 auto;padding:0 32px;
+  display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:48px;
+  padding-bottom:48px;
+}
+.footer-brand .footer-logo{height:18px;opacity:.45;margin-bottom:16px}
+.footer-brand p{font-family:var(--font-mono);font-size:9px;color:var(--muted);line-height:1.8;letter-spacing:.5px}
+.footer-col-h{font-family:var(--font-mono);font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.footer-link{
+  display:block;font-size:13px;color:var(--muted);margin-bottom:10px;
+  background:none;border:none;text-align:left;cursor:pointer;transition:color .2s;
+}
+.footer-link:hover{color:var(--text)}
+.footer-bottom{
+  border-top:1px solid var(--border);
+  max-width:var(--max-w);margin:0 auto;
+  padding:20px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-copy{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:.5px}
+.live-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--gold);
+  box-shadow:0 0 8px var(--gold);animation:pulse 2.5s infinite;display:inline-block;margin-right:6px;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ─── SCAN PAGE ─────────────────────────────────────────────────── */
+.inner-page{padding:calc(var(--nav-h) + 64px) 0 80px}
+.pg-header{margin-bottom:56px}
+.pg-eyebrow{font-family:var(--font-mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.pg-title{font-family:var(--font-display);font-size:clamp(44px,7vw,80px);color:var(--white);line-height:.95;letter-spacing:2px;margin-bottom:16px}
+.pg-sub{font-size:15px;color:var(--text);line-height:1.7;max-width:540px}
+
+.scan-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+
+.scan-panel{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:44px;
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+}
+.qr-frame{
+  width:200px;height:200px;position:relative;cursor:pointer;margin-bottom:28px;
+}
+.qr-inner{
+  width:100%;height:100%;
+  background:var(--surface2);border:1px solid var(--border3);
+  border-radius:var(--r);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  position:relative;overflow:hidden;transition:all .25s;
+}
+.qr-inner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(circle,var(--gold-glow) 0%,transparent 70%);
+  opacity:0;transition:opacity .25s;
+}
+.qr-frame:hover .qr-inner{border-color:var(--gold-dim);box-shadow:0 0 48px var(--gold-glow)}
+.qr-frame:hover .qr-inner::before{opacity:1}
+.qr-emoji{font-size:52px;position:relative;z-index:1}
+.qr-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);position:relative;z-index:1}
+.qr-frame::before,.qr-frame::after,.qr-br::before,.qr-br::after{
+  content:'';position:absolute;width:15px;height:15px;
+  border-color:var(--gold);border-style:solid;z-index:2;
+}
+.qr-frame::before{top:-1px;left:-1px;border-width:2px 0 0 2px;border-radius:4px 0 0 0}
+.qr-frame::after{top:-1px;right:-1px;border-width:2px 2px 0 0;border-radius:0 4px 0 0}
+.qr-br::before{bottom:-1px;left:-1px;border-width:0 0 2px 2px;border-radius:0 0 0 4px}
+.qr-br::after{bottom:-1px;right:-1px;border-width:0 2px 2px 0;border-radius:0 0 4px 0}
+
+.scan-or{
+  display:flex;align-items:center;gap:14px;width:100%;margin-bottom:18px;
+}
+.scan-or::before,.scan-or::after{content:'';flex:1;height:1px;background:var(--border2)}
+.scan-or span{font-family:var(--font-mono);font-size:8.5px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+
+.batch-input{
+  width:100%;padding:13px 18px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:6px;color:var(--white);
+  font-family:var(--font-mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;
+  outline:none;transition:border-color .2s;
+}
+.batch-input::placeholder{color:var(--muted);letter-spacing:.5px;text-transform:none;font-size:12px}
+.batch-input:focus{border-color:var(--gold-dim)}
+
+.earn-panel{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:32px;
+  display:flex;flex-direction:column;gap:14px;
+}
+.ep-title{font-family:var(--font-display);font-size:24px;color:var(--white);letter-spacing:.5px;margin-bottom:4px}
+.ep-sub{font-size:13px;color:var(--text);line-height:1.65;margin-bottom:6px}
+.earn-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);
+}
+.ei-left{display:flex;align-items:center;gap:12px}
+.ei-icon{font-size:18px}
+.ei-name{font-size:13px;color:var(--white);font-weight:500;margin-bottom:2px}
+.ei-note{font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.ei-pts{font-family:var(--font-display);font-size:20px;color:var(--gold);letter-spacing:.5px}
+
+.recent-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:12px;margin-top:20px;
+}
+.rc-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:18px;cursor:pointer;transition:all .2s;
+}
+.rc-card:hover{border-color:var(--gold-dim);transform:translateY(-3px)}
+.rc-type{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:5px}
+.rc-name{font-family:var(--font-display);font-size:21px;color:var(--white);letter-spacing:.5px;margin-bottom:4px}
+.rc-batch{font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:10px}
+.rc-stars{font-size:11px;color:var(--gold)}
+
+/* ─── FRIDGE PAGE ───────────────────────────────────────────────── */
+.fridge-layout{display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+.fridge-sidebar{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:24px;
+  position:sticky;top:calc(var(--nav-h) + 24px);
+}
+.fs-head{font-family:var(--font-mono);font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.fg-section{margin-bottom:22px}
+.fg-label{font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.filter-btn{
+  display:block;width:100%;text-align:left;
+  padding:9px 12px;border-radius:6px;background:none;border:none;
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--muted);cursor:pointer;transition:all .2s;margin-bottom:1px;
+}
+.filter-btn:hover{color:var(--text);background:var(--surface2)}
+.filter-btn.on{color:var(--gold);background:var(--gold-glow)}
+.fridge-stats-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  padding:14px;background:var(--surface2);border-radius:var(--r);
+}
+.fsg-item{text-align:center}
+.fsg-v{font-family:var(--font-display);font-size:22px;color:var(--gold);display:block}
+.fsg-l{font-family:var(--font-mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+
+.prod-list{display:flex;flex-direction:column;gap:10px}
+.prod-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:22px;cursor:pointer;
+  transition:all .22s;position:relative;overflow:hidden;
+}
+.prod-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--gold);opacity:0;transition:opacity .2s;border-radius:0;
+}
+.prod-card:hover{border-color:var(--gold-dim);transform:translateX(4px);box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.prod-card:hover::before{opacity:1}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.pc-rating{display:flex;align-items:center;gap:5px}
+.pc-stars{font-size:11px;color:var(--gold)}
+.pc-score{font-family:var(--font-mono);font-size:9.5px;color:var(--muted)}
+.pc-name{font-family:var(--font-display);font-size:28px;color:var(--white);letter-spacing:.5px;margin-bottom:3px}
+.pc-batch{font-family:var(--font-mono);font-size:8.5px;color:var(--muted);margin-bottom:12px}
+.terp-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.terp{padding:3px 8px;background:var(--surface2);border-radius:3px;font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.pc-foot{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:12px;border-top:1px solid var(--border);
+}
+.pc-date{font-family:var(--font-mono);font-size:8.5px;color:var(--muted)}
+.pc-pts{font-family:var(--font-mono);font-size:8.5px;color:var(--gold)}
+
+/* ─── REWARDS PAGE ──────────────────────────────────────────────── */
+.rewards-grid{display:grid;grid-template-columns:1fr 340px;gap:28px;align-items:start}
+
+.wallet{
+  background:linear-gradient(135deg,#100d02 0%,#1c1600 50%,#0d0a01 100%);
+  border:1px solid var(--gold-dim);border-radius:var(--r-lg);
+  padding:32px;position:relative;overflow:hidden;margin-bottom:22px;
+}
+.wallet::after{
+  content:'';position:absolute;top:-70px;right:-70px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(200,168,75,.13) 0%,transparent 70%);
+  pointer-events:none;
+}
+.w-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px}
+.w-logo{height:16px;opacity:.5}
+.w-label{font-family:var(--font-mono);font-size:8px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.w-amount{font-family:var(--font-display);font-size:68px;color:var(--gold);line-height:1;letter-spacing:1px;margin-bottom:4px}
+.w-amount sup{font-size:30px}
+.w-cent{font-family:var(--font-display);font-size:38px;color:var(--gold-dim)}
+.w-sub{font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-bottom:18px}
+.w-pts-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.w-pts{font-family:var(--font-display);font-size:32px;color:var(--white);letter-spacing:1px}
+.w-pts-lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.w-conv{font-family:var(--font-mono);font-size:8px;color:var(--gold-dim);margin-left:auto}
+.tier-bar-top{display:flex;justify-content:space-between;margin-bottom:7px}
+.tbt-l{font-family:var(--font-mono);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.tbt-r{font-family:var(--font-mono);font-size:8px;color:var(--gold)}
+.tier-track{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.tier-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:28px}
+.act-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:20px;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.act-card:hover{border-color:var(--gold-dim);background:var(--gold-glow);transform:translateY(-2px)}
+.act-icon{font-size:24px;display:block;margin-bottom:8px}
+.act-label{font-family:var(--font-display);font-size:16px;color:var(--white);letter-spacing:1px;display:block;margin-bottom:2px}
+.act-sub{font-family:var(--font-mono);font-size:7.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+
+.sec-head{font-family:var(--font-mono);font-size:8.5px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:block}
+
+.codes-stack{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.code-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:18px;transition:border-color .2s;
+}
+.code-card:hover{border-color:var(--border3)}
+.cc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.cc-val{font-family:var(--font-display);font-size:24px;color:var(--green);letter-spacing:1px}
+.cc-exp{font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.cc-code{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 14px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:6px;cursor:pointer;transition:border-color .2s;
+  font-family:var(--font-mono);font-size:12px;color:var(--white);letter-spacing:2.5px;
+}
+.cc-code:hover{border-color:var(--gold-dim)}
+.cc-copy{font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--gold);flex-shrink:0}
+.code-card.used{opacity:.35;pointer-events:none}
+
+.hist-list{display:flex;flex-direction:column;gap:8px}
+.h-item{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 16px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r);
+}
+.h-ico{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.hi-e{background:rgba(200,168,75,.1)}
+.hi-r{background:rgba(74,154,104,.1)}
+.hi-b{background:rgba(158,120,208,.1)}
+.h-info{flex:1}
+.h-name{font-size:13px;color:var(--white);margin-bottom:2px;font-weight:500}
+.h-date{font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.h-pts{font-family:var(--font-display);font-size:18px;letter-spacing:.5px}
+.earn{color:var(--gold)}
+.spend{color:var(--green)}
+
+/* Rewards sidebar */
+.tier-list{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);overflow:hidden;
+}
+.tl-row{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  transition:background .2s;
+}
+.tl-row:last-child{border-bottom:none}
+.tl-row.on{background:var(--gold-glow)}
+.tl-icon{font-size:22px;flex-shrink:0}
+.tl-info{flex:1}
+.tl-name{font-family:var(--font-display);font-size:17px;color:var(--white);letter-spacing:.5px}
+.tl-row.on .tl-name{color:var(--gold)}
+.tl-pts{font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.tl-status{font-family:var(--font-mono);font-size:8px}
+.tl-you{color:var(--gold)}
+.tl-away{color:var(--muted)}
+
+/* ─── PRODUCT PAGE ──────────────────────────────────────────────── */
+.product-layout{display:grid;grid-template-columns:1fr 360px;gap:40px;align-items:start}
+.prod-img{
+  width:100%;height:280px;border-radius:var(--r-lg);
+  overflow:hidden;border:1px solid var(--border2);margin-bottom:28px;
+}
+.prod-img img{width:100%;height:100%;object-fit:cover;object-position:center 40%;opacity:.75}
+.prod-name{font-family:var(--font-display);font-size:clamp(48px,7vw,80px);color:var(--white);line-height:.95;letter-spacing:2px;margin:14px 0 8px}
+.prod-batch{font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:28px}
+
+.prod-data{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:28px;
+}
+.pd-cell{background:var(--surface2);padding:18px 14px;text-align:center}
+.pd-val{font-family:var(--font-display);font-size:28px;color:var(--gold);display:block;letter-spacing:.5px;margin-bottom:4px}
+.pd-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.terp-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.terp-chip{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;
+}
+.tc-name{font-family:var(--font-mono);font-size:10px;color:var(--text)}
+.tc-pct{font-family:var(--font-mono);font-size:9px;color:var(--gold)}
+
+.coa-row{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px;background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);cursor:pointer;transition:all .2s;margin-bottom:28px;
+}
+.coa-row:hover{border-color:var(--gold-dim);background:var(--gold-glow)}
+.coa-icon{font-size:20px}
+.coa-info{flex:1}
+.coa-title{font-size:13px;color:var(--white);font-weight:500;margin-bottom:2px}
+.coa-sub{font-family:var(--font-mono);font-size:8.5px;color:var(--muted)}
+.coa-arrow{color:var(--gold);font-size:16px}
+
+.claim-panel{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:28px;
+  position:sticky;top:calc(var(--nav-h) + 24px);
+}
+.cp-eyebrow{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.cp-h{font-family:var(--font-display);font-size:26px;color:var(--white);letter-spacing:.5px;line-height:1.05;margin-bottom:10px}
+.cp-p{font-size:13px;color:var(--text);line-height:1.65;margin-bottom:20px}
+.cp-pts{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;background:var(--gold-glow);border:1px solid var(--gold-dim);
+  border-radius:var(--r);margin-bottom:16px;
+}
+.cp-pts-n{font-family:var(--font-display);font-size:38px;color:var(--gold);letter-spacing:1px}
+.cp-pts-i span{display:block}
+.cp-pts-l{font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:1px}
+.cp-pts-v{font-family:var(--font-mono);font-size:8px;color:var(--gold-dim)}
+.cp-breakdown{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px;
+}
+.cpb-cell{background:var(--surface2);border-radius:6px;padding:10px;text-align:center}
+.cpb-v{font-family:var(--font-display);font-size:15px;color:var(--white);display:block;margin-bottom:2px}
+.cpb-l{font-family:var(--font-mono);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+
+/* ─── PROFILE PAGE ──────────────────────────────────────────────── */
+.profile-layout{display:grid;grid-template-columns:1fr 300px;gap:28px;align-items:start}
+.profile-hero-block{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);overflow:hidden;margin-bottom:20px;
+}
+.profile-banner{height:140px;position:relative;overflow:hidden}
+.profile-banner img{width:100%;height:100%;object-fit:cover;object-position:center 18%;opacity:.35}
+.pb-grad{position:absolute;inset:0;background:linear-gradient(to top,var(--surface) 0%,transparent 65%)}
+.profile-info{padding:0 28px 28px;display:flex;align-items:flex-end;gap:18px;margin-top:-26px;position:relative;z-index:1}
+.profile-av{
+  width:58px;height:58px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--gold-dim),#111);
+  border:2px solid var(--gold-dim);box-shadow:0 0 22px var(--gold-glow2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display);font-size:22px;color:var(--gold);
+}
+.profile-text .p-name{font-family:var(--font-display);font-size:30px;color:var(--white);letter-spacing:1px;margin-bottom:3px}
+.profile-text .p-handle{font-family:var(--font-mono);font-size:8.5px;color:var(--muted);letter-spacing:1px;margin-bottom:10px}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-cell{
+  background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);
+  padding:18px 14px;text-align:center;transition:all .2s;
+}
+.stat-cell:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
+.st-val{font-family:var(--font-display);font-size:32px;color:var(--gold);display:block;letter-spacing:1px;margin-bottom:3px}
+.st-lbl{font-family:var(--font-mono);font-size:7.5px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+
+.badges-block{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:24px;margin-bottom:20px;
+}
+.badge-row{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+.b-item{width:70px;text-align:center}
+.b-ico{
+  width:52px;height:52px;border-radius:12px;margin:0 auto 7px;
+  background:var(--surface2);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+  transition:all .2s;
+}
+.b-item.on .b-ico{background:var(--gold-glow);border-color:var(--gold-dim);box-shadow:0 4px 16px var(--gold-glow2)}
+.b-item.off .b-ico{filter:grayscale(1);opacity:.22}
+.b-name{font-family:var(--font-mono);font-size:7px;color:var(--muted);line-height:1.4}
+.b-item.on .b-name{color:var(--gold)}
+
+.flavor-block{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r-lg);padding:24px;
+}
+.fl-row{display:flex;align-items:center;gap:12px;margin-bottom:11px}
+.fl-lbl{font-family:var(--font-mono);font-size:9px;color:var(--text);width:76px;flex-shrink:0}
+.fl-track{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.fl-fill{height:100%;border-radius:2px}
+.fg{background:linear-gradient(90deg,#2a3a6a,#6070cc)}
+.fc{background:linear-gradient(90deg,var(--gold-dim),var(--gold))}
+.fe{background:linear-gradient(90deg,#5a3010,#b07838)}
+.fp{background:linear-gradient(90deg,#1e4a1e,#5a9a5a)}
+.ff{background:linear-gradient(90deg,#4a2060,#a060b0)}
+.fl-pct{font-family:var(--font-mono);font-size:9px;color:var(--muted);width:30px;text-align:right}
+
+.profile-sidebar{display:flex;flex-direction:column;gap:14px}
+.pside{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:20px}
+.pside-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.tier-feature{
+  display:flex;align-items:center;gap:12px;padding:14px;
+  background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:var(--r);margin-bottom:12px;
+}
+.tf-icon{font-size:26px}
+.tf-name{font-family:var(--font-display);font-size:21px;color:var(--gold);letter-spacing:1px}
+.tf-pts{font-family:var(--font-mono);font-size:8px;color:var(--gold-dim)}
+.tier-track2{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.tier-fill2{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px}
+
+/* ─── MODALS ────────────────────────────────────────────────────── */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:1000;
+  background:rgba(0,0,0,.88);backdrop-filter:blur(14px);
+  align-items:center;justify-content:center;padding:24px;
+}
+.overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border3);
+  border-radius:var(--r-lg);width:100%;max-width:460px;
+  max-height:90vh;overflow-y:auto;scrollbar-width:none;
+  padding:32px;position:relative;
+  animation:mIn .28s cubic-bezier(.32,.72,0,1);
+}
+.modal::-webkit-scrollbar{display:none}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.m-close{
+  position:absolute;top:18px;right:18px;
+  width:30px;height:30px;border-radius:50%;
+  background:var(--surface2);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:14px;cursor:pointer;transition:all .2s;
+}
+.m-close:hover{border-color:var(--gold-dim);color:var(--gold)}
+
+/* Scan success modal */
+.success-modal{text-align:center;padding:8px 0}
+.sm-burst{font-size:56px;margin-bottom:14px;animation:pop .5s cubic-bezier(.17,.67,.3,1.5)}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+.sm-title{font-family:var(--font-display);font-size:34px;color:var(--white);letter-spacing:2px;margin-bottom:8px}
+.sm-sub{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.sm-pts{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:16px;background:var(--gold-glow);border:1px solid var(--gold-dim);
+  border-radius:var(--r);margin-bottom:14px;
+}
+.sm-n{font-family:var(--font-display);font-size:44px;color:var(--gold);letter-spacing:1px}
+.sm-info span{display:block}
+.sm-lbl{font-family:var(--font-mono);font-size:9px;color:var(--gold);letter-spacing:1px}
+.sm-val{font-family:var(--font-mono);font-size:8px;color:var(--gold-dim)}
+.sm-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px}
+.sm-cell{background:var(--surface2);border-radius:6px;padding:10px;text-align:center}
+.sm-cv{font-family:var(--font-display);font-size:16px;color:var(--white);display:block;margin-bottom:2px}
+.sm-cl{font-family:var(--font-mono);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+
+/* Detail modal */
+.dm-eyebrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.dm-name{font-family:var(--font-display);font-size:36px;color:var(--white);letter-spacing:1px;line-height:1;margin-bottom:5px}
+.dm-date{font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-bottom:18px}
+.dm-img{width:100%;height:155px;border-radius:var(--r);overflow:hidden;margin-bottom:18px;border:1px solid var(--border)}
+.dm-img img{width:100%;height:100%;object-fit:cover;object-position:center 40%;opacity:.7}
+.dm-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:18px}
+.dmg-cell{background:var(--surface2);padding:14px;text-align:center}
+.dmg-v{font-family:var(--font-display);font-size:24px;color:var(--gold);display:block;margin-bottom:3px}
+.dmg-l{font-family:var(--font-mono);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.taste-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.t-cell{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:12px}
+.t-lbl{font-family:var(--font-mono);font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.t-val{font-size:12px;color:var(--white)}
+.score-bar{margin-bottom:10px}
+.sb-row{display:flex;justify-content:space-between;margin-bottom:5px}
+.sb-name{font-family:var(--font-mono);font-size:10px;color:var(--text)}
+.sb-num{font-family:var(--font-display);font-size:15px;color:var(--gold)}
+.sb-track{height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.sb-fill{height:100%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px}
+.notes-box{
+  background:var(--bg);border:1px solid var(--border);border-radius:6px;
+  padding:16px;font-family:var(--font-mono);font-size:11px;
+  color:var(--text);line-height:1.9;font-style:italic;
+}
+
+/* Redeem modal */
+.rdm-bal{
+  text-align:center;padding:18px;margin-bottom:22px;
+  background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:var(--r);
+}
+.rdm-lbl{font-family:var(--font-mono);font-size:8px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.rdm-pts{font-family:var(--font-display);font-size:42px;color:var(--gold);letter-spacing:1px}
+.rdm-conv{font-family:var(--font-mono);font-size:9px;color:var(--gold-dim);margin-top:3px}
+.rdm-amounts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.rdm-btn{
+  padding:16px 8px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--r);cursor:pointer;text-align:center;transition:all .2s;
+}
+.rdm-btn.sel{background:var(--gold-glow);border-color:var(--gold-dim)}
+.rdm-btn:hover{border-color:var(--gold-dim)}
+.rdm-dollar{font-family:var(--font-display);font-size:22px;color:var(--white);display:block;margin-bottom:3px}
+.rdm-btn.sel .rdm-dollar{color:var(--gold)}
+.rdm-ptsn{font-family:var(--font-mono);font-size:8px;color:var(--muted)}
+.rdm-note{
+  font-family:var(--font-mono);font-size:8.5px;color:var(--muted);line-height:1.75;
+  padding:12px 14px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:6px;margin-bottom:14px;
+}
+.btn-redeem{
+  display:block;width:100%;padding:15px;margin-bottom:10px;
+  background:var(--green);color:var(--white);border:none;border-radius:6px;
+  font-family:var(--font-display);font-size:16px;letter-spacing:2px;text-transform:uppercase;
+  cursor:pointer;transition:all .2s;
+}
+.btn-redeem:hover{background:#5cb878;transform:translateY(-1px)}
+
+/* ─── RESPONSIVE ────────────────────────────────────────────────── */
+@media(max-width:960px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .hero-body{grid-template-columns:1fr;gap:0;padding-top:110px}
+  .hero-card{display:none}
+  .bs-inner{grid-template-columns:1fr}
+  .bs-photo{order:-1;max-height:300px}
+  .bs-photo img{height:300px}
+  .how-steps{grid-template-columns:1fr 1fr;gap:24px}
+  .how-steps::before{display:none}
+  .tier-grid{grid-template-columns:1fr 1fr}
+  .ctab-right{display:none}
+  .ctab-form{flex-direction:column}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:32px}
+  .scan-grid{grid-template-columns:1fr}
+  .fridge-layout{grid-template-columns:1fr}
+  .fridge-sidebar{display:none}
+  .rewards-grid{grid-template-columns:1fr}
+  .tier-list{display:none}
+  .product-layout{grid-template-columns:1fr}
+  .claim-panel{position:static}
+  .profile-layout{grid-template-columns:1fr}
+  .profile-sidebar{display:none}
+}
+@media(max-width:600px){
+  .wrap,.wrap-sm,.wrap-md{padding:0 20px}
+  .nav-inner{padding:0 20px}
+  .hero-body{padding:100px 20px 60px}
+  .how-steps{grid-template-columns:1fr}
+  .tier-grid{grid-template-columns:1fr 1fr}
+  .stats-row{grid-template-columns:1fr 1fr 1fr}
+  .footer-inner{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;gap:8px;text-align:center}
+  .act-grid{grid-template-columns:1fr 1fr}
+}
+
+/* ─── MANUAL LOG FORM ───────────────────────────────────────────── */
+.form-row { margin-bottom:16px }
+.form-label {
+  display:block;font-family:var(--font-mono);font-size:8.5px;
+  letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:7px;
+}
+.form-input, .form-select, .form-textarea {
+  width:100%;padding:12px 16px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;color:var(--white);
+  font-family:var(--font-body);font-size:14px;
+  outline:none;transition:border-color .2s;
+}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--muted)}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--gold-dim);background:rgba(200,168,75,.03)}
+.form-select{appearance:none;cursor:pointer}
+.form-select option{background:var(--surface2);color:var(--white)}
+.form-textarea{resize:vertical;min-height:90px;line-height:1.6}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row-inline{display:flex;align-items:center;gap:10px}
+
+/* Terpene tag input */
+.terp-input-wrap{
+  display:flex;flex-wrap:wrap;gap:7px;align-items:center;
+  padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;min-height:46px;cursor:text;transition:border-color .2s;
+}
+.terp-input-wrap:focus-within{border-color:var(--gold-dim)}
+.terp-tag-item{
+  display:flex;align-items:center;gap:5px;
+  padding:3px 8px;background:var(--surface3);border:1px solid var(--border3);
+  border-radius:4px;font-family:var(--font-mono);font-size:8.5px;color:var(--text);
+}
+.terp-tag-remove{
+  background:none;border:none;color:var(--muted);font-size:12px;
+  cursor:pointer;line-height:1;padding:0 1px;transition:color .15s;
+}
+.terp-tag-remove:hover{color:var(--white)}
+.terp-bare-input{
+  background:none;border:none;outline:none;
+  font-family:var(--font-mono);font-size:12px;color:var(--white);
+  min-width:120px;flex:1;
+}
+.terp-bare-input::placeholder{color:var(--muted);font-size:11px}
+
+/* Star rating picker */
+.star-picker{display:flex;gap:6px}
+.star-btn{
+  font-size:22px;background:none;border:none;
+  cursor:pointer;opacity:.25;transition:all .15s;line-height:1;
+}
+.star-btn.on,.star-btn:hover{opacity:1}
+
+/* Photo upload area */
+.photo-drop{
+  border:1.5px dashed var(--border3);border-radius:8px;
+  padding:24px;text-align:center;cursor:pointer;
+  transition:all .2s;background:var(--surface2);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.photo-drop:hover{border-color:var(--gold-dim);background:var(--gold-glow)}
+.photo-drop-icon{font-size:28px}
+.photo-drop-text{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase}
+.photo-preview{
+  width:100%;height:120px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--border2);display:none;
+  position:relative;
+}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.photo-preview-remove{
+  position:absolute;top:6px;right:6px;
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(0,0,0,.7);border:1px solid var(--border3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--white);cursor:pointer;
+}
+
+/* Form section divider */
+.form-section-head{
+  font-family:var(--font-mono);font-size:8px;letter-spacing:3px;
+  text-transform:uppercase;color:var(--gold);
+  padding:12px 0 8px;border-top:1px solid var(--border);
+  margin-top:4px;
+}
+
+/* Third-party product card variant */
+.prod-card.third-party::before{background:#555}
+.prod-card.third-party:hover{border-color:var(--border3)}
+.pc-brand{font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:2px}
+.no-pts-badge{
+  font-family:var(--font-mono);font-size:7.5px;
+  color:var(--muted);letter-spacing:1px;
+  display:flex;align-items:center;gap:4px;
+}
+
+/* One-time HC upsell callout (shown after first third-party save) */
+.hc-upsell{
+  display:flex;align-items:flex-start;gap:14px;
+  padding:16px 18px;
+  background:linear-gradient(135deg,#100d02,#1a1500);
+  border:1px solid var(--gold-dim);border-radius:var(--r);
+  margin-top:16px;position:relative;
+}
+.hc-upsell-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.hc-upsell-body{flex:1}
+.hc-upsell-title{
+  font-family:var(--font-display);font-size:17px;color:var(--gold);
+  letter-spacing:.5px;margin-bottom:4px;
+}
+.hc-upsell-text{font-size:12px;color:var(--text);line-height:1.6;margin-bottom:10px}
+.hc-upsell-close{
+  position:absolute;top:10px;right:12px;
+  background:none;border:none;color:var(--muted);font-size:14px;
+  cursor:pointer;transition:color .15s;
+}
+.hc-upsell-close:hover{color:var(--white)}
+
+/* Scan page manual log link */
+.manual-log-link{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px;margin-top:14px;
+  border:1px dashed var(--border3);border-radius:var(--r);
+  font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;
+  transition:all .2s;background:none;width:100%;
+}
+.manual-log-link:hover{border-color:var(--border2);color:var(--text);background:var(--surface)}
+.manual-log-link span{font-size:16px}
+
+/* Fridge header row with add button */
+.fridge-header-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;flex-wrap:wrap;gap:12px;
+}
+
+/* Modal step indicator */
+.modal-steps{
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:22px;
+}
+.ms-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--border3);transition:background .2s;
+}
+.ms-dot.on{background:var(--gold)}
+.ms-line{flex:1;height:1px;background:var(--border2)}
+
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══════════════════════════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <img class="nav-logo" src="https://cdn.prod.website-files.com/64fcf2fb4ceea7b72a699432/64fe28527fae295e3debffd7_HC-Logo_Horiz_Lockup_White-Metal.svg" alt="Head Change 710" onerror="this.style.display='none';this.nextElementSibling&&(this.nextElementSibling.style.display='block')"><span class="nav-logo-fallback" style="display:none;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#f0ede8;letter-spacing:2px">HEAD CHANGE <span style="color:#c8a84b">710</span></span>
+      <span class="nav-sub">HashNotes</span>
+    </div>
+
+    <div class="nav-links">
+      <button class="nav-link active" onclick="go('home',this)">Home</button>
+      <button class="nav-link" onclick="go('scan',this)">Scan</button>
+      <button class="nav-link" onclick="go('fridge',this)">My Fridge</button>
+      <button class="nav-link" onclick="go('rewards',this)">Rewards</button>
+      <button class="nav-link" onclick="go('product',this)">Product Page</button>
+      <button class="nav-link" onclick="go('profile',this)">Profile</button>
+    </div>
+
+    <div class="nav-right">
+      <div class="pts-pill" onclick="go('rewards',document.querySelectorAll('.nav-link')[3])">
+        <span class="pts-num">2,450</span>
+        <span class="pts-lbl">pts</span>
+      </div>
+      <div class="nav-av">DZ</div>
+      <button class="hamburger" id="hbg" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="nav-drip">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 22" preserveAspectRatio="none" style="width:100%;height:20px;display:block;opacity:.65">
+  <path d="M0,0 L1440,0 L1440,8 
+    Q1380,22 1320,8 Q1260,0 1200,10 Q1140,20 1080,8 Q1020,0 960,12 
+    Q900,22 840,8 Q780,0 720,14 Q660,22 600,8 Q540,0 480,12 
+    Q420,20 360,8 Q300,0 240,10 Q180,22 120,8 Q60,0 0,14 Z" 
+    fill="#1a1a1a"/>
+</svg>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mob-menu" id="mob-menu">
+  <button class="mob-link active" onclick="go('home',this);toggleMenu()">Home</button>
+  <button class="mob-link" onclick="go('scan',this);toggleMenu()">Scan</button>
+  <button class="mob-link" onclick="go('fridge',this);toggleMenu()">My Fridge</button>
+  <button class="mob-link" onclick="go('rewards',this);toggleMenu()">Rewards</button>
+  <button class="mob-link" onclick="go('product',this);toggleMenu()">Product Page</button>
+  <button class="mob-link" onclick="go('profile',this);toggleMenu()">Profile</button>
+</div>
+
+<!-- ══ HOME ══════════════════════════════════════════════════════════ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-photo"></div>
+    <div class="hero-vignette"></div>
+    <div class="hero-body">
+      <div class="hero-left">
+        <div class="hero-eyebrow">Hash Club — Members Only</div>
+        <h1 class="hero-h">Your<br><em>Digital</em><br>Fridge.</h1>
+        <p class="hero-p">Scan any HC710 batch to verify your product, log your collection, and earn store credit on every drop you try. No app. Just your phone.</p>
+        <div class="hero-actions">
+          <button class="btn btn-gold" onclick="go('scan',document.querySelectorAll('.nav-link')[1])">📷 Scan a Product</button>
+          <button class="btn btn-outline" onclick="go('product',document.querySelectorAll('.nav-link')[4])">View a Batch Page</button>
+        </div>
+        <div class="hero-strip">
+          <div class="hs-cell"><span class="hs-v">+100</span><span class="hs-l">Per Scan</span></div>
+          <div class="hs-cell"><span class="hs-v">$1</span><span class="hs-l">/ 100 pts</span></div>
+          <div class="hs-cell"><span class="hs-v">4×</span><span class="hs-l">Ways to Earn</span></div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hc-label">Recently Logged</div>
+        <div class="hc-prod">
+          <div class="hc-prod-header">
+            <span class="tag tag-rosin">🫧 Live Rosin</span>
+            <span class="hc-prod-score">★★★★★ 9.4</span>
+          </div>
+          <div class="hc-prod-name">Jealousy #4</div>
+          <div class="hc-prod-batch">Batch HC-2024-0891 · Pressed Nov 12, 2024</div>
+          <div class="hc-terps">
+            <span class="hc-terp">🍋 Limonene</span>
+            <span class="hc-terp">🌿 Myrcene</span>
+            <span class="hc-terp">🔥 Caryophyllene</span>
+          </div>
+          <div class="hc-thc">
+            <span class="hc-thc-lbl">THC</span>
+            <div class="hc-thc-track"><div class="hc-thc-fill" style="width:78%"></div></div>
+            <span class="hc-thc-val">78%</span>
+          </div>
+        </div>
+        <div class="hc-pts">
+          <div class="hc-pts-left">
+            <span class="hc-pts-n">+175</span>
+            <div class="hc-pts-info">
+              <span class="t">Points Earned</span>
+              <span class="s">= $1.75 store credit</span>
+            </div>
+          </div>
+          <span class="tag tag-gold">🏆 Gold</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brand statement — "Flavorful AF" energy -->
+  <section class="brand-statement">
+    <div class="bs-inner">
+      <div class="bs-photo">
+        <img src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=800&q=70"
+             alt="Head Change product" onerror="this.parentElement.style.background='var(--surface2)'">
+      </div>
+      <div class="bs-text">
+        <div class="bs-eyebrow">Flavorful AF</div>
+        <h2 class="bs-h">Big Aromas.<br>Exotic Drops.<br>Your Log.</h2>
+        <p class="bs-p">Every batch we press is chosen for its quality, aroma, and honesty to the plant. Now you can track every one you've tried, rate the terp profiles, and build a collection that tells your story.</p>
+        <div class="bs-quote">"Scan. Log. Earn. Repeat. The Hash Club rewards you for exploring every drop we make."</div>
+        <button class="btn btn-gold" onclick="go('scan',document.querySelectorAll('.nav-link')[1])">Start Your Collection</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="how">
+    <div class="how-inner">
+      <div class="how-head">
+        <div class="eyebrow" style="margin-bottom:12px">How It Works</div>
+        <h2 style="font-family:var(--font-display);font-size:clamp(36px,5vw,58px);color:var(--white);letter-spacing:1.5px;line-height:.95">The Hash Club Loop</h2>
+      </div>
+      <div class="how-steps">
+        <div class="how-step">
+          <div class="how-num-wrap"><span class="how-num">01</span></div>
+          <div class="how-icon">📷</div>
+          <div class="how-title">Scan</div>
+          <p class="how-desc">Point your camera at the QR code on any HC710 batch. No app. Opens in your browser in seconds.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num-wrap"><span class="how-num">02</span></div>
+          <div class="how-icon">🫙</div>
+          <div class="how-title">Claim</div>
+          <p class="how-desc">Join the Hash Club free and add the batch to your digital fridge. One claim per batch keeps it authentic.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num-wrap"><span class="how-num">03</span></div>
+          <div class="how-icon">✍️</div>
+          <div class="how-title">Log It</div>
+          <p class="how-desc">Drop your tasting notes, rate it, upload a photo. Every action earns more points and builds your profile.</p>
+        </div>
+        <div class="how-step">
+          <div class="how-num-wrap"><span class="how-num">04</span></div>
+          <div class="how-icon">💳</div>
+          <div class="how-title">Earn</div>
+          <p class="how-desc">Convert points to store credit at headchange710.com. The deeper you go, the more you earn.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tiers -->
+  <section class="tiers">
+    <div class="tiers-inner">
+      <div class="eyebrow" style="margin-bottom:12px">Connoisseur Tiers</div>
+      <h2 style="font-family:var(--font-display);font-size:clamp(36px,5vw,58px);color:var(--white);letter-spacing:1.5px;line-height:.95;margin-bottom:8px">Level Up Your Collection</h2>
+      <p style="font-size:15px;color:var(--text)">Every scan moves you closer to Platinum.</p>
+      <div class="tier-grid">
+        <div class="tier-card"><span class="t-icon">🥉</span><div class="t-name">Bronze</div><div class="t-pts">0+ points</div><p class="t-perks">Full Hash Club access. Earn on every scan, note, and photo.</p><div class="t-credit">$0+</div></div>
+        <div class="tier-card"><span class="t-icon">🥈</span><div class="t-name">Silver</div><div class="t-pts">500+ points</div><p class="t-perks">Early access emails. Silver badge on your profile.</p><div class="t-credit">$5+</div></div>
+        <div class="tier-card current"><span class="t-icon">🥇</span><div class="t-name">Gold</div><div class="t-pts">1,500+ points</div><p class="t-perks">Priority drop access. Bonus point events. Gold badge.</p><div class="t-credit">$15+</div></div>
+        <div class="tier-card"><span class="t-icon">💎</span><div class="t-name">Platinum</div><div class="t-pts">3,000+ points</div><p class="t-perks">Exclusive batches. Giveaway entries. Full VIP status.</p><div class="t-credit">$30+</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA with HC710 second photo -->
+  <section class="cta-band">
+    <div class="cta-band-photo"></div>
+    <div class="cta-band-vignette"></div>
+    <div class="cta-band-body">
+      <div class="ctab-left">
+        <div class="ctab-eyebrow">Born &amp; Raised in St. Louis</div>
+        <div class="ctab-h">Join the Hash Club.<br>Free. Always.</div>
+        <p class="ctab-p">Sign up with your email, scan your first batch, and start earning. No subscription. No fees. Just points on every drop you explore.</p>
+        <div class="ctab-form">
+          <input class="ctab-input" type="email" placeholder="your@email.com">
+          <button class="btn btn-gold">Join Free</button>
+        </div>
+      </div>
+      <div class="ctab-right">HC<br>710</div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img class="footer-logo" src="https://cdn.prod.website-files.com/64fcf2fb4ceea7b72a699432/64fe28527fae295e3debffd7_HC-Logo_Horiz_Lockup_White-Metal.svg" alt="HC710" onerror="this.style.visibility='hidden'">
+        <p>Born &amp; raised in St. Louis.<br>Missouri's premium craft hashmakers.<br>Exciting aromatics in exotic drops.</p>
+      </div>
+      <div>
+        <div class="footer-col-h">HashNotes</div>
+        <button class="footer-link" onclick="go('scan',document.querySelectorAll('.nav-link')[1])">Scan a Product</button>
+        <button class="footer-link" onclick="go('fridge',document.querySelectorAll('.nav-link')[2])">My Fridge</button>
+        <button class="footer-link" onclick="go('rewards',document.querySelectorAll('.nav-link')[3])">Rewards</button>
+        <button class="footer-link" onclick="go('profile',document.querySelectorAll('.nav-link')[5])">My Profile</button>
+      </div>
+      <div>
+        <div class="footer-col-h">Head Change 710</div>
+        <a class="footer-link" href="https://headchange710.com" target="_blank">Shop headchange710.com</a>
+        <a class="footer-link" href="https://headchange710.com/pharmacopeia" target="_blank">Pharmacopeia</a>
+        <a class="footer-link" href="https://headchange710.com/about-us" target="_blank">About Us</a>
+        <a class="footer-link" href="https://headchange710.com/store-locator" target="_blank">Store Locator</a>
+      </div>
+      <div>
+        <div class="footer-col-h">Legal</div>
+        <a class="footer-link" href="https://headchange710.com/privacy-policy" target="_blank">Privacy Policy</a>
+        <a class="footer-link" href="https://headchange710.com/terms-and-conditions" target="_blank">Terms &amp; Conditions</a>
+        <button class="footer-link">Contact Us</button>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2025 Head Change 710 · All rights reserved · St. Louis, MO</span>
+      <span class="footer-copy"><span class="live-dot"></span>HashNotes v1.0</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ══ SCAN ══════════════════════════════════════════════════════════ -->
+<div id="page-scan" class="page">
+  <div class="inner-page">
+    <div class="wrap">
+      <div class="pg-header">
+        <div class="pg-eyebrow">Hash Club</div>
+        <h1 class="pg-title">Scan &amp; Claim</h1>
+        <p class="pg-sub">Point your camera at the QR code on any Head Change 710 batch to verify your product and start earning.</p>
+      </div>
+      <div class="scan-grid">
+        <div class="scan-panel">
+          <div class="qr-frame" onclick="openModal('o-scan')">
+            <div class="qr-inner">
+              <div class="qr-emoji">🫙</div>
+              <div class="qr-lbl">Tap to Scan</div>
+            </div>
+            <div class="qr-br"></div>
+          </div>
+          <button class="btn btn-gold btn-full" style="margin-bottom:16px" onclick="openModal('o-scan')">📷 Open Camera Scanner</button>
+          <div class="scan-or"><span>or enter code</span></div>
+          <input class="batch-input" type="text" placeholder="Enter batch code — e.g. HC-2024-0891" style="margin-bottom:10px">
+          <button class="btn btn-ghost btn-full">Submit Code</button>
+          <button class="manual-log-link" onclick="openManualLog()">
+            <span>✏️</span> Log a non-HC710 product manually
+          </button>
+        </div>
+        <div class="earn-panel">
+          <div class="ep-title">Ways to Earn</div>
+          <p class="ep-sub">Every action builds your collection and earns points redeemable for store credit.</p>
+          <div class="earn-item"><div class="ei-left"><span class="ei-icon">📷</span><div><div class="ei-name">Scan &amp; Claim</div><div class="ei-note">One-time per batch</div></div></div><span class="ei-pts">+100</span></div>
+          <div class="earn-item"><div class="ei-left"><span class="ei-icon">✍️</span><div><div class="ei-name">Tasting Notes</div><div class="ei-note">Structured note entry</div></div></div><span class="ei-pts">+50</span></div>
+          <div class="earn-item"><div class="ei-left"><span class="ei-icon">📸</span><div><div class="ei-name">Upload Photo</div><div class="ei-note">Your product, your shot</div></div></div><span class="ei-pts">+25</span></div>
+          <div class="earn-item"><div class="ei-left"><span class="ei-icon">⭐</span><div><div class="ei-name">Rate the Batch</div><div class="ei-note">1–10 score</div></div></div><span class="ei-pts">+10</span></div>
+          <div class="earn-item"><div class="ei-left"><span class="ei-icon">🆕</span><div><div class="ei-name">New Strain Bonus</div><div class="ei-note">First time trying a strain</div></div></div><span class="ei-pts">+200</span></div>
+          <div style="padding:14px 16px;background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:var(--r);text-align:center;margin-top:4px">
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--gold-dim)">100 pts = </span>
+            <span style="font-family:var(--font-display);font-size:24px;color:var(--gold)">$1.00</span>
+            <span style="font-family:var(--font-mono);font-size:9px;color:var(--gold-dim)"> store credit</span>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:52px">
+        <div class="eyebrow" style="margin-bottom:16px">Recently Logged</div>
+        <div class="recent-grid">
+          <div class="rc-card" onclick="openModal('o-detail')"><div class="rc-type">Live Rosin</div><div class="rc-name">Jealousy #4</div><div class="rc-batch">HC-2024-0891 · Jan 14</div><div class="rc-stars">★★★★★</div></div>
+          <div class="rc-card" onclick="openModal('o-detail')"><div class="rc-type">Live Resin</div><div class="rc-name">Runtz Badder</div><div class="rc-batch">HC-2024-0774 · Dec 28</div><div class="rc-stars">★★★★☆</div></div>
+          <div class="rc-card" onclick="openModal('o-detail')"><div class="rc-type">Live Rosin</div><div class="rc-name">GMO #7</div><div class="rc-batch">HC-2024-0712 · Dec 12</div><div class="rc-stars">★★★★★</div></div>
+          <div class="rc-card" onclick="openModal('o-detail')"><div class="rc-type">Badder</div><div class="rc-name">Purple Punch</div><div class="rc-batch">HC-2024-0640 · Nov 30</div><div class="rc-stars">★★★☆☆</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ FRIDGE ══════════════════════════════════════════════════════════ -->
+<div id="page-fridge" class="page">
+  <div class="inner-page">
+    <div class="wrap">
+      <div class="fridge-header-row">
+        <div class="pg-header" style="margin-bottom:0">
+          <div class="pg-eyebrow">Hash Club</div>
+          <h1 class="pg-title" style="font-size:clamp(36px,6vw,64px)">My Fridge</h1>
+          <p class="pg-sub" style="margin-bottom:0">Every concentrate you've tried — HC710 and beyond.</p>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openManualLog()" style="flex-shrink:0;margin-top:8px">✏️ Log a Product</button>
+      </div>
+      <div class="fridge-layout">
+        <div class="fridge-sidebar">
+          <div class="fs-head">Filter</div>
+          <div class="fg-section">
+            <div class="fg-label">Brand</div>
+            <button class="filter-btn on">All Brands</button>
+            <button class="filter-btn">Head Change 710</button>
+            <button class="filter-btn">Other Brands</button>
+          </div>
+          <div class="fg-section">
+            <div class="fg-label">Type</div>
+            <button class="filter-btn on">All Types</button>
+            <button class="filter-btn">Live Rosin</button>
+            <button class="filter-btn">Live Resin</button>
+            <button class="filter-btn">Badder</button>
+            <button class="filter-btn">Shatter</button>
+          </div>
+          <div class="fg-section">
+            <div class="fg-label">Sort By</div>
+            <button class="filter-btn on">Most Recent</button>
+            <button class="filter-btn">Highest Rated</button>
+            <button class="filter-btn">Most Points</button>
+          </div>
+          <div class="rule" style="margin:16px 0"></div>
+          <div class="fridge-stats-grid">
+            <div class="fsg-item"><span class="fsg-v">24</span><span class="fsg-l">Logged</span></div>
+            <div class="fsg-item"><span class="fsg-v">8.3</span><span class="fsg-l">Avg Score</span></div>
+            <div class="fsg-item"><span class="fsg-v">3</span><span class="fsg-l">Types</span></div>
+            <div class="fsg-item"><span class="fsg-v">$24</span><span class="fsg-l">Earned</span></div>
+          </div>
+        </div>
+        <div class="prod-list">
+          <div class="prod-card" onclick="openModal('o-detail')">
+            <div class="pc-top"><span class="tag tag-rosin">🫧 Live Rosin</span><div class="pc-rating"><span class="pc-stars">★★★★★</span><span class="pc-score">9.4</span></div></div>
+            <div class="pc-name">Jealousy #4</div>
+            <div class="pc-batch">Batch HC-2024-0891 · Pressed Nov 12, 2024</div>
+            <div class="terp-row"><span class="terp">🍋 Limonene</span><span class="terp">🌿 Myrcene</span><span class="terp">🔥 Caryophyllene</span></div>
+            <div class="pc-foot"><span class="pc-date">Logged Jan 14</span><span class="pc-pts">+175 pts earned</span></div>
+          </div>
+          <div class="prod-card" onclick="openModal('o-detail')">
+            <div class="pc-top"><span class="tag tag-resin">💎 Live Resin</span><div class="pc-rating"><span class="pc-stars">★★★★☆</span><span class="pc-score">8.1</span></div></div>
+            <div class="pc-name">Runtz Badder</div>
+            <div class="pc-batch">Batch HC-2024-0774 · Extracted Oct 30, 2024</div>
+            <div class="terp-row"><span class="terp">🍇 Linalool</span><span class="terp">🍬 Terpinolene</span></div>
+            <div class="pc-foot"><span class="pc-date">Logged Dec 28</span><span class="pc-pts">+150 pts earned</span></div>
+          </div>
+          <div class="prod-card" onclick="openModal('o-detail')">
+            <div class="pc-top"><span class="tag tag-rosin">🫧 Live Rosin</span><div class="pc-rating"><span class="pc-stars">★★★★★</span><span class="pc-score">9.8</span></div></div>
+            <div class="pc-name">GMO #7</div>
+            <div class="pc-batch">Batch HC-2024-0712 · Pressed Oct 4, 2024</div>
+            <div class="terp-row"><span class="terp">⛽ Myrcene</span><span class="terp">🌱 Caryophyllene</span><span class="terp">🧄 Humulene</span></div>
+            <div class="pc-foot"><span class="pc-date">Logged Dec 12</span><span class="pc-pts">+200 pts · 2× new strain</span></div>
+          </div>
+          <div class="prod-card" onclick="openModal('o-detail')">
+            <div class="pc-top"><span class="tag tag-badder">🌀 Badder</span><div class="pc-rating"><span class="pc-stars">★★★☆☆</span><span class="pc-score">6.5</span></div></div>
+            <div class="pc-name">Purple Punch</div>
+            <div class="pc-batch">Batch HC-2024-0640 · Extracted Sep 22, 2024</div>
+            <div class="terp-row"><span class="terp">🍇 Linalool</span><span class="terp">🍊 Limonene</span></div>
+            <div class="pc-foot"><span class="pc-date">Logged Nov 30</span><span class="pc-pts">+100 pts earned</span></div>
+          </div>
+
+          <!-- Third-party cards -->
+          <div class="prod-card third-party" onclick="openModal('o-tp-detail')">
+            <div class="pc-top"><span class="tag tag-rosin" style="color:#72b860;border-color:rgba(114,184,96,.3);background:rgba(114,184,96,.06)">🫧 Live Rosin</span><div class="pc-rating"><span class="pc-stars">★★★★☆</span><span class="pc-score">8.6</span></div></div>
+            <div class="pc-brand">Viola · Other Brand</div>
+            <div class="pc-name">Wedding Cake</div>
+            <div class="pc-batch">Lot V-2024-1122 · Purchased Dec 5, 2024</div>
+            <div class="terp-row"><span class="terp">🍰 Caryophyllene</span><span class="terp">🌿 Myrcene</span></div>
+            <div class="pc-foot">
+              <span class="pc-date">Logged Dec 6</span>
+              <span class="no-pts-badge">⚪ No points — not HC710</span>
+            </div>
+          </div>
+
+          <div class="prod-card third-party" onclick="openModal('o-tp-detail')">
+            <div class="pc-top"><span class="tag tag-badder">🌀 Badder</span><div class="pc-rating"><span class="pc-stars">★★★☆☆</span><span class="pc-score">7.1</span></div></div>
+            <div class="pc-brand">Illicit Gardens · Other Brand</div>
+            <div class="pc-name">Grape Gas</div>
+            <div class="pc-batch">No batch info available</div>
+            <div class="terp-row"><span class="terp">🍇 Linalool</span><span class="terp">⛽ Caryophyllene</span></div>
+            <div class="pc-foot">
+              <span class="pc-date">Logged Nov 18</span>
+              <span class="no-pts-badge">⚪ No points — not HC710</span>
+            </div>
+          </div>
+
+          <!-- Smart one-time HC upsell (hidden after first dismiss) -->
+          <div class="hc-upsell" id="hc-upsell">
+            <div class="hc-upsell-icon">🏆</div>
+            <div class="hc-upsell-body">
+              <div class="hc-upsell-title">Earn rewards on your next drop</div>
+              <p class="hc-upsell-text">You logged 2 products from other brands — nice collection. Head Change 710 products earn you points toward store credit. Scan any HC710 batch to start earning.</p>
+              <button class="btn btn-gold btn-sm" onclick="go('scan',document.querySelectorAll('.nav-link')[1]);closeUpsell()">📷 Scan an HC710 Product</button>
+            </div>
+            <button class="hc-upsell-close" onclick="closeUpsell()" title="Dismiss">✕</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REWARDS ══════════════════════════════════════════════════════════ -->
+<div id="page-rewards" class="page">
+  <div class="inner-page">
+    <div class="wrap">
+      <div class="pg-header">
+        <div class="pg-eyebrow">Hash Club</div>
+        <h1 class="pg-title">Rewards</h1>
+        <p class="pg-sub">Your points, your credit. Redeem anytime at headchange710.com.</p>
+      </div>
+      <div class="rewards-grid">
+        <div>
+          <div class="wallet">
+            <div class="w-top">
+              <img class="w-logo" src="https://cdn.prod.website-files.com/64fcf2fb4ceea7b72a699432/64fe28527fae295e3debffd7_HC-Logo_Horiz_Lockup_White-Metal.svg" alt="HC710" onerror="this.style.visibility='hidden'">
+              <span class="tag tag-gold">🏆 Gold Connoisseur</span>
+            </div>
+            <div class="w-label">Store Credit Value</div>
+            <div class="w-amount"><sup>$</sup>24<span class="w-cent">.50</span></div>
+            <div class="w-sub">Available at headchange710.com</div>
+            <div class="w-pts-row">
+              <span class="w-pts">2,450</span>
+              <span class="w-pts-lbl">points</span>
+              <span class="w-conv">100 pts = $1.00</span>
+            </div>
+            <div class="tier-bar-top"><span class="tbt-l">Progress to Platinum</span><span class="tbt-r">550 pts away</span></div>
+            <div class="tier-track"><div class="tier-fill" style="width:82%"></div></div>
+          </div>
+          <div class="act-grid">
+            <div class="act-card" onclick="openModal('o-redeem')"><span class="act-icon">💳</span><span class="act-label">Redeem</span><span class="act-sub">Get discount code</span></div>
+            <div class="act-card" onclick="go('scan',document.querySelectorAll('.nav-link')[1])"><span class="act-icon">📷</span><span class="act-label">Earn More</span><span class="act-sub">Scan a product</span></div>
+            <div class="act-card"><span class="act-icon">🛍️</span><span class="act-label">Shop Now</span><span class="act-sub">Use your credit</span></div>
+            <div class="act-card"><span class="act-icon">📊</span><span class="act-label">History</span><span class="act-sub">All transactions</span></div>
+          </div>
+          <span class="sec-head">Active Codes</span>
+          <div class="codes-stack">
+            <div class="code-card">
+              <div class="cc-top"><span class="cc-val">$10.00 off</span><span class="cc-exp">Expires Mar 15, 2025</span></div>
+              <div class="cc-code" onclick="copyCode(this)"><span>HC-HASH-X9F4K2</span><span class="cc-copy">Copy</span></div>
+            </div>
+            <div class="code-card used">
+              <div class="cc-top"><span class="cc-val">$5.00 off</span><span class="cc-exp">Used Jan 8 · Expired</span></div>
+              <div class="cc-code"><span>HC-HASH-M3T8P1</span><span class="cc-copy">Used</span></div>
+            </div>
+          </div>
+          <span class="sec-head" style="margin-top:32px">Points History</span>
+          <div class="hist-list">
+            <div class="h-item"><div class="h-ico hi-e">🫙</div><div class="h-info"><div class="h-name">Jealousy #4 Scanned</div><div class="h-date">Jan 14 · Scan + Notes + Photo</div></div><div class="h-pts earn">+175</div></div>
+            <div class="h-item"><div class="h-ico hi-r">💳</div><div class="h-info"><div class="h-name">Redeemed $5 Code</div><div class="h-date">Jan 8 · HC-HASH-M3T8P1</div></div><div class="h-pts spend">−500</div></div>
+            <div class="h-item"><div class="h-ico hi-b">⭐</div><div class="h-info"><div class="h-name">New Strain Bonus · GMO #7</div><div class="h-date">Dec 12 · 2× multiplier</div></div><div class="h-pts earn">+200</div></div>
+            <div class="h-item"><div class="h-ico hi-e">🫙</div><div class="h-info"><div class="h-name">Runtz Badder Scanned</div><div class="h-date">Dec 28 · Scan + Notes</div></div><div class="h-pts earn">+150</div></div>
+            <div class="h-item"><div class="h-ico hi-b">🎉</div><div class="h-info"><div class="h-name">Welcome Bonus</div><div class="h-date">Jan 1 · Account created</div></div><div class="h-pts earn">+500</div></div>
+          </div>
+        </div>
+        <div>
+          <div class="tier-list">
+            <div class="tl-row"><span class="tl-icon">🥉</span><div class="tl-info"><div class="tl-name">Bronze</div><div class="tl-pts" style="font-family:var(--font-mono);font-size:8.5px;color:var(--muted)">0+ pts</div></div><div class="tl-status tl-you">✓</div></div>
+            <div class="tl-row"><span class="tl-icon">🥈</span><div class="tl-info"><div class="tl-name">Silver</div><div class="tl-pts" style="font-family:var(--font-mono);font-size:8.5px;color:var(--muted)">500+ pts</div></div><div class="tl-status tl-you">✓</div></div>
+            <div class="tl-row on"><span class="tl-icon">🥇</span><div class="tl-info"><div class="tl-name">Gold</div><div class="tl-pts" style="font-family:var(--font-mono);font-size:8.5px;color:var(--gold)">1,500+ pts</div></div><div class="tl-status tl-you">● You</div></div>
+            <div class="tl-row"><span class="tl-icon">💎</span><div class="tl-info"><div class="tl-name">Platinum</div><div class="tl-pts" style="font-family:var(--font-mono);font-size:8.5px;color:var(--muted)">3,000+ pts</div></div><div class="tl-status tl-away">550 away</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRODUCT PAGE ══════════════════════════════════════════════════════ -->
+<div id="page-product" class="page">
+  <div class="inner-page">
+    <div class="wrap">
+      <span class="tag tag-rosin" style="margin-bottom:8px;display:inline-flex">🫧 Live Rosin</span>
+      <div class="product-layout">
+        <div>
+          <div class="prod-img">
+            <img src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=800&q=70" alt="Jealousy #4" onerror="this.parentElement.style.background='var(--surface2)'">
+          </div>
+          <h1 class="prod-name">Jealousy #4</h1>
+          <div class="prod-batch">Batch HC-2024-0891 · Pressed Nov 12, 2024 · Head Change 710</div>
+          <div class="prod-data">
+            <div class="pd-cell"><span class="pd-val">78%</span><span class="pd-lbl">THC</span></div>
+            <div class="pd-cell"><span class="pd-val">0.4%</span><span class="pd-lbl">CBD</span></div>
+            <div class="pd-cell"><span class="pd-val">3.2%</span><span class="pd-lbl">Terpenes</span></div>
+          </div>
+          <div style="margin-bottom:28px">
+            <div class="eyebrow" style="margin-bottom:12px">Terpene Profile</div>
+            <div class="terp-chips">
+              <div class="terp-chip"><span>🍋</span><span class="tc-name">Limonene</span><span class="tc-pct">1.4%</span></div>
+              <div class="terp-chip"><span>🌿</span><span class="tc-name">Myrcene</span><span class="tc-pct">1.1%</span></div>
+              <div class="terp-chip"><span>🔥</span><span class="tc-name">Caryophyllene</span><span class="tc-pct">0.7%</span></div>
+              <div class="terp-chip"><span>🌸</span><span class="tc-name">Linalool</span><span class="tc-pct">0.4%</span></div>
+            </div>
+          </div>
+          <div class="coa-row">
+            <span class="coa-icon">📋</span>
+            <div class="coa-info"><div class="coa-title">Certificate of Analysis — Batch HC-2024-0891</div><div class="coa-sub">Third-party lab verified · PDF · Opens in browser</div></div>
+            <span class="coa-arrow">↗</span>
+          </div>
+          <div class="eyebrow" style="margin-bottom:12px">About This Batch</div>
+          <p style="font-size:14px;line-height:1.8;color:var(--text)">Jealousy #4 is a full-melt live rosin pressed from fresh-frozen flower at peak trichome development. This batch expresses a pronounced candy-citrus nose with a deep fuel finish — one of our cleanest presses of the year. Consistency lands in the soft badder-rosin range, perfect for low-temp dabbing.</p>
+        </div>
+        <div class="claim-panel">
+          <div class="cp-eyebrow">Hash Club · Exclusive</div>
+          <div class="cp-h">Claim This Drop &amp; Earn Rewards</div>
+          <p class="cp-p">Join the Hash Club free to add this batch to your digital fridge and start earning points toward store credit.</p>
+          <div class="cp-pts">
+            <div class="cp-pts-n">+175</div>
+            <div class="cp-pts-i"><span class="cp-pts-l">Points Available</span><span class="cp-pts-v">= $1.75 store credit</span></div>
+          </div>
+          <div class="cp-breakdown">
+            <div class="cpb-cell"><span class="cpb-v">+100</span><span class="cpb-l">Scan</span></div>
+            <div class="cpb-cell"><span class="cpb-v">+50</span><span class="cpb-l">Notes</span></div>
+            <div class="cpb-cell"><span class="cpb-v">+25</span><span class="cpb-l">Photo</span></div>
+          </div>
+          <button class="btn btn-gold btn-full" style="margin-bottom:10px" onclick="openModal('o-scan')">🫙 Add to My Fridge</button>
+          <button class="btn btn-outline btn-full btn-sm">Sign In — Already a Member</button>
+          <p style="text-align:center;font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:14px">One-time claim per batch · Free to join</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE ══════════════════════════════════════════════════════════ -->
+<div id="page-profile" class="page">
+  <div class="inner-page">
+    <div class="wrap">
+      <div class="pg-header" style="margin-bottom:32px">
+        <div class="pg-eyebrow">Hash Club</div>
+        <h1 class="pg-title">Profile</h1>
+      </div>
+      <div class="profile-layout">
+        <div>
+          <div class="profile-hero-block">
+            <div class="profile-banner">
+              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=70" alt="" onerror="this.style.opacity=0">
+              <div class="pb-grad"></div>
+            </div>
+            <div class="profile-info">
+              <div class="profile-av">DZ</div>
+              <div class="profile-text">
+                <div class="p-name">DabberZ</div>
+                <div class="p-handle">@dabberz · Member since Jan 2024</div>
+                <span class="tag tag-gold">🏆 Gold Connoisseur · 2,450 pts</span>
+              </div>
+            </div>
+          </div>
+          <div class="stats-row">
+            <div class="stat-cell"><span class="st-val">24</span><span class="st-lbl">Logged</span></div>
+            <div class="stat-cell"><span class="st-val">$24</span><span class="st-lbl">Earned</span></div>
+            <div class="stat-cell"><span class="st-val">8.3</span><span class="st-lbl">Avg Rating</span></div>
+          </div>
+          <div class="badges-block">
+            <div class="eyebrow">Badges</div>
+            <div class="badge-row">
+              <div class="b-item on"><div class="b-ico">🫧</div><div class="b-name">Rosin Rider</div></div>
+              <div class="b-item on"><div class="b-ico">🔬</div><div class="b-name">COA Nerd</div></div>
+              <div class="b-item on"><div class="b-ico">🌿</div><div class="b-name">Terp Hunter</div></div>
+              <div class="b-item off"><div class="b-ico">💯</div><div class="b-name">Century Club</div></div>
+              <div class="b-item off"><div class="b-ico">👑</div><div class="b-name">OG Collector</div></div>
+              <div class="b-item off"><div class="b-ico">📸</div><div class="b-name">Shutterbud</div></div>
+            </div>
+          </div>
+          <div class="flavor-block">
+            <div class="eyebrow" style="margin-bottom:14px">Flavor Profile</div>
+            <p style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:18px;letter-spacing:1px">Based on your logged concentrates</p>
+            <div class="fl-row"><span class="fl-lbl">Gas / Chem</span><div class="fl-track"><div class="fl-fill fg" style="width:88%"></div></div><span class="fl-pct">88%</span></div>
+            <div class="fl-row"><span class="fl-lbl">Citrus</span><div class="fl-track"><div class="fl-fill fc" style="width:82%"></div></div><span class="fl-pct">82%</span></div>
+            <div class="fl-row"><span class="fl-lbl">Dank / Funk</span><div class="fl-track"><div class="fl-fill fe" style="width:70%"></div></div><span class="fl-pct">70%</span></div>
+            <div class="fl-row"><span class="fl-lbl">Pine / Earth</span><div class="fl-track"><div class="fl-fill fp" style="width:65%"></div></div><span class="fl-pct">65%</span></div>
+            <div class="fl-row" style="margin-bottom:0"><span class="fl-lbl">Floral</span><div class="fl-track"><div class="fl-fill ff" style="width:28%"></div></div><span class="fl-pct">28%</span></div>
+          </div>
+        </div>
+        <div class="profile-sidebar">
+          <div class="pside">
+            <div class="pside-lbl">Current Tier</div>
+            <div class="tier-feature">
+              <span class="tf-icon">🥇</span>
+              <div><div class="tf-name">Gold</div><div class="tf-pts">2,450 pts · 550 to Platinum</div></div>
+            </div>
+            <div class="tier-track2"><div class="tier-fill2" style="width:82%"></div></div>
+          </div>
+          <div class="pside">
+            <div class="pside-lbl">Account</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-ghost btn-full btn-sm">Edit Profile</button>
+              <button class="btn btn-ghost btn-full btn-sm">Notifications</button>
+              <button class="btn btn-ghost btn-full btn-sm">Privacy</button>
+              <button class="btn btn-outline btn-full btn-sm" style="margin-top:4px;color:var(--muted)">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALS ══════════════════════════════════════════════════════════ -->
+<div class="overlay" id="o-scan" onclick="closeOvl(event,'o-scan')">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('o-scan')">✕</button>
+    <div class="success-modal">
+      <div class="sm-burst">🎉</div>
+      <div class="sm-title">Product Verified!</div>
+      <div class="sm-sub">Jealousy #4 · Batch HC-2024-0892<br>One-time claim confirmed. Add to your fridge to earn.</div>
+      <div class="sm-pts">
+        <div class="sm-n">+175</div>
+        <div class="sm-info"><span class="sm-lbl">Points Earned</span><span class="sm-val">= $1.75 store credit</span></div>
+      </div>
+      <div class="sm-breakdown">
+        <div class="sm-cell"><span class="sm-cv">+100</span><span class="sm-cl">Scan</span></div>
+        <div class="sm-cell"><span class="sm-cv">+50</span><span class="sm-cl">Notes</span></div>
+        <div class="sm-cell"><span class="sm-cv">+25</span><span class="sm-cl">Photo</span></div>
+      </div>
+      <button class="btn btn-gold btn-full" style="margin-bottom:10px" onclick="closeModal('o-scan');setTimeout(()=>go('rewards',document.querySelectorAll('.nav-link')[3]),150)">➕ Add to Fridge &amp; Claim</button>
+      <button class="btn btn-outline btn-full" onclick="closeModal('o-scan')">Cancel — Don't Claim</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="o-detail" onclick="closeOvl(event,'o-detail')">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('o-detail')">✕</button>
+    <div class="dm-eyebrow"><span class="tag tag-rosin">🫧 Live Rosin</span><span style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">HC-2024-0891</span></div>
+    <div class="dm-name">Jealousy #4</div>
+    <div class="dm-date">Batch 0891 · Pressed Nov 12, 2024 · Logged Jan 14</div>
+    <div class="dm-img"><img src="https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=800&q=70" alt="Jealousy #4" onerror="this.parentElement.style.background='var(--surface2)'"></div>
+    <div class="dm-grid3">
+      <div class="dmg-cell"><span class="dmg-v">9.4</span><span class="dmg-l">Rating</span></div>
+      <div class="dmg-cell"><span class="dmg-v">78%</span><span class="dmg-l">THC</span></div>
+      <div class="dmg-cell"><span class="dmg-v">+175</span><span class="dmg-l">Pts</span></div>
+    </div>
+    <div class="taste-grid">
+      <div class="t-cell"><div class="t-lbl">Aroma</div><div class="t-val">Candy, Citrus, Gas</div></div>
+      <div class="t-cell"><div class="t-lbl">Flavor</div><div class="t-val">Sweet, Fuel, Floral</div></div>
+      <div class="t-cell"><div class="t-lbl">Consistency</div><div class="t-val">Badder-Rosin</div></div>
+      <div class="t-cell"><div class="t-lbl">Color</div><div class="t-val">Golden Amber</div></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="score-bar"><div class="sb-row"><span class="sb-name">Aroma</span><span class="sb-num">9.5</span></div><div class="sb-track"><div class="sb-fill" style="width:95%"></div></div></div>
+      <div class="score-bar"><div class="sb-row"><span class="sb-name">Flavor</span><span class="sb-num">9.2</span></div><div class="sb-track"><div class="sb-fill" style="width:92%"></div></div></div>
+      <div class="score-bar"><div class="sb-row"><span class="sb-name">Effect</span><span class="sb-num">9.8</span></div><div class="sb-track"><div class="sb-fill" style="width:98%"></div></div></div>
+    </div>
+    <div class="notes-box">"Insane terp push on this one. Almost candy-like on the inhale then transitions to pure fuel. Consistency is perfect — not too wet, not crumbly. One of the best HC drops I've had."</div>
+    <button class="btn btn-outline btn-full" style="margin-top:16px" onclick="closeModal('o-detail')">Close</button>
+  </div>
+</div>
+
+<div class="overlay" id="o-redeem" onclick="closeOvl(event,'o-redeem')">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('o-redeem')">✕</button>
+    <h2 style="font-family:var(--font-display);font-size:30px;color:var(--white);letter-spacing:1px;margin-bottom:6px">Redeem Points</h2>
+    <p style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-bottom:20px">Points convert to single-use discount codes for headchange710.com</p>
+    <div class="rdm-bal">
+      <div class="rdm-lbl">Available Balance</div>
+      <div class="rdm-pts">2,450 pts</div>
+      <div class="rdm-conv">= $24.50 store credit available</div>
+    </div>
+    <div class="eyebrow" style="margin-bottom:12px">Select Amount</div>
+    <div class="rdm-amounts">
+      <div class="rdm-btn" onclick="selAmt(this)"><span class="rdm-dollar">$5</span><span class="rdm-ptsn">500 pts</span></div>
+      <div class="rdm-btn sel" onclick="selAmt(this)"><span class="rdm-dollar">$10</span><span class="rdm-ptsn">1,000 pts</span></div>
+      <div class="rdm-btn" onclick="selAmt(this)"><span class="rdm-dollar">$20</span><span class="rdm-ptsn">2,000 pts</span></div>
+    </div>
+    <div class="rdm-note">💡 Codes are generated instantly, tied to your account, expire in 90 days, and are valid for one-time use only.</div>
+    <button class="btn-redeem" id="rdm-btn" onclick="closeModal('o-redeem')">Generate $10 Discount Code</button>
+    <button class="btn btn-outline btn-full" onclick="closeModal('o-redeem')">Cancel</button>
+  </div>
+</div>
+
+
+<!-- ══ MANUAL LOG MODAL ════════════════════════════════════════════════ -->
+<div class="overlay" id="o-manual-log" onclick="closeOvl(event,'o-manual-log')">
+  <div class="modal" style="max-width:520px">
+    <button class="m-close" onclick="closeModal('o-manual-log')">✕</button>
+
+    <div class="eyebrow" style="margin-bottom:6px">Hash Club Journal</div>
+    <h2 style="font-family:var(--font-display);font-size:28px;color:var(--white);letter-spacing:1px;margin-bottom:4px">Log a Product</h2>
+    <p style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-bottom:20px">Any brand, any concentrate. Your notes, your collection.</p>
+
+    <!-- Step dots -->
+    <div class="modal-steps">
+      <div class="ms-dot on" id="ms1"></div>
+      <div class="ms-line"></div>
+      <div class="ms-dot" id="ms2"></div>
+      <div class="ms-line"></div>
+      <div class="ms-dot" id="ms3"></div>
+    </div>
+
+    <!-- Step 1: Product Info -->
+    <div id="log-step-1">
+      <div class="form-section-head" style="border-top:none;padding-top:0">Product Info</div>
+
+      <div class="form-row">
+        <label class="form-label">Brand Name</label>
+        <input class="form-input" type="text" id="log-brand" placeholder="e.g. Viola, Illicit Gardens, Stiiizy...">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Product Name / Strain</label>
+        <input class="form-input" type="text" id="log-name" placeholder="e.g. Wedding Cake Live Rosin">
+      </div>
+
+      <div class="form-grid2">
+        <div class="form-row">
+          <label class="form-label">Concentrate Type</label>
+          <select class="form-select" id="log-type">
+            <option value="">Select type...</option>
+            <option>Live Rosin</option>
+            <option>Live Resin</option>
+            <option>Badder</option>
+            <option>Shatter</option>
+            <option>Wax</option>
+            <option>Diamonds</option>
+            <option>Sugar</option>
+            <option>Crumble</option>
+            <option>Rosin</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Purchase Date</label>
+          <input class="form-input" type="date" id="log-date">
+        </div>
+      </div>
+
+      <div class="form-grid2">
+        <div class="form-row">
+          <label class="form-label">THC % (if known)</label>
+          <input class="form-input" type="text" id="log-thc" placeholder="e.g. 76">
+        </div>
+        <div class="form-row">
+          <label class="form-label">Batch / Lot #</label>
+          <input class="form-input" type="text" id="log-batch" placeholder="e.g. V-2024-1122">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:8px">
+        <button class="btn btn-gold btn-sm" onclick="logStep(2)">Next — Terpenes &amp; Notes →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Terpenes + Rating -->
+    <div id="log-step-2" style="display:none">
+      <div class="form-section-head" style="border-top:none;padding-top:0">Terpenes &amp; Rating</div>
+
+      <div class="form-row">
+        <label class="form-label">Terpenes — type and press Enter or comma</label>
+        <div class="terp-input-wrap" id="terp-wrap" onclick="document.getElementById('terp-bare').focus()">
+          <input class="terp-bare-input" id="terp-bare" placeholder="e.g. Myrcene, Limonene...">
+        </div>
+        <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-top:5px">Press Enter or comma to add each terpene</div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Your Rating</label>
+        <div class="star-picker" id="star-picker">
+          <button class="star-btn" data-v="1" onclick="setRating(1)">★</button>
+          <button class="star-btn" data-v="2" onclick="setRating(2)">★</button>
+          <button class="star-btn" data-v="3" onclick="setRating(3)">★</button>
+          <button class="star-btn" data-v="4" onclick="setRating(4)">★</button>
+          <button class="star-btn" data-v="5" onclick="setRating(5)">★</button>
+        </div>
+        <input type="hidden" id="log-rating" value="0">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Tasting Notes</label>
+        <textarea class="form-textarea" id="log-notes" placeholder="Aroma, flavor, consistency, effects — whatever you want to remember about this one..."></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;margin-top:8px;gap:10px">
+        <button class="btn btn-outline btn-sm" onclick="logStep(1)">← Back</button>
+        <button class="btn btn-gold btn-sm" onclick="logStep(3)">Next — Photo →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Photo + Save -->
+    <div id="log-step-3" style="display:none">
+      <div class="form-section-head" style="border-top:none;padding-top:0">Photo (Optional)</div>
+
+      <div class="form-row">
+        <label class="form-label">Product Photo</label>
+        <div class="photo-preview" id="photo-preview">
+          <img id="photo-preview-img" src="" alt="Preview">
+          <button class="photo-preview-remove" onclick="removePhoto()">✕</button>
+        </div>
+        <div class="photo-drop" id="photo-drop" onclick="document.getElementById('photo-file').click()">
+          <div class="photo-drop-icon">📸</div>
+          <div class="photo-drop-text">Tap to upload · JPG, PNG, HEIC</div>
+          <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Optional — shows in your fridge card</div>
+        </div>
+        <input type="file" id="photo-file" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+      </div>
+
+      <!-- Smart HC upsell — shown once, inline, not aggressive -->
+      <div id="save-upsell" style="padding:14px 16px;background:linear-gradient(135deg,#100d02,#161200);border:1px solid var(--gold-dim);border-radius:var(--r);margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">💡</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:15px;color:var(--gold);letter-spacing:.5px;margin-bottom:3px">HC710 products earn you real rewards</div>
+            <div style="font-size:12px;color:var(--text);line-height:1.5">Scan any Head Change 710 batch to earn points toward store credit — something this entry won't do.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;gap:10px">
+        <button class="btn btn-outline btn-sm" onclick="logStep(2)">← Back</button>
+        <button class="btn btn-gold btn-sm" style="flex:1" onclick="saveLog()">✓ Save to My Fridge</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ THIRD-PARTY DETAIL MODAL ════════════════════════════════════════ -->
+<div class="overlay" id="o-tp-detail" onclick="closeOvl(event,'o-tp-detail')">
+  <div class="modal">
+    <button class="m-close" onclick="closeModal('o-tp-detail')">✕</button>
+    <div class="dm-eyebrow">
+      <span style="display:flex;align-items:center;gap:8px">
+        <span class="tag tag-rosin" style="color:#72b860;border-color:rgba(114,184,96,.3);background:rgba(114,184,96,.06)">🫧 Live Rosin</span>
+        <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px">VIOLA · OTHER BRAND</span>
+      </span>
+      <span style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Lot V-2024-1122</span>
+    </div>
+    <div class="dm-name">Wedding Cake</div>
+    <div class="dm-date">Purchased Dec 5, 2024 · Logged Dec 6</div>
+
+    <!-- No points notice -->
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);margin-bottom:16px">
+      <span style="font-size:18px">⚪</span>
+      <div style="flex:1">
+        <div style="font-size:12px;color:var(--text);margin-bottom:2px;font-weight:500">No points earned for this entry</div>
+        <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">Points are exclusive to verified Head Change 710 products</div>
+      </div>
+    </div>
+
+    <div class="dm-grid3">
+      <div class="dmg-cell"><span class="dmg-v">8.6</span><span class="dmg-l">Rating</span></div>
+      <div class="dmg-cell"><span class="dmg-v">~74%</span><span class="dmg-l">THC est.</span></div>
+      <div class="dmg-cell"><span class="dmg-v" style="font-size:16px;padding-top:4px">No COA</span><span class="dmg-l">Not verified</span></div>
+    </div>
+    <div class="taste-grid">
+      <div class="t-cell"><div class="t-lbl">Aroma</div><div class="t-val">Sweet, Floral, Vanilla</div></div>
+      <div class="t-cell"><div class="t-lbl">Flavor</div><div class="t-val">Cake, Earth, Spice</div></div>
+      <div class="t-cell"><div class="t-lbl">Consistency</div><div class="t-val">Firm Badder</div></div>
+      <div class="t-cell"><div class="t-lbl">Color</div><div class="t-val">Light Amber</div></div>
+    </div>
+    <div class="notes-box">"Decent terps on the nose but the flavor fell off quick. Good consistency though, not too greasy. Would try again but HC710 Jealousy hits harder for the price."</div>
+
+    <!-- Conversion nudge — subtle, one contextual line -->
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:var(--r);margin-top:16px">
+      <span style="font-size:18px">🏆</span>
+      <div style="flex:1;font-size:12px;color:var(--text);line-height:1.5">Try <strong style="color:var(--gold)">HC710 Jealousy #4</strong> next — similar profile, verified batch, and you'd earn <strong style="color:var(--gold)">+175 pts</strong> ($1.75 credit) just for scanning.</div>
+      <button class="btn btn-gold btn-sm" onclick="closeModal('o-tp-detail');go('scan',document.querySelectorAll('.nav-link')[1])" style="flex-shrink:0">Scan It</button>
+    </div>
+
+    <button class="btn btn-outline btn-full" style="margin-top:12px" onclick="closeModal('o-tp-detail')">Close</button>
+  </div>
+</div>
+
+<!-- ══ SCRIPT ══════════════════════════════════════════════════════════ -->
+<script>
+const PAGES = ['home','scan','fridge','rewards','product','profile'];
+
+function go(name, clickedEl) {
+  PAGES.forEach(p => document.getElementById('page-'+p).classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+
+  const idx = PAGES.indexOf(name);
+  document.querySelectorAll('.nav-link').forEach((l,i) => l.classList.toggle('active', i===idx));
+  document.querySelectorAll('.mob-link').forEach((l,i) => l.classList.toggle('active', i===idx));
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function toggleMenu() {
+  const m = document.getElementById('mob-menu');
+  const h = document.getElementById('hbg');
+  m.classList.toggle('open');
+  h.classList.toggle('open');
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeOvl(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+}
+
+function selAmt(el) {
+  document.querySelectorAll('.rdm-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('rdm-btn').textContent = 'Generate ' + el.querySelector('.rdm-dollar').textContent + ' Discount Code';
+}
+
+function copyCode(el) {
+  const code = el.querySelector('span:first-child').textContent.trim();
+  navigator.clipboard.writeText(code).catch(()=>{});
+  const btn = el.querySelector('.cc-copy');
+  const prev = btn.textContent;
+  btn.textContent = 'Copied!';
+  btn.style.color = 'var(--green)';
+  setTimeout(() => { btn.textContent = prev; btn.style.color = ''; }, 2000);
+}
+
+document.querySelectorAll('.fg-section').forEach(sec => {
+  sec.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      sec.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.overlay.open').forEach(o => {
+      o.classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  }
+});
+
+document.addEventListener('click', e => {
+  const m = document.getElementById('mob-menu');
+  const h = document.getElementById('hbg');
+  if (m.classList.contains('open') && !m.contains(e.target) && !h.contains(e.target)) {
+    m.classList.remove('open');
+    h.classList.remove('open');
+  }
+});
+
+// ── Manual log multi-step ─────────────────────────────────────────
+let currentLogStep = 1;
+
+function logStep(n) {
+  [1,2,3].forEach(i => {
+    const s = document.getElementById('log-step-'+i);
+    if(s) s.style.display = i===n ? 'block' : 'none';
+    const d = document.getElementById('ms'+i);
+    if(d) d.classList.toggle('on', i<=n);
+  });
+  currentLogStep = n;
+  // Only show the HC upsell on step 3 if not already dismissed
+  const upsell = document.getElementById('save-upsell');
+  if(upsell) upsell.style.display = (!localStorage.getItem('hc_upsell_shown') && n===3) ? 'block' : 'none';
+}
+
+function openManualLog() {
+  // Reset form
+  ['log-brand','log-name','log-thc','log-batch','log-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  const sel = document.getElementById('log-type');
+  if(sel) sel.selectedIndex = 0;
+  const dt = document.getElementById('log-date');
+  if(dt) dt.value = '';
+  document.getElementById('log-rating').value = '0';
+  document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('on'));
+  // Clear terp tags
+  document.querySelectorAll('.terp-tag-item').forEach(t => t.remove());
+  removePhoto();
+  logStep(1);
+  openModal('o-manual-log');
+}
+
+function saveLog() {
+  const brand = document.getElementById('log-brand').value.trim() || 'Unknown Brand';
+  const name  = document.getElementById('log-name').value.trim() || 'Unnamed Product';
+  // Mark upsell shown so it doesn't appear again
+  localStorage.setItem('hc_upsell_shown', '1');
+  closeModal('o-manual-log');
+  // Show fridge page with the upsell callout once
+  go('fridge', document.querySelectorAll('.nav-link')[2]);
+  const upsellCard = document.getElementById('hc-upsell');
+  if(upsellCard && !localStorage.getItem('hc_upsell_card_dismissed')) {
+    upsellCard.style.display = 'flex';
+  }
+}
+
+function closeUpsell() {
+  localStorage.setItem('hc_upsell_card_dismissed','1');
+  const el = document.getElementById('hc-upsell');
+  if(el) { el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.style.display='none',300); }
+}
+
+// ── Terpene tag input ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('terp-bare');
+  if(!input) return;
+  input.addEventListener('keydown', function(e) {
+    if(e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      addTerpTag(this.value.trim().replace(/,$/,'').trim());
+      this.value = '';
+    }
+  });
+  input.addEventListener('blur', function() {
+    if(this.value.trim()) {
+      addTerpTag(this.value.trim());
+      this.value = '';
+    }
+  });
+});
+
+function addTerpTag(val) {
+  if(!val) return;
+  const wrap = document.getElementById('terp-wrap');
+  const input = document.getElementById('terp-bare');
+  const tag = document.createElement('div');
+  tag.className = 'terp-tag-item';
+  tag.innerHTML = val + '<button class="terp-tag-remove" onclick="this.parentElement.remove()">×</button>';
+  wrap.insertBefore(tag, input);
+}
+
+// ── Star rating ───────────────────────────────────────────────────
+function setRating(n) {
+  document.getElementById('log-rating').value = n;
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('on', parseInt(b.dataset.v) <= n);
+  });
+}
+
+// ── Photo upload ──────────────────────────────────────────────────
+function handlePhoto(input) {
+  if(!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('photo-preview-img').src = e.target.result;
+    document.getElementById('photo-preview').style.display = 'block';
+    document.getElementById('photo-drop').style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removePhoto() {
+  document.getElementById('photo-preview').style.display = 'none';
+  document.getElementById('photo-drop').style.display = 'flex';
+  document.getElementById('photo-preview-img').src = '';
+  const fi = document.getElementById('photo-file');
+  if(fi) fi.value = '';
+}
+
+// ── On load: init upsell card visibility ──────────────────────────
+window.addEventListener('load', () => {
+  const upsellCard = document.getElementById('hc-upsell');
+  if(upsellCard) {
+    upsellCard.style.display = localStorage.getItem('hc_upsell_card_dismissed') ? 'none' : 'flex';
+  }
+  // Init step display
+  logStep(1);
+  const saveUp = document.getElementById('save-upsell');
+  if(saveUp) saveUp.style.display = 'none';
+});
+
+</script>
+</body>
+</html>

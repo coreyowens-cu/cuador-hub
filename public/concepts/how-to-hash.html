@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeadChange — How To Hash · Vol. I</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --forest:#1a3a2a;--sage:#4e8b5f;--mint:#7dc492;
+  --cream:#f5f0e8;--parchment:#ede7d9;--gold:#c9a84c;
+  --sand:#ddd5c4;--muted:#6b6455;--ink:#0f1a14;
+}
+body{background:#2a2a22;font-family:'Libre Baskerville',Georgia,serif;color:var(--ink);line-height:1.6;}
+.book{max-width:820px;margin:0 auto;border-left:8px solid var(--forest);box-shadow:0 0 80px rgba(0,0,0,0.6);}
+.cover{background:var(--forest);padding:32px 56px 0 64px;}
+.cover-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;}
+.c-brand{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.35em;text-transform:uppercase;color:var(--mint);opacity:.8;}
+.c-vol{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.2em;color:rgba(255,255,255,.3);}
+.c-kicker{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.c-title{font-family:'Playfair Display',serif;font-size:clamp(64px,11vw,104px);font-weight:900;line-height:.88;color:#fff;letter-spacing:-.02em;margin-bottom:6px;}
+.c-title .it{font-style:italic;color:var(--mint);display:block;}
+.c-sub{font-family:'Playfair Display',serif;font-size:17px;font-style:italic;color:rgba(255,255,255,.5);margin-top:20px;line-height:1.5;}
+.c-rule{width:80px;height:2px;background:var(--gold);margin:24px 0 16px;}
+.c-toc{display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:28px;}
+.c-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-right:14px;}
+.c-foot{border-top:1px solid rgba(255,255,255,.1);padding:14px 0;display:flex;justify-content:space-between;align-items:center;}
+.c-foot-brand{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.08em;}
+.c-foot-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.15em;color:rgba(255,255,255,.22);}
+.divider{background:var(--ink);padding:14px 64px;display:flex;align-items:center;gap:16px;}
+.div-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--gold);letter-spacing:.1em;}
+.div-title{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:rgba(255,255,255,.5);}
+.div-line{flex:1;height:1px;background:rgba(255,255,255,.1);}
+.page{background:var(--cream);padding:36px 64px 40px;border-bottom:1px solid rgba(0,0,0,.06);position:relative;}
+.page-dark{background:var(--forest);color:#fff;}
+.page-parch{background:var(--parchment);}
+.pg{position:absolute;bottom:16px;right:32px;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;}
+.pg-lt{color:rgba(255,255,255,.25);}
+.lbl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--sage);margin-bottom:12px;}
+.lbl-lt{color:var(--mint);opacity:.7;}
+.h1{font-family:'Playfair Display',serif;font-size:clamp(28px,4.5vw,46px);font-weight:700;line-height:1.05;letter-spacing:-.015em;margin-bottom:20px;}
+.h1-lt{color:#fff;}
+.h1 em{font-style:italic;color:var(--sage);}
+.h1-lt em{color:var(--mint);}
+.intro{font-size:15px;line-height:1.75;color:var(--muted);max-width:560px;margin-bottom:24px;}
+.intro-lt{color:rgba(255,255,255,.65);}
+.body-t{font-size:13px;line-height:1.8;color:#3a3530;}
+.pq{border-left:4px solid var(--gold);padding:3px 0 3px 18px;margin:20px 0;}
+.pqt{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;line-height:1.5;color:var(--forest);}
+.twow{display:grid;grid-template-columns:3fr 2fr;gap:40px;align-items:start;}
+.steps{display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.08);border-radius:4px;overflow:hidden;}
+.sr{display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid rgba(0,0,0,.06);}
+.sr:last-child{border-bottom:none;}
+.sn{background:var(--forest);display:flex;align-items:flex-start;justify-content:center;padding:18px 0;flex-shrink:0;}
+.snum{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:var(--mint);line-height:1;}
+.sc{background:#fff;padding:16px 20px;}
+.st{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);margin-bottom:4px;}
+.sb{font-size:12px;line-height:1.65;color:var(--muted);}
+.stip{display:inline-block;margin-top:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--gold);background:rgba(201,168,76,.1);padding:2px 7px;border-radius:2px;}
+.tsec{display:grid;grid-template-columns:1fr 190px;gap:32px;align-items:start;}
+.tchart{display:flex;flex-direction:column;gap:5px;}
+.tr{display:grid;grid-template-columns:130px 1fr 58px;align-items:center;gap:8px;}
+.tprod{font-size:11px;font-weight:700;color:var(--forest);font-family:'Libre Baskerville',serif;}
+.tbw{background:rgba(0,0,0,.06);height:9px;border-radius:2px;overflow:hidden;}
+.tb{height:100%;background:var(--mint);border-radius:2px;}
+.trange{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);text-align:right;white-space:nowrap;}
+.tsb{background:var(--forest);border-radius:4px;padding:18px 16px;}
+.tsbh{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);margin-bottom:10px;}
+.trule{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;}
+.trd{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;}
+.trt{font-size:11px;line-height:1.5;color:rgba(255,255,255,.7);}
+.ttype{border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.08);}
+.trow{display:grid;grid-template-columns:120px 100px 1fr 100px;border-bottom:1px solid rgba(0,0,0,.06);align-items:center;}
+.trow:last-child{border-bottom:none;}
+.trow.hdr{background:var(--forest);}
+.tc{padding:11px 13px;font-size:12px;color:#3a3530;}
+.tc.nm{font-weight:700;color:var(--forest);font-family:'Playfair Display',serif;font-size:13px;}
+.tc.hc{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.55);padding:9px 13px;}
+.bg{display:inline-block;font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;}
+.bg-g{background:rgba(78,139,95,.15);color:var(--sage);}
+.bg-o{background:rgba(201,168,76,.15);color:#8a6a1a;}
+.mlist{display:flex;flex-direction:column;gap:10px;}
+.mi{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:flex-start;padding:13px 16px;background:rgba(255,255,255,.06);border-radius:4px;border:1px solid rgba(255,255,255,.07);}
+.mx{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--gold);line-height:1;text-align:center;}
+.mt{font-size:13px;font-weight:700;color:#fff;margin-bottom:3px;font-family:'Playfair Display',serif;}
+.mf{font-size:12px;line-height:1.55;color:rgba(255,255,255,.6);}
+.glossgrid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(0,0,0,.08);border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.08);}
+.gi{background:#fff;padding:12px 14px;}
+.gterm{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px;}
+.gdef{font-size:11px;line-height:1.6;color:var(--muted);}
+.gear-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.gear-item{background:#fff;border-radius:4px;padding:14px 16px;border:1px solid rgba(0,0,0,.07);}
+.gear-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);margin-bottom:3px;}
+.gear-why{font-size:11px;line-height:1.6;color:var(--muted);margin-bottom:6px;}
+.gear-price{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;color:var(--sage);}
+.cta-band{background:var(--ink);padding:32px 64px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;}
+.cta-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--mint);margin-bottom:10px;}
+.cta-headline{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:10px;}
+.cta-body{font-size:13px;line-height:1.65;color:rgba(255,255,255,.55);max-width:400px;}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.qr-box{width:96px;height:96px;background:#fff;border-radius:4px;display:flex;align-items:center;justify-content:center;}
+.qr-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.35);text-align:center;}
+.closing{background:var(--forest);padding:48px 64px 52px;}
+.cq{font-family:'Playfair Display',serif;font-size:clamp(22px,3.5vw,36px);font-weight:700;font-style:italic;color:#fff;line-height:1.3;max-width:480px;margin-bottom:28px;}
+.cq span{color:var(--mint);}
+.closing-note{font-size:13px;line-height:1.75;color:rgba(255,255,255,.5);max-width:460px;margin-bottom:32px;font-family:'Libre Baskerville',serif;font-style:italic;}
+.cfoot{display:flex;justify-content:space-between;align-items:flex-end;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);}
+.cbrand{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:rgba(255,255,255,.85);letter-spacing:.04em;}
+.csub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.28);margin-top:3px;}
+.cv2{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;color:var(--gold);text-align:right;opacity:.75;}
+.hc-intro{background:var(--forest);padding:32px 64px;}
+.hc-intro-grid{display:grid;grid-template-columns:1fr 220px;gap:48px;align-items:center;}
+.hc-logo-lockup{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.hc-mark{width:80px;height:80px;border-radius:50%;background:rgba(125,196,146,.12);border:1px solid rgba(125,196,146,.25);display:flex;align-items:center;justify-content:center;}
+.hc-mark-text{font-family:'Playfair Display',serif;font-size:11px;font-weight:900;color:var(--mint);letter-spacing:.05em;text-align:center;line-height:1.2;}
+.hc-brand-full{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:rgba(255,255,255,.6);letter-spacing:.06em;}
+.hc-brand-sub{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;color:rgba(255,255,255,.3);text-align:center;}
+.hc-commit-head{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--mint);margin-bottom:12px;opacity:.7;}
+.hc-commit-body{font-size:13px;line-height:1.75;color:rgba(255,255,255,.65);}
+.hc-commit-quote{font-family:'Playfair Display',serif;font-size:16px;font-style:italic;color:rgba(255,255,255,.85);line-height:1.5;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);}
+.storage-timeline{display:flex;flex-direction:column;border:1px solid rgba(0,0,0,.08);border-radius:4px;overflow:hidden;margin-bottom:20px;}
+.stl-row{display:grid;grid-template-columns:120px 1fr;border-bottom:1px solid rgba(0,0,0,.06);}
+.stl-row:last-child{border-bottom:none;}
+.stl-period{background:var(--forest);padding:16px 14px;display:flex;flex-direction:column;justify-content:center;}
+.stl-period-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);margin-bottom:4px;}
+.stl-period-time{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;line-height:1.2;}
+.stl-content{background:#fff;padding:16px 18px;}
+.stl-method{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);margin-bottom:4px;}
+.stl-detail{font-size:12px;line-height:1.6;color:var(--muted);}
+.stl-warn{display:inline-block;margin-top:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;color:#8a6a1a;background:rgba(201,168,76,.1);padding:2px 7px;border-radius:2px;}
+.container-table{width:100%;border-collapse:collapse;border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.08);}
+.container-table th{background:var(--forest);color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:9px 13px;text-align:left;font-weight:400;}
+.container-table td{padding:11px 13px;font-size:12px;border-bottom:1px solid rgba(0,0,0,.06);vertical-align:top;color:#3a3530;}
+.container-table tr:last-child td{border-bottom:none;}
+.container-table tr:nth-child(odd) td{background:#fff;}
+.container-table tr:nth-child(even) td{background:rgba(255,255,255,.55);}
+.container-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);}
+.enemies-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.enemy-card{border-radius:4px;overflow:hidden;}
+.enemy-head{padding:10px 14px;background:var(--forest);}
+.enemy-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:#fff;}
+.enemy-body{background:#fff;padding:10px 14px;}
+.enemy-do{color:var(--sage);font-size:12px;font-weight:700;margin-bottom:3px;}
+.enemy-dont{font-size:11px;color:var(--muted);}
+.cleaning-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.clean-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:4px;overflow:hidden;}
+.clean-head{background:rgba(125,196,146,.15);padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.06);}
+.clean-head-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;}
+.clean-head-freq{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mint);opacity:.8;}
+.clean-body{padding:14px 16px;}
+.clean-step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.clean-step:last-child{margin-bottom:0;}
+.clean-step-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--gold);flex-shrink:0;line-height:1.8;}
+.clean-step-text{font-size:12px;line-height:1.6;color:rgba(255,255,255,.65);}
+.clean-tip{display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.06em;color:var(--gold);background:rgba(201,168,76,.1);padding:2px 7px;border-radius:2px;}
+.consume-intro-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
+.consume-card{border-radius:4px;overflow:hidden;border:1px solid rgba(0,0,0,.08);}
+.consume-card.featured{border:2px solid var(--mint);}
+.consume-card-head{background:var(--forest);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.consume-card-head.featured-head{background:var(--sage);}
+.consume-card-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;}
+.consume-card-tag{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.12em;text-transform:uppercase;padding:3px 7px;border-radius:2px;white-space:nowrap;flex-shrink:0;}
+.tag-focus{background:var(--gold);color:var(--forest);}
+.tag-other{background:rgba(255,255,255,.12);color:rgba(255,255,255,.6);}
+.consume-card-body{background:#fff;padding:14px 18px;}
+.consume-desc{font-size:12px;line-height:1.65;color:var(--muted);margin-bottom:10px;}
+.consume-brands-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);margin-bottom:6px;}
+.consume-brands{display:flex;flex-wrap:wrap;gap:5px;}
+.brand-pill{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.06em;background:var(--parchment);color:var(--muted);padding:2px 8px;border-radius:2px;border:1px solid rgba(0,0,0,.07);}
+.brand-pill.hc{background:rgba(78,139,95,.1);color:var(--sage);border-color:rgba(78,139,95,.2);}
+.focus-banner{background:var(--sage);border-radius:4px;padding:18px 22px;display:flex;align-items:center;gap:20px;}
+.focus-banner-icon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:'Playfair Display',serif;font-size:16px;font-weight:900;color:#fff;}
+.focus-banner-text{font-size:13px;line-height:1.6;color:rgba(255,255,255,.9);}
+.focus-banner-text strong{color:#fff;}
+.terp-layout{display:grid;grid-template-columns:1fr 220px;gap:32px;align-items:start;}
+.terp-table{width:100%;border-collapse:collapse;}
+.terp-table th{background:var(--forest);color:rgba(255,255,255,.6);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;padding:9px 13px;text-align:left;font-weight:400;}
+.terp-table td{padding:10px 13px;font-size:12px;border-bottom:1px solid rgba(0,0,0,.06);vertical-align:top;}
+.terp-table tr:last-child td{border-bottom:none;}
+.terp-table tr:nth-child(even) td{background:rgba(255,255,255,.5);}
+.terp-table tr:nth-child(odd) td{background:#fff;}
+.terp-name{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);}
+.terp-fx{color:var(--muted);}
+.terp-sidebar{display:flex;flex-direction:column;gap:12px;}
+.terp-tip-card{background:var(--forest);border-radius:4px;padding:16px;}
+.terp-tip-head{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);margin-bottom:10px;}
+.terp-tip-body{font-size:12px;line-height:1.65;color:rgba(255,255,255,.65);}
+.terp-tip-body strong{color:rgba(255,255,255,.9);}
+.terp-connect{background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:14px 16px;}
+.terp-connect-head{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.terp-connect-body{font-size:11px;line-height:1.65;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="book">
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-top"><div class="c-brand">HeadChange Cannabis</div><div class="c-vol">Missouri · Vol. I</div></div>
+  <div class="c-kicker">A Field Guide to Concentrates</div>
+  <div class="c-title">HOW TO<span class="it">Hash</span></div>
+  <div class="c-sub">Everything you need to know<br>to consume concentrates with confidence.</div>
+  <div class="c-rule"></div>
+  <div class="c-toc">
+    <span class="c-tag">History of Hash</span><span class="c-tag">Ways to Consume</span><span class="c-tag">Dab Rig Step-by-Step</span>
+    <span class="c-tag">Temperature</span><span class="c-tag">Terpenes</span>
+    <span class="c-tag">Concentrate Types</span><span class="c-tag">Storage</span>
+    <span class="c-tag">Cleaning</span><span class="c-tag">Mistakes</span>
+    <span class="c-tag">Glossary</span><span class="c-tag">Gear Guide</span>
+  </div>
+  <div class="c-foot"><div class="c-foot-brand">HEAD CHANGE</div><div class="c-foot-tag">Craft Concentrates · Missouri</div></div>
+</div>
+
+<!-- HC INTRO -->
+<div class="hc-intro">
+  <div class="hc-intro-grid">
+    <div>
+      <div class="hc-commit-head">Powered by HeadChange Cannabis</div>
+      <p class="hc-commit-body">HeadChange is a Missouri craft concentrate brand built around one obsession: the quality of the product and the knowledge to enjoy it. We make solventless concentrates — live rosin, hash rosin, bubble hash — using fresh-frozen, hand-selected input material and a process that prioritizes terpene preservation at every step.</p>
+      <p class="hc-commit-quote">"We made this guide because great concentrate deserves to be understood. The more you know, the better it tastes."</p>
+    </div>
+    <div class="hc-logo-lockup">
+      <div class="hc-mark"><div class="hc-mark-text">HEAD<br>CHANGE</div></div>
+      <div class="hc-brand-full">HEAD CHANGE</div>
+      <div class="hc-brand-sub">Craft Concentrates<br>Missouri</div>
+    </div>
+  </div>
+</div>
+
+<!-- BEFORE YOU START -->
+<div class="divider"><div class="div-num">→</div><div class="div-title">Before You Start</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Start here</div>
+  <div class="h1">One rule <em>before anything else.</em></div>
+  <div class="twow">
+    <div>
+      <p class="intro">This isn't a textbook. You don't need to read it front to back. Think of it as a field guide — flip to what's useful, come back when you have a question, keep it by your gear.</p>
+      <div class="pq"><div class="pqt">"Start small. Concentrates are significantly stronger than flower. You can always take more. You can't untake a dab."</div></div>
+      <p class="body-t">If you're new, start at Section 01 and work through in order. If you already know the basics, jump to whatever you need. Either way — welcome. Hash is worth understanding.</p>
+    </div>
+    <div style="background:var(--forest);border-radius:4px;padding:20px 18px;">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--mint);margin-bottom:14px;">Potency at a glance</div>
+      <div style="margin-bottom:12px;">
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.45);margin-bottom:5px;">FLOWER</div>
+        <div style="background:rgba(255,255,255,.08);height:10px;border-radius:2px;overflow:hidden;"><div style="width:22%;height:100%;background:rgba(125,196,146,.5);"></div></div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">15–25% THC</div>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.45);margin-bottom:5px;">CONCENTRATES</div>
+        <div style="background:rgba(255,255,255,.08);height:10px;border-radius:2px;overflow:hidden;"><div style="width:82%;height:100%;background:var(--mint);"></div></div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:rgba(255,255,255,.4);margin-top:3px;">60–90%+ THC</div>
+      </div>
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.45);line-height:1.6;">Think of the difference between a beer and a neat whiskey. Same category. Very different approach required.</div>
+    </div>
+  </div>
+  <div class="pg">2</div>
+</div>
+
+<!-- HISTORY OF HASH -->
+<div class="divider"><div class="div-num">→</div><div class="div-title">A Brief History of Hash</div><div class="div-line"></div></div>
+
+<div class="page">
+  <div class="lbl">Origins</div>
+  <div class="h1">One of the oldest cannabis<br>preparations <em>in human history.</em></div>
+  <p class="intro">Hash predates modern flower consumption by centuries. The desire to isolate the most potent part of the plant is ancient — what's changed is how precisely we can do it.</p>
+
+  <div style="display:flex;flex-direction:column;gap:0;position:relative;">
+    <div style="position:absolute;left:110px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,var(--mint),var(--sage),var(--gold));"></div>
+
+    <div style="display:grid;grid-template-columns:110px 1fr;position:relative;margin-bottom:32px;">
+      <div style="padding:0 28px 0 0;text-align:right;padding-top:2px;">
+        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Ancient</div>
+        <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);line-height:1.2;">Central Asia &amp;<br>Middle East</div>
+      </div>
+      <div style="position:absolute;left:104px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--mint);border:2px solid var(--cream);z-index:1;"></div>
+      <div style="padding:0 0 0 28px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:6px;">Charas — the original concentrate</div>
+        <p style="font-size:13px;line-height:1.75;color:#4a4540;">The earliest recorded hash was made by hand-rubbing live cannabis plants, collecting the sticky resin on the palms, and pressing it into dark, dense slabs. This method — called charas — is still practiced in parts of India and Nepal today, passed down through generations without much change.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:110px 1fr;position:relative;margin-bottom:32px;">
+      <div style="padding:0 28px 0 0;text-align:right;padding-top:2px;">
+        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Traditional</div>
+        <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);line-height:1.2;">Morocco &amp;<br>Afghanistan</div>
+      </div>
+      <div style="position:absolute;left:104px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--mint);border:2px solid var(--cream);z-index:1;"></div>
+      <div style="padding:0 0 0 28px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:6px;">Kief pressing &amp; regional styles</div>
+        <p style="font-size:13px;line-height:1.75;color:#4a4540;">In Morocco, dry-sift kief pressing became the standard — dried cannabis sifted through fine mesh screens, pressed into pale crumbly blocks. Afghanistan and Lebanon developed their own distinct styles, each with recognizable textures and effect profiles that spread through trade routes into Europe and the West.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:110px 1fr;position:relative;margin-bottom:32px;">
+      <div style="padding:0 28px 0 0;text-align:right;padding-top:2px;">
+        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Evolution</div>
+        <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);line-height:1.2;">The Modern<br>Movement</div>
+      </div>
+      <div style="position:absolute;left:104px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--mint);border:2px solid var(--cream);z-index:1;"></div>
+      <div style="padding:0 0 0 28px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:6px;">Same goal, better tools</div>
+        <p style="font-size:13px;line-height:1.75;color:#4a4540;">The modern concentrate movement is a direct evolution of this ancient practice — just with a much better understanding of chemistry and far more precise equipment. Ice water extraction, rosin pressing, closed-loop hydrocarbon systems. All different methods. All the same core goal: isolate and concentrate the plant's most valuable compounds.</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:110px 1fr;position:relative;">
+      <div style="padding:0 28px 0 0;text-align:right;padding-top:2px;">
+        <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Today</div>
+        <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:700;color:var(--forest);line-height:1.2;">Craft<br>Concentrates</div>
+      </div>
+      <div style="position:absolute;left:104px;top:6px;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid var(--cream);z-index:1;"></div>
+      <div style="padding:0 0 0 28px;">
+        <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--forest);margin-bottom:6px;">The premium tier</div>
+        <p style="font-size:13px;line-height:1.75;color:#4a4540;">Live rosin, hash rosin, full-melt bubble hash. The same ancient principle — collect the resin — refined to a level of purity and flavor complexity that wasn't possible until recently. The legal market demands consistency and safety testing. The craft movement demands something more: that the product actually tastes like the plant it came from.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="pq" style="margin-top:28px;"><div class="pqt">What changed is the how. What didn't change is the what — it's still about trichomes. It's still about resin.</div></div>
+  <div class="pg">3</div>
+</div>
+
+<div class="page page-parch">
+  <div class="lbl">The science, simply</div>
+  <div class="h1">Why concentrates are <em>stronger.</em></div>
+  <p class="intro" style="margin-bottom:20px;">Cannabis plants produce trichomes — tiny mushroom-shaped glands that coat the flowers. Inside those trichomes are the compounds that make cannabis work: cannabinoids like THC and CBD, and terpenes that shape flavor and aroma.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;">
+    <div style="background:#fff;border-radius:4px;padding:20px;border:1px solid rgba(0,0,0,.07);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--sand);flex-shrink:0;"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);">When you smoke flower</div>
+      </div>
+      <p style="font-size:12px;line-height:1.7;color:var(--muted);">You're burning the whole plant — cellulose, chlorophyll, plant waxes, and all. Only a fraction of what you're consuming is the active compounds you're after.</p>
+    </div>
+    <div style="background:var(--forest);border-radius:4px;padding:20px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--mint);">When you dab a concentrate</div>
+      </div>
+      <p style="font-size:12px;line-height:1.7;color:rgba(255,255,255,.65);">Everything except the active compounds has been removed. What remains is almost entirely cannabinoids and terpenes — which is why concentrates are stronger, cleaner-tasting, and more efficient per unit.</p>
+    </div>
+  </div>
+
+  <div class="lbl">Why people make the switch</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+    <div style="background:#fff;border-radius:4px;padding:16px;border-top:3px solid var(--mint);border:1px solid rgba(0,0,0,.07);border-top:3px solid var(--mint);">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;">Efficiency</div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);margin-bottom:6px;">Less is more</div>
+      <p style="font-size:11px;line-height:1.65;color:var(--muted);">A fraction of the amount for the same or stronger effect. Concentrates are 60–90%+ THC versus 15–25% in typical flower.</p>
+    </div>
+    <div style="background:#fff;border-radius:4px;padding:16px;border:1px solid rgba(0,0,0,.07);border-top:3px solid var(--mint);">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;">Flavor</div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);margin-bottom:6px;">Terpene clarity</div>
+      <p style="font-size:11px;line-height:1.65;color:var(--muted);">Terpenes are more pronounced, complex, and varied than in flower. Premium concentrates taste like the plant — not the smoke.</p>
+    </div>
+    <div style="background:#fff;border-radius:4px;padding:16px;border:1px solid rgba(0,0,0,.07);border-top:3px solid var(--mint);">
+      <div style="font-family:'DM Mono',monospace;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--sage);margin-bottom:8px;">Experience</div>
+      <div style="font-family:'Playfair Display',serif;font-size:14px;font-weight:700;color:var(--forest);margin-bottom:6px;">Noticeably different</div>
+      <p style="font-size:11px;line-height:1.65;color:var(--muted);">Done right, it's a qualitatively different effect. More nuanced, more tied to the specific cultivar and its terpene profile.</p>
+    </div>
+  </div>
+  <div class="pg">4</div>
+</div>
+
+<!-- 01 WAYS TO CONSUME -->
+<div class="divider"><div class="div-num">01</div><div class="div-title">Ways to Consume — Know Your Options</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 01 · The landscape</div>
+  <div class="h1">There's more than <em>one way in.</em></div>
+  <p class="intro">Concentrates can be consumed several different ways — each with its own trade-offs between ease of use, temperature control, flavor, and portability. Here's an honest overview of the main methods and the leading products in each category.</p>
+  <div class="consume-intro-grid">
+    <div class="consume-card featured">
+      <div class="consume-card-head featured-head"><div class="consume-card-name">Traditional Dab Rig</div><span class="consume-card-tag tag-focus">Focus of this guide</span></div>
+      <div class="consume-card-body">
+        <p class="consume-desc">A glass water pipe with a heated quartz banger. Requires a torch and a little technique — but delivers the fullest flavor experience of any method. The gold standard for solventless concentrates like live rosin and hash rosin.</p>
+        <div class="consume-brands-label">Leading Brands</div>
+        <div class="consume-brands"><span class="brand-pill">MJ Arsenal</span><span class="brand-pill">Pulsar</span><span class="brand-pill">Lookah</span><span class="brand-pill">Highly Educated</span><span class="brand-pill hc">HeadChange pairs best with a rig</span></div>
+      </div>
+    </div>
+    <div class="consume-card">
+      <div class="consume-card-head"><div class="consume-card-name">E-Rig (Electronic)</div><span class="consume-card-tag tag-other">No torch needed</span></div>
+      <div class="consume-card-body">
+        <p class="consume-desc">A self-contained electronic device that heats to a precise temperature at the press of a button. More consistent than a torch, easier for beginners, and harder to accidentally overheat.</p>
+        <div class="consume-brands-label">Leading Brands</div>
+        <div class="consume-brands"><span class="brand-pill">Puffco Peak Pro</span><span class="brand-pill">Dr. Dabber Switch</span><span class="brand-pill">Focus V Carta 2</span><span class="brand-pill">Ispire Daab</span></div>
+      </div>
+    </div>
+    <div class="consume-card">
+      <div class="consume-card-head"><div class="consume-card-name">Vape Pen / Cartridge</div><span class="consume-card-tag tag-other">Most accessible</span></div>
+      <div class="consume-card-body">
+        <p class="consume-desc">A pre-filled cartridge attached to a battery — draw and go. No torch, no tools, no cleanup. Most carts use distillate; look for live resin or full-spectrum carts for more flavor.</p>
+        <div class="consume-brands-label">Leading Brands</div>
+        <div class="consume-brands"><span class="brand-pill">Pax Era</span><span class="brand-pill">STIIIZY</span><span class="brand-pill">Raw Garden</span><span class="brand-pill">Heavy Hitters</span></div>
+      </div>
+    </div>
+    <div class="consume-card">
+      <div class="consume-card-head"><div class="consume-card-name">Nectar Collector</div><span class="consume-card-tag tag-other">Portable dabbing</span></div>
+      <div class="consume-card-body">
+        <p class="consume-desc">A dip straw — heat the tip, touch it directly to concentrate, inhale simultaneously. Portable and minimal gear required. Less temperature precision than a rig, more control than a cart.</p>
+        <div class="consume-brands-label">Leading Brands</div>
+        <div class="consume-brands"><span class="brand-pill">Lookah Seahorse Pro</span><span class="brand-pill">Dip Devices EVRI</span><span class="brand-pill">Boundless Terp Pen</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="focus-banner">
+    <div class="focus-banner-icon">→</div>
+    <div class="focus-banner-text"><strong>This guide focuses on the traditional dab rig.</strong> It gives you the most control over temperature, the fullest flavor from your concentrate, and the best foundation for understanding how concentrates actually work. Once you know the rig, everything else is easier.</div>
+  </div>
+  <div class="pg">4</div>
+</div>
+
+<!-- 02 DAB RIG -->
+<div class="divider"><div class="div-num">02</div><div class="div-title">The Dab Rig — Step by Step</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 02 · The classic setup</div>
+  <div class="h1">How to dab, <em>done right.</em></div>
+  <p class="intro">The traditional method. A water pipe with a heated quartz banger instead of a bowl. Requires a torch and a little patience — especially on step 4.</p>
+  <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">What you need: dab rig · quartz banger · torch · dab tool · carb cap · cotton swabs · isopropyl alcohol</div>
+  <div class="steps">
+    <div class="sr"><div class="sn"><div class="snum">1</div></div><div class="sc"><div class="st">Fill with water</div><div class="sb">Add enough water that it bubbles when you draw, but doesn't splash into the stem. About 1–2 inches in most rigs.</div></div></div>
+    <div class="sr"><div class="sn"><div class="snum">2</div></div><div class="sc"><div class="st">Prepare your dab</div><div class="sb">Use a dab tool to pick up a small amount — grain of rice or smaller to start. Set it aside on parchment or the edge of your tool.</div></div></div>
+    <div class="sr"><div class="sn"><div class="snum">3</div></div><div class="sc"><div class="st">Heat the banger</div><div class="sb">Hold the torch 2–3 inches from the banger. Heat the bottom and sides for 20–30 seconds until the quartz begins to glow faintly.</div></div></div>
+    <div class="sr"><div class="sn" style="background:var(--gold)"><div class="snum" style="color:var(--forest)">4</div></div><div class="sc"><div class="st">Wait — this is the most important step</div><div class="sb">Set a timer. For live rosin: <strong>50–60 seconds.</strong> For standard BHO: 35–45 seconds. Lower temp = better flavor, smoother hit.</div><span class="stip">The 60-second rule for rosin</span></div></div>
+    <div class="sr"><div class="sn"><div class="snum">5</div></div><div class="sc"><div class="st">Load the concentrate</div><div class="sb">Place concentrate into the banger — it should vaporize immediately. If it combusts or turns black, it was still too hot.</div></div></div>
+    <div class="sr"><div class="sn"><div class="snum">6</div></div><div class="sc"><div class="st">Cap it &amp; inhale slowly</div><div class="sb">Place the carb cap over the banger. Draw gently — a slow, controlled pull is more effective and more comfortable.</div></div></div>
+    <div class="sr"><div class="sn"><div class="snum">7</div></div><div class="sc"><div class="st">Swab while warm</div><div class="sb">While the banger is still warm, swab inside with a dry cotton swab, then an ISO-dipped one. A clean banger = better flavor every time.</div></div></div>
+  </div>
+  <div class="pg">6</div>
+</div>
+
+<!-- 03 TEMPERATURE -->
+<div class="divider"><div class="div-num">03</div><div class="div-title">Temperature — The Single Most Important Variable</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 03 · Temperature</div>
+  <div class="h1">Heat it <em>right.</em></div>
+  <div class="tsec">
+    <div>
+      <p class="intro">At high temps, terpenes combust before they reach you. At 450–520°F they vaporize cleanly — preserving the full character of the concentrate.</p>
+      <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;">Ideal range by product</div>
+      <div class="tchart">
+        <div class="tr"><div class="tprod">Live Rosin</div><div class="tbw"><div class="tb" style="width:52%"></div></div><div class="trange">460–510°F</div></div>
+        <div class="tr"><div class="tprod">Hash Rosin</div><div class="tbw"><div class="tb" style="width:47%"></div></div><div class="trange">450–500°F</div></div>
+        <div class="tr"><div class="tprod">Live Resin</div><div class="tbw"><div class="tb" style="width:63%"></div></div><div class="trange">490–530°F</div></div>
+        <div class="tr"><div class="tprod">BHO / Wax</div><div class="tbw"><div class="tb" style="width:73%"></div></div><div class="trange">500–540°F</div></div>
+        <div class="tr"><div class="tprod">Bubble Hash</div><div class="tbw"><div class="tb" style="width:42%"></div></div><div class="trange">450–480°F</div></div>
+        <div class="tr"><div class="tprod">Sauce / Diamonds</div><div class="tbw"><div class="tb" style="width:68%"></div></div><div class="trange">500–530°F</div></div>
+      </div>
+      <div class="pq" style="margin-top:18px;"><div class="pqt">Swab test: golden or clear residue = perfect temp. Dark brown or black = too hot.</div></div>
+    </div>
+    <div class="tsb">
+      <div class="tsbh">Low temp wins</div>
+      <div class="trule"><div class="trd"></div><div class="trt">Maximum flavor — terpenes fully intact</div></div>
+      <div class="trule"><div class="trd"></div><div class="trt">Smooth vapor — easier on throat and lungs</div></div>
+      <div class="trule"><div class="trd"></div><div class="trt">Full terpene profile = nuanced effect</div></div>
+      <div class="trule"><div class="trd"></div><div class="trt">Essential for premium live rosin</div></div>
+      <div style="height:12px;"></div>
+      <div class="tsbh" style="color:rgba(255,255,255,.35);">High temp trade-offs</div>
+      <div class="trule"><div class="trd" style="background:rgba(255,255,255,.18)"></div><div class="trt" style="color:rgba(255,255,255,.38);">Terpenes combust before you inhale</div></div>
+      <div class="trule"><div class="trd" style="background:rgba(255,255,255,.18)"></div><div class="trt" style="color:rgba(255,255,255,.38);">Harsh vapor — can cause coughing</div></div>
+      <div class="trule"><div class="trd" style="background:rgba(255,255,255,.18)"></div><div class="trt" style="color:rgba(255,255,255,.38);">Wastes what you paid a premium for</div></div>
+    </div>
+  </div>
+  <div class="pg">8</div>
+</div>
+
+<!-- 04 TERPENES -->
+<div class="divider"><div class="div-num">04</div><div class="div-title">Terpenes — Flavor, Aroma &amp; Effect</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 04 · Why terpenes matter more than THC</div>
+  <div class="h1">Don't just read THC.<br><em>Read the terpenes.</em></div>
+  <div class="terp-layout">
+    <div>
+      <p class="intro" style="margin-bottom:16px;">Terpenes are the aromatic compounds responsible for flavor, aroma, and the specific character of effects. A concentrate with a rich terpene profile at 70% THC is almost always a better experience than stripped distillate at 90%.</p>
+      <table class="terp-table">
+        <thead><tr><th>Terpene</th><th>Aroma</th><th>Associated Effects</th><th>Also Found In</th></tr></thead>
+        <tbody>
+          <tr><td><div class="terp-name">Myrcene</div></td><td class="terp-fx">Earthy, musky, herbal</td><td class="terp-fx">Relaxing, body-heavy, sedating</td><td class="terp-fx" style="font-size:11px;">Mango, hops</td></tr>
+          <tr><td><div class="terp-name">Limonene</div></td><td class="terp-fx">Citrus, lemon, orange</td><td class="terp-fx">Uplifting, mood-elevating</td><td class="terp-fx" style="font-size:11px;">Citrus peels</td></tr>
+          <tr><td><div class="terp-name">Caryophyllene</div></td><td class="terp-fx">Spicy, peppery, woody</td><td class="terp-fx">Calming, anti-inflammatory</td><td class="terp-fx" style="font-size:11px;">Black pepper</td></tr>
+          <tr><td><div class="terp-name">Linalool</div></td><td class="terp-fx">Floral, lavender, sweet</td><td class="terp-fx">Anxiety-reducing, sleep support</td><td class="terp-fx" style="font-size:11px;">Lavender</td></tr>
+          <tr><td><div class="terp-name">Pinene</div></td><td class="terp-fx">Pine, fresh, clean</td><td class="terp-fx">Alertness, memory retention</td><td class="terp-fx" style="font-size:11px;">Pine, rosemary</td></tr>
+          <tr><td><div class="terp-name">Humulene</div></td><td class="terp-fx">Earthy, woody, hoppy</td><td class="terp-fx">Appetite-suppressing, anti-inflammatory</td><td class="terp-fx" style="font-size:11px;">Hops, sage</td></tr>
+        </tbody>
+      </table>
+      <div class="pq" style="margin-top:18px;"><div class="pqt">Anything above 0.5% terpene content is noticeable. Above 1% is significant. The most flavorful concentrates often run 3–5% total terpenes.</div></div>
+    </div>
+    <div class="terp-sidebar">
+      <div class="terp-tip-card">
+        <div class="terp-tip-head">How to read a label</div>
+        <p class="terp-tip-body">When you see a terpene percentage on a lab test, you're seeing how much is present by weight. <strong>0.5%+</strong> is noticeable. <strong>1%+</strong> is significant. The best concentrates often run <strong>3–5%+.</strong></p>
+      </div>
+      <div class="terp-tip-card">
+        <div class="terp-tip-head">Terpenes + temperature</div>
+        <p class="terp-tip-body">Myrcene and limonene start vaporizing around <strong>334–348°F</strong> — the first to burn off at high heat. Another reason low-temp dabbing matters.</p>
+      </div>
+      <div class="terp-connect">
+        <div class="terp-connect-head">The entourage effect</div>
+        <p class="terp-connect-body">Cannabinoids and terpenes work better together than in isolation. A rich, diverse terpene profile produces a more complex, more effective experience than high-THC product with stripped-out terpenes.</p>
+      </div>
+    </div>
+  </div>
+  <div class="pg">10</div>
+</div>
+
+<!-- 05 CONCENTRATE TYPES -->
+<div class="divider"><div class="div-num">05</div><div class="div-title">Concentrate Types — Why the Format Matters</div><div class="div-line"></div></div>
+<div class="page page-parch">
+  <div class="lbl">Section 05 · The spectrum</div>
+  <div class="h1">Not all concentrates <em>are the same.</em></div>
+  <p class="intro" style="margin-bottom:16px;">The process used to make a concentrate affects flavor, potency, purity, and the experience it produces.</p>
+  <div class="ttype">
+    <div class="trow hdr"><div class="tc hc">Product</div><div class="tc hc">Method</div><div class="tc hc">Flavor Profile</div><div class="tc hc">Best For</div></div>
+    <div class="trow" style="background:#fff"><div class="tc nm">Live Rosin</div><div class="tc"><span class="bg bg-g">Solventless</span></div><div class="tc">Richest, most complex</div><div class="tc" style="font-size:11px;color:var(--muted);">Flavor chasers</div></div>
+    <div class="trow" style="background:rgba(255,255,255,.55)"><div class="tc nm">Hash Rosin</div><div class="tc"><span class="bg bg-g">Solventless</span></div><div class="tc">Ultra clean, full-spectrum</div><div class="tc" style="font-size:11px;color:var(--muted);">Connoisseurs</div></div>
+    <div class="trow" style="background:#fff"><div class="tc nm">Bubble Hash</div><div class="tc"><span class="bg bg-g">Solventless</span></div><div class="tc">Earthy, aromatic</div><div class="tc" style="font-size:11px;color:var(--muted);">Hash lovers</div></div>
+    <div class="trow" style="background:rgba(255,255,255,.55)"><div class="tc nm">Live Resin</div><div class="tc"><span class="bg bg-o">Solvent</span></div><div class="tc">High terpene, flavorful</div><div class="tc" style="font-size:11px;color:var(--muted);">Everyday premium</div></div>
+    <div class="trow" style="background:#fff"><div class="tc nm">Sauce / Diamonds</div><div class="tc"><span class="bg bg-o">Solvent</span></div><div class="tc">Fruity, pungent, potent</div><div class="tc" style="font-size:11px;color:var(--muted);">Flavor + potency</div></div>
+    <div class="trow" style="background:rgba(255,255,255,.55)"><div class="tc nm">BHO / Wax</div><div class="tc"><span class="bg bg-o">Solvent</span></div><div class="tc">Moderate</div><div class="tc" style="font-size:11px;color:var(--muted);">Budget-friendly</div></div>
+    <div class="trow" style="background:#fff"><div class="tc nm">Distillate</div><div class="tc"><span class="bg bg-o">Solvent</span></div><div class="tc">Minimal (add CDTs)</div><div class="tc" style="font-size:11px;color:var(--muted);">Vape carts, edibles</div></div>
+  </div>
+  <div class="pg">11</div>
+</div>
+
+<!-- 06 STORAGE -->
+<div class="divider"><div class="div-num">06</div><div class="div-title">Storage — Protecting What You Paid For</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 06 · Storage</div>
+  <div class="h1">Sealed. Cool. <em>Dark.</em></div>
+  <p class="intro" style="margin-bottom:20px;">Concentrate degrades when exposed to heat, light, air, and moisture. Avoiding them is simple once you know what to watch for.</p>
+  <div class="enemies-grid">
+    <div class="enemy-card"><div class="enemy-head"><div class="enemy-name">Air</div></div><div class="enemy-body"><div class="enemy-do">Keep sealed between every use</div><div class="enemy-dont">Even a few minutes of air exposure degrades terpenes. Never leave lids loose while setting up.</div></div></div>
+    <div class="enemy-card"><div class="enemy-head"><div class="enemy-name">Light</div></div><div class="enemy-body"><div class="enemy-do">Store away from sunlight &amp; UV</div><div class="enemy-dont">Don't leave on a sunny countertop or near a window. UV light accelerates degradation significantly.</div></div></div>
+    <div class="enemy-card"><div class="enemy-head"><div class="enemy-name">Heat</div></div><div class="enemy-body"><div class="enemy-do">Keep below 75°F consistently</div><div class="enemy-dont">Never store in a warm car, near a heat source, or in a hot bathroom. Rosin in a hot car can degrade in hours.</div></div></div>
+    <div class="enemy-card"><div class="enemy-head"><div class="enemy-name">Moisture</div></div><div class="enemy-body"><div class="enemy-do">Use dry, sealed containers only</div><div class="enemy-dont">Fridge condensation contaminates product. Always let cold containers reach room temp before opening.</div></div></div>
+  </div>
+  <div class="storage-timeline">
+    <div class="stl-row"><div class="stl-period"><div class="stl-period-label">Short-term</div><div class="stl-period-time">Days to<br>2 weeks</div></div><div class="stl-content"><div class="stl-method">Sealed glass or silicone · room temperature</div><div class="stl-detail">A sealed container in a cool drawer is all you need. Under 75°F. Silicone is easy to scoop from; glass is better for flavor — silicone absorbs trace terpenes over time.</div></div></div>
+    <div class="stl-row"><div class="stl-period"><div class="stl-period-label">Medium-term</div><div class="stl-period-time">2 weeks to<br>2 months</div></div><div class="stl-content"><div class="stl-method">Refrigerator · sealed, in a bag or box</div><div class="stl-detail">Keep at the back of the fridge, away from odors and moisture.<br><span class="stl-warn">Warm-up rule: remove 20–30 min before use. Open only after container feels like room temp.</span></div></div></div>
+    <div class="stl-row"><div class="stl-period"><div class="stl-period-label">Long-term</div><div class="stl-period-time">Months</div></div><div class="stl-content"><div class="stl-method">Freezer · airtight containers only</div><div class="stl-detail">Nearly halts degradation. Let frozen product thaw completely before opening — may take an hour or more.</div></div></div>
+  </div>
+  <table class="container-table">
+    <thead><tr><th>Container</th><th>Best For</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><div class="container-name">Glass jar</div></td><td>Long-term flavor</td><td>Doesn't absorb terpenes. Best for fridge/freezer.</td></tr>
+      <tr><td><div class="container-name">Silicone container</div></td><td>Daily use</td><td>Non-stick, portable. Absorbs trace terpenes over months.</td></tr>
+      <tr><td><div class="container-name">Parchment paper</div></td><td>Short-term / transport</td><td>Not airtight — wrap tightly or place in a container.</td></tr>
+      <tr><td><div class="container-name">Plastic bags</div></td><td style="color:#a33;">Not recommended</td><td>Porous — terpenes escape. Plastic can leach into product.</td></tr>
+    </tbody>
+  </table>
+  <div class="pg">12</div>
+</div>
+
+<!-- 07 CLEANING -->
+<div class="divider"><div class="div-num">07</div><div class="div-title">Cleaning — Protect Your Gear, Protect Your Flavor</div><div class="div-line"></div></div>
+<div class="page page-dark">
+  <div class="lbl lbl-lt">Section 07 · Cleaning</div>
+  <div class="h1 h1-lt">A dirty banger <em>ruins expensive product.</em></div>
+  <p class="intro intro-lt" style="margin-bottom:20px;">Residue from previous sessions burns alongside fresh concentrate, introducing char flavor and permanently staining your quartz. Clean gear isn't optional — it's the difference between tasting your product and tasting yesterday's.</p>
+  <div class="cleaning-steps">
+    <div class="clean-card">
+      <div class="clean-head"><div class="clean-head-title">After every dab</div><div class="clean-head-freq">The 60-second habit</div></div>
+      <div class="clean-body">
+        <div class="clean-step"><div class="clean-step-num">01</div><div class="clean-step-text">While the banger is still warm — not hot — take a dry cotton swab and wipe the inside walls in a circular motion.</div></div>
+        <div class="clean-step"><div class="clean-step-num">02</div><div class="clean-step-text">Follow with a swab lightly dipped in 99% isopropyl alcohol. This dissolves residue the dry swab missed.</div></div>
+        <div class="clean-step"><div class="clean-step-num">03</div><div class="clean-step-text">Let cool completely before your next dab. ISO evaporates — but don't torch a banger that's still wet.</div></div>
+        <span class="clean-tip">Residue comes off easily while warm. Don't wait.</span>
+      </div>
+    </div>
+    <div class="clean-card">
+      <div class="clean-head"><div class="clean-head-title">Deep clean — banger</div><div class="clean-head-freq">Weekly for regular consumers</div></div>
+      <div class="clean-body">
+        <div class="clean-step"><div class="clean-step-num">01</div><div class="clean-step-text">Place the banger in a zip-lock bag or glass jar. Cover completely with 99% isopropyl alcohol.</div></div>
+        <div class="clean-step"><div class="clean-step-num">02</div><div class="clean-step-text">Soak 30–60 minutes. Stubborn staining can go overnight.</div></div>
+        <div class="clean-step"><div class="clean-step-num">03</div><div class="clean-step-text">Rinse thoroughly with warm water, dry completely. Never torch a wet banger.</div></div>
+        <div class="clean-step"><div class="clean-step-num">04</div><div class="clean-step-text">For persistent staining: torch until residue burns off, then swab while warm.</div></div>
+        <span class="clean-tip">99% ISO only — 70% won't cut concentrate residue</span>
+      </div>
+    </div>
+    <div class="clean-card">
+      <div class="clean-head"><div class="clean-head-title">Clean the rig</div><div class="clean-head-freq">Every 1–2 weeks</div></div>
+      <div class="clean-body">
+        <div class="clean-step"><div class="clean-step-num">01</div><div class="clean-step-text">Empty the water. Pour in enough 99% ISO to coat all internal surfaces — about a quarter full.</div></div>
+        <div class="clean-step"><div class="clean-step-num">02</div><div class="clean-step-text">Add a pinch of coarse salt. Cover all openings and shake vigorously for 30–60 seconds.</div></div>
+        <div class="clean-step"><div class="clean-step-num">03</div><div class="clean-step-text">Pour out the ISO, rinse thoroughly with warm water several times until no ISO smell remains. Air dry.</div></div>
+        <span class="clean-tip">Reclaim in the rig restricts airflow and adds stale flavor</span>
+      </div>
+    </div>
+    <div class="clean-card">
+      <div class="clean-head"><div class="clean-head-title">Terp pearls &amp; carb cap</div><div class="clean-head-freq">After every few sessions</div></div>
+      <div class="clean-body">
+        <div class="clean-step"><div class="clean-step-num">01</div><div class="clean-step-text">Soak terp pearls in 99% ISO for 20–30 minutes. Rinse, dry completely before use.</div></div>
+        <div class="clean-step"><div class="clean-step-num">02</div><div class="clean-step-text">Clean pearls spin better and distribute heat more evenly — the difference is noticeable.</div></div>
+        <div class="clean-step"><div class="clean-step-num">03</div><div class="clean-step-text">Wipe the carb cap inside and out with an ISO-dipped swab. Residue on the cap reheats and affects flavor.</div></div>
+        <span class="clean-tip">Clean pearls = noticeably better low-temp performance</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:20px;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:4px;padding:14px 20px;">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;">Cleaning supply list</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="font-size:12px;color:rgba(255,255,255,.7);">Cotton swabs (bulk)<br><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$5–10</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);">99% Isopropyl alcohol<br><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$5–10</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);">Small glass jars<br><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$5–15</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);">Coarse salt (optional)<br><span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$2–5</span></div>
+    </div>
+  </div>
+  <div class="pg pg-lt">13</div>
+</div>
+
+<!-- 08 COMMON MISTAKES -->
+<div class="divider"><div class="div-num">08</div><div class="div-title">Common Mistakes — And How to Fix Them</div><div class="div-line"></div></div>
+<div class="page page-dark">
+  <div class="lbl lbl-lt">Section 08 · What goes wrong</div>
+  <div class="h1 h1-lt">Most bad dabs are <em>predictable.</em></div>
+  <p class="intro intro-lt" style="margin-bottom:20px;">None of these are hard to fix once you know what to watch for.</p>
+  <div class="mlist">
+    <div class="mi"><div class="mx">1</div><div><div class="mt">Using too much</div><div class="mf">A grain of rice — or smaller. Trust the size. Take one, wait 15 minutes. There is no experience ruined by a dab that was too small.</div></div></div>
+    <div class="mi"><div class="mx">2</div><div><div class="mt">Dabbing too hot</div><div class="mf">Set a timer after torching. 45 seconds minimum, 60 for rosin. The banger may not look ready — but it's at a better temperature.</div></div></div>
+    <div class="mi"><div class="mx">3</div><div><div class="mt">Skipping the carb cap</div><div class="mf">Not optional. Without it, concentrate can't vaporize fully at low temps. You leave product and flavor behind every single dab.</div></div></div>
+    <div class="mi"><div class="mx">4</div><div><div class="mt">Chasing THC % over terpenes</div><div class="mf">72% live rosin with a rich terpene profile almost always beats 90% distillate. Shop by profile, not percentage.</div></div></div>
+    <div class="mi"><div class="mx">5</div><div><div class="mt">Skipping gear maintenance</div><div class="mf">Swab after every dab while the banger is still warm. Deep clean with 99% ISO weekly. A dirty banger ruins expensive product.</div></div></div>
+    <div class="mi"><div class="mx">6</div><div><div class="mt">Storing carelessly</div><div class="mf">Sealed. Cool. Dark. Rosin in a hot car can degrade in hours. Fridge for 2+ weeks, freezer for months — warm up before opening.</div></div></div>
+  </div>
+  <div class="pg pg-lt">14</div>
+</div>
+
+<!-- 09 GLOSSARY -->
+<div class="divider"><div class="div-num">09</div><div class="div-title">Words Worth Knowing — The Glossary</div><div class="div-line"></div></div>
+<div class="page page-parch">
+  <div class="lbl">Section 09 · Glossary</div>
+  <div class="h1">The words <em>that matter.</em></div>
+  <p class="intro" style="margin-bottom:16px;">Every term on a concentrate menu, explained plainly.</p>
+  <div class="glossgrid">
+    <div class="gi"><div class="gterm">Trichomes</div><div class="gdef">Tiny crystal glands on cannabis flowers where all the value lives — THC, CBD, terpenes. Concentrates are essentially concentrated trichomes.</div></div>
+    <div class="gi"><div class="gterm">Terpenes</div><div class="gdef">Aromatic compounds responsible for flavor, aroma, and effect character. Over 200 identified in cannabis. They interact with cannabinoids to shape your experience.</div></div>
+    <div class="gi"><div class="gterm">Entourage Effect</div><div class="gdef">Cannabinoids and terpenes working better together than in isolation. Why full-spectrum and solventless products are valued over isolates.</div></div>
+    <div class="gi"><div class="gterm">Solventless</div><div class="gdef">Made using only water, heat, and/or pressure — no chemical solvents. Bubble hash and rosin are solventless. The cleanest extraction method.</div></div>
+    <div class="gi"><div class="gterm">Live (Rosin / Resin)</div><div class="gdef">Made from fresh-frozen plant material — frozen immediately after harvest. Preserves terpenes that would otherwise degrade during drying.</div></div>
+    <div class="gi"><div class="gterm">Banger / Nail</div><div class="gdef">The heated quartz cup on a dab rig where concentrate is applied. Quartz retains heat evenly and doesn't affect flavor.</div></div>
+    <div class="gi"><div class="gterm">Carb Cap</div><div class="gdef">A cap placed over the banger after loading concentrate. Restricts airflow, retains heat. Essential for low-temp dabbing — not optional.</div></div>
+    <div class="gi"><div class="gterm">Terp Pearls</div><div class="gdef">Small quartz balls that spin inside the banger under the carb cap, distributing heat and concentrate evenly. A simple upgrade with real impact.</div></div>
+    <div class="gi"><div class="gterm">Decarboxylation</div><div class="gdef">Heat-activated conversion of THCA to THC — happens automatically when you dab or vape. This is what makes the product psychoactive.</div></div>
+    <div class="gi"><div class="gterm">Reclaim</div><div class="gdef">Residue that collects inside a rig after multiple dabs. Can be reused though flavor is diminished. Clean your rig regularly to prevent buildup.</div></div>
+  </div>
+  <div class="pg">15</div>
+</div>
+
+<!-- 10 GEAR GUIDE -->
+<div class="divider"><div class="div-num">10</div><div class="div-title">Gear Guide — What You Actually Need</div><div class="div-line"></div></div>
+<div class="page">
+  <div class="lbl">Section 10 · Essential kit</div>
+  <div class="h1">Start modest. <em>Upgrade intentionally.</em></div>
+  <p class="intro" style="margin-bottom:20px;">A $40 rig with a clean quartz banger and good technique will outperform a $200 rig with a dirty banger and sloppy temperature control every time.</p>
+  <div class="gear-grid">
+    <div class="gear-item"><div class="gear-name">Dab Rig</div><div class="gear-why">Glass or silicone with a water chamber. Simpler is fine — you don't need fancy to start.</div><div class="gear-price">$30–$150</div></div>
+    <div class="gear-item"><div class="gear-name">Quartz Banger</div><div class="gear-why">Retains heat evenly, doesn't affect flavor. Avoid cheap titanium. Replace when permanently stained.</div><div class="gear-price">$15–$60</div></div>
+    <div class="gear-item"><div class="gear-name">Butane Torch</div><div class="gear-why">Culinary-style torches work well. Refillable. Keep extra butane on hand.</div><div class="gear-price">$20–$50</div></div>
+    <div class="gear-item"><div class="gear-name">Dab Tool</div><div class="gear-why">Metal or glass wand. Get two — one for softer textures, one for harder ones.</div><div class="gear-price">$5–$20</div></div>
+    <div class="gear-item"><div class="gear-name">Carb Cap</div><div class="gear-why">Essential for low-temp dabbing. Traps heat, controls airflow. Not optional.</div><div class="gear-price">$10–$40</div></div>
+    <div class="gear-item"><div class="gear-name">Cotton Swabs + ISO 99%</div><div class="gear-why">Swab the banger after every dab while warm. 99% isopropyl only — 70% won't cut residue.</div><div class="gear-price">$5–$10</div></div>
+  </div>
+  <div style="margin-top:16px;background:var(--forest);border-radius:4px;padding:16px 20px;">
+    <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--mint);margin-bottom:10px;">E-Rig option — skip the torch entirely</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;">
+      <div><div style="font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Puffco Peak Pro</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Best all-around. App connectivity.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$300–400</div></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Dr. Dabber Switch</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Works for concentrate + flower.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$200–300</div></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Focus V Carta 2</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Solid mid-range. Good flavor.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$150–200</div></div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:12px;font-weight:700;color:#fff;margin-bottom:3px;">Lookah Seahorse</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:4px;">Entry-level. Portable, simple.</div><div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--gold);">$50–80</div></div>
+    </div>
+  </div>
+  <div class="pg">16</div>
+</div>
+
+<!-- QR / CTA -->
+<div class="cta-band">
+  <div>
+    <div class="cta-label">Learn more · headchangecannabis.com</div>
+    <div class="cta-headline">Go deeper with HeadChange.</div>
+    <p class="cta-body">Scan to explore the full digital guide — interactive product finder, strain-specific terpene profiles, and exclusive drops for subscribers. Enter your info and we'll keep you updated on new products, education, and events near you.</p>
+  </div>
+  <div class="qr-wrap">
+    <div class="qr-box">
+      <svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg" style="padding:4px;">
+        <rect x="2" y="2" width="26" height="26" rx="2" fill="none" stroke="#1a3a2a" stroke-width="2"/><rect x="7" y="7" width="16" height="16" rx="1" fill="#1a3a2a"/>
+        <rect x="52" y="2" width="26" height="26" rx="2" fill="none" stroke="#1a3a2a" stroke-width="2"/><rect x="57" y="7" width="16" height="16" rx="1" fill="#1a3a2a"/>
+        <rect x="2" y="52" width="26" height="26" rx="2" fill="none" stroke="#1a3a2a" stroke-width="2"/><rect x="7" y="57" width="16" height="16" rx="1" fill="#1a3a2a"/>
+        <rect x="35" y="2" width="4" height="4" fill="#1a3a2a"/><rect x="41" y="2" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="8" width="4" height="4" fill="#1a3a2a"/><rect x="41" y="8" width="4" height="4" fill="#1a3a2a"/><rect x="47" y="8" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="14" width="4" height="4" fill="#1a3a2a"/><rect x="47" y="14" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="20" width="10" height="4" fill="#1a3a2a"/>
+        <rect x="2" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="8" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="14" y="35" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="2" y="41" width="4" height="4" fill="#1a3a2a"/><rect x="14" y="41" width="4" height="4" fill="#1a3a2a"/><rect x="20" y="41" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="2" y="47" width="10" height="4" fill="#1a3a2a"/><rect x="14" y="47" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="41" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="47" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="53" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="59" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="65" y="35" width="4" height="4" fill="#1a3a2a"/><rect x="71" y="35" width="6" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="41" width="4" height="4" fill="#1a3a2a"/><rect x="47" y="41" width="4" height="4" fill="#1a3a2a"/><rect x="59" y="41" width="4" height="4" fill="#1a3a2a"/><rect x="71" y="41" width="6" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="47" width="4" height="4" fill="#1a3a2a"/><rect x="41" y="47" width="10" height="4" fill="#1a3a2a"/><rect x="59" y="47" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="53" width="4" height="4" fill="#1a3a2a"/><rect x="41" y="53" width="4" height="4" fill="#1a3a2a"/><rect x="53" y="53" width="4" height="4" fill="#1a3a2a"/><rect x="65" y="53" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="59" width="10" height="4" fill="#1a3a2a"/><rect x="53" y="59" width="4" height="4" fill="#1a3a2a"/><rect x="59" y="59" width="4" height="4" fill="#1a3a2a"/><rect x="71" y="59" width="6" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="65" width="4" height="4" fill="#1a3a2a"/><rect x="47" y="65" width="4" height="4" fill="#1a3a2a"/><rect x="59" y="65" width="4" height="4" fill="#1a3a2a"/>
+        <rect x="35" y="71" width="4" height="6" fill="#1a3a2a"/><rect x="41" y="71" width="4" height="6" fill="#1a3a2a"/><rect x="53" y="71" width="4" height="6" fill="#1a3a2a"/><rect x="65" y="71" width="4" height="6" fill="#1a3a2a"/><rect x="71" y="65" width="6" height="4" fill="#1a3a2a"/>
+      </svg>
+    </div>
+    <div class="qr-label">Scan to learn more<br>headchangecannabis.com</div>
+  </div>
+</div>
+
+<!-- CLOSING -->
+<div class="closing">
+  <div class="cq">"Start low. Keep it cool.<br><span>Enjoy the process.</span>"</div>
+  <p class="closing-note">Hash has been around for thousands of years. What's changed is how precisely we understand it. The people growing the input material, washing the hash, pressing the rosin — they're doing skilled, careful work. Meet that work with a little intention on your end.</p>
+  <div class="cfoot">
+    <div><div class="cbrand">HEAD CHANGE</div><div class="csub">Craft Concentrates · Missouri · How to Hash Vol. I</div></div>
+    <div class="cv2">Volume II: Advanced Consumption<br>&amp; Terpene Science · Coming Soon</div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

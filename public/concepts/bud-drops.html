@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BudDrops</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --slide-w: 960px;
+  --slide-h: 540px;
+}
+
+body {
+  background: #080808;
+  font-family: 'DM Sans', sans-serif;
+  padding: 48px 24px 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 36px;
+  min-width: 0;
+}
+
+/* ── GRAIN OVERLAY (shared) ── */
+.slide {
+  width: min(var(--slide-w), 100%);
+  aspect-ratio: 16 / 9;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 16px 60px rgba(0,0,0,0.7);
+}
+
+/* SVG grain filter applied via pseudo-element */
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.slide-num {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: rgba(255,255,255,0.18);
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: 10px;
+  width: min(var(--slide-w), 100%);
+}
+
+/* ═══════════════════════════════════════════
+   SHARED ORB MIXIN — reused across slides
+═══════════════════════════════════════════ */
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(32px);
+}
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 1 — COVER
+═══════════════════════════════════════════ */
+.s1 { background: #1a0a24; }
+
+.s1 .orb-main {
+  width: 520px; height: 520px;
+  top: -120px; left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 40% 40%,
+    #ff6b35 0%, #e8294a 30%, #8b1a6b 60%, #2d0b4e 85%, transparent 100%);
+  filter: blur(48px);
+  opacity: 0.85;
+}
+.s1 .orb-teal {
+  width: 180px; height: 180px;
+  top: 10px; left: 60px;
+  background: radial-gradient(circle, #4ecdc4 0%, #1a6b8a 60%, transparent 100%);
+  filter: blur(28px);
+  opacity: 0.6;
+}
+.s1 .orb-pink {
+  width: 140px; height: 140px;
+  top: 20px; right: 120px;
+  background: radial-gradient(circle, #ff9de2 0%, #d44dff 60%, transparent 100%);
+  filter: blur(24px);
+  opacity: 0.55;
+}
+.s1 .orb-bottom {
+  width: 400px; height: 300px;
+  bottom: -80px; left: 50%;
+  transform: translateX(-50%);
+  background: radial-gradient(circle at 50% 30%,
+    #ff3366 0%, #6600cc 50%, transparent 80%);
+  filter: blur(40px);
+  opacity: 0.5;
+}
+
+.s1 .inner {
+  position: absolute; inset: 0; z-index: 10;
+  padding: 52px 68px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.s1 .eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 6px; text-transform: uppercase;
+  color: rgba(255,200,120,0.8);
+}
+.s1 .title {
+  font-family: 'Playfair Display', serif;
+  font-size: 108px; font-weight: 700; line-height: 0.88;
+  color: #fff;
+  text-shadow: 0 0 80px rgba(255,100,50,0.4), 0 0 140px rgba(180,40,200,0.3);
+  letter-spacing: -3px;
+  margin: 16px 0 18px;
+}
+.s1 .tagline {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 17px;
+  color: rgba(255,220,200,0.8); line-height: 1.6; max-width: 460px;
+}
+.s1 .footer {
+  display: flex; align-items: center; gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.s1 .footer-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(255,255,255,0.28);
+}
+.s1 .dot { width: 3px; height: 3px; border-radius: 50%; background: rgba(255,150,80,0.6); }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 2 — THE IDEA
+═══════════════════════════════════════════ */
+.s2 { background: #120818; display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+
+.s2 .left {
+  position: relative; overflow: hidden;
+  padding: 52px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.s2 .left .orb-a {
+  width: 380px; height: 380px;
+  top: -100px; left: -100px;
+  background: radial-gradient(circle at 50% 50%,
+    #7b2fff 0%, #e8294a 45%, #ff6b35 70%, transparent 90%);
+  filter: blur(36px); opacity: 0.55;
+}
+.s2 .left .orb-b {
+  width: 200px; height: 200px;
+  bottom: 20px; right: -40px;
+  background: radial-gradient(circle, #00e5cc 0%, #0066ff 60%, transparent 100%);
+  filter: blur(30px); opacity: 0.4;
+}
+.s2 .left-content { position: relative; z-index: 2; }
+.s2 .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(180,130,255,0.7); margin-bottom: 22px;
+}
+.s2 .left h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 24px; font-weight: 700; color: #fff;
+  line-height: 1.3; margin-bottom: 18px;
+}
+.s2 .left p {
+  font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.7; margin-bottom: 22px;
+}
+.s2 .divider { width: 40px; height: 1px; background: rgba(255,180,60,0.7); margin-bottom: 16px; }
+.s2 .quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 19px;
+  color: rgba(255,190,80,0.9); line-height: 1.45;
+}
+
+.s2 .right {
+  padding: 52px 48px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.s2 .right .orb-c {
+  width: 280px; height: 280px;
+  top: -60px; right: -60px;
+  background: radial-gradient(circle, #ff3399 0%, #6600cc 55%, transparent 85%);
+  filter: blur(40px); opacity: 0.25;
+}
+.s2 .right-content { position: relative; z-index: 2; }
+.s2 .right h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 16px; line-height: 1.15;
+}
+.s2 .right p { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.75; margin-bottom: 12px; }
+.s2 .cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 24px; }
+.s2 .card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 14px 12px;
+  position: relative; overflow: hidden;
+}
+.s2 .card::before {
+  content: ''; display: block; height: 2px;
+  background: linear-gradient(90deg, rgba(255,180,60,0.8), rgba(255,80,150,0.6));
+  margin-bottom: 10px;
+}
+.s2 .card-title { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 5px; line-height: 1.3; }
+.s2 .card-sub { font-size: 10px; color: rgba(120,220,200,0.7); font-style: italic; }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 3 — YOUR INVITATION
+═══════════════════════════════════════════ */
+.s3 {
+  background: #0a1020;
+  padding: 48px 68px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  position: relative;
+}
+.s3 .orb-center {
+  width: 560px; height: 300px;
+  top: -80px; left: 50%; transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 60%,
+    #ff4500 0%, #cc2200 30%, #660066 65%, transparent 90%);
+  filter: blur(50px); opacity: 0.55;
+}
+.s3 .orb-teal {
+  width: 180px; height: 180px;
+  bottom: -40px; left: 80px;
+  background: radial-gradient(circle, #00ffc8 0%, #004466 70%, transparent 100%);
+  filter: blur(28px); opacity: 0.35;
+}
+.s3 .eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(255,190,80,0.75); margin-bottom: 12px; position: relative; z-index: 2;
+}
+.s3 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 50px; font-weight: 700; color: #fff;
+  text-align: center; margin-bottom: 10px;
+  text-shadow: 0 0 60px rgba(255,80,0,0.3);
+  position: relative; z-index: 2;
+}
+.s3 .sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 14px;
+  color: rgba(255,220,180,0.65); text-align: center; margin-bottom: 40px;
+  position: relative; z-index: 2;
+}
+.s3 .steps {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 12px; width: 100%; position: relative; z-index: 2;
+}
+.s3 .step {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: 2px solid rgba(80,220,160,0.6);
+  padding: 18px 16px 16px;
+}
+.s3 .step-num {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700;
+  color: rgba(80,220,160,0.85);
+  line-height: 1; margin-bottom: 10px;
+}
+.s3 .step-title { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.85); margin-bottom: 7px; line-height: 1.3; }
+.s3 .step-body { font-size: 10px; color: rgba(255,255,255,0.38); line-height: 1.6; font-style: italic; }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 4 — MEMBERSHIP
+═══════════════════════════════════════════ */
+.s4 {
+  background: #0d0010;
+  display: flex; flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+.s4 .orb-bg {
+  width: 700px; height: 400px;
+  top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse,
+    rgba(120,0,180,0.3) 0%, rgba(200,50,100,0.15) 40%, transparent 70%);
+  filter: blur(50px);
+}
+.s4 .header {
+  background: rgba(0,0,0,0.6);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding: 14px 40px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative; z-index: 2;
+}
+.s4 .header-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(255,190,80,0.75);
+}
+.s4 .cols {
+  flex: 1; display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 14px; padding: 22px 32px 28px;
+  position: relative; z-index: 2;
+}
+.s4 .col {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  padding: 20px 18px;
+  position: relative; overflow: hidden;
+}
+.s4 .col-icon { font-size: 18px; margin-bottom: 10px; }
+.s4 .col-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px;
+}
+.s4 .col-divider { width: 24px; height: 1px; margin-bottom: 12px; }
+.s4 .item {
+  font-size: 11px; color: rgba(255,255,255,0.50);
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+  line-height: 1.4; display: flex; gap: 7px; align-items: flex-start;
+}
+.s4 .item:last-child { border-bottom: none; }
+.s4 .dash { font-weight: 700; flex-shrink: 0; margin-top: 0; }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 5 — DROP SYSTEM
+═══════════════════════════════════════════ */
+.s5 {
+  background: #100500;
+  padding: 48px 68px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative;
+}
+.s5 .orb-fire {
+  width: 600px; height: 500px;
+  top: -100px; left: 50%; transform: translateX(-45%);
+  background: radial-gradient(ellipse at 50% 40%,
+    #ff6a00 0%, #ff2200 25%, #cc0055 55%, #330022 80%, transparent 95%);
+  filter: blur(50px); opacity: 0.65;
+}
+.s5 .orb-teal-accent {
+  width: 120px; height: 200px;
+  top: 0; left: 30px;
+  background: radial-gradient(ellipse, #00ffd0 0%, transparent 70%);
+  filter: blur(20px); opacity: 0.35;
+}
+.s5 .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(255,190,80,0.75); margin-bottom: 10px; position: relative; z-index: 2;
+}
+.s5 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 46px; font-weight: 700; color: #fff; margin-bottom: 8px;
+  text-shadow: 0 0 80px rgba(255,100,0,0.5);
+  position: relative; z-index: 2;
+}
+.s5 .sub {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 13px;
+  color: rgba(255,210,160,0.6); margin-bottom: 34px;
+  position: relative; z-index: 2;
+}
+.s5 .drops { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; position: relative; z-index: 2; }
+.s5 .drop { background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.07); overflow: hidden; }
+.s5 .drop-bar { height: 3px; }
+.s5 .drop-inner { padding: 18px 18px 20px; }
+.s5 .drop-type {
+  font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 7px; font-weight: 400;
+}
+.s5 .drop-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 700; color: #fff; margin-bottom: 9px; }
+.s5 .drop-badge {
+  display: inline-block; font-family: 'DM Mono', monospace;
+  font-size: 8px; letter-spacing: 2px;
+  text-transform: uppercase; padding: 3px 7px; font-weight: 400;
+  margin-bottom: 12px; background: rgba(255,255,255,0.06);
+}
+.s5 .drop-body { font-size: 11px; color: rgba(255,255,255,0.42); line-height: 1.65; }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 6 — TRUST
+═══════════════════════════════════════════ */
+.s6 { background: #080d18; display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+
+.s6 .left {
+  padding: 50px 46px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.s6 .left .orb-l {
+  width: 300px; height: 300px;
+  bottom: -80px; left: -80px;
+  background: radial-gradient(circle, #0066ff 0%, #003399 50%, transparent 80%);
+  filter: blur(40px); opacity: 0.3;
+}
+.s6 .left .orb-l2 {
+  width: 160px; height: 160px;
+  top: 30px; right: -20px;
+  background: radial-gradient(circle, #cc44ff 0%, transparent 70%);
+  filter: blur(24px); opacity: 0.25;
+}
+.s6 .left-content { position: relative; z-index: 2; }
+.s6 .label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+  color: rgba(80,180,255,0.7); margin-bottom: 18px;
+}
+.s6 .left h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px; font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 16px;
+}
+.s6 .body-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 12px;
+  color: rgba(255,255,255,0.45); line-height: 1.7; margin-bottom: 24px;
+}
+.s6 .layers { display: flex; flex-direction: column; gap: 14px; }
+.s6 .layer { display: flex; align-items: flex-start; gap: 12px; }
+.s6 .layer-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(80,180,255,0.2);
+  border: 1px solid rgba(80,180,255,0.4);
+  color: rgba(120,200,255,0.9);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 500; flex-shrink: 0;
+}
+.s6 .layer-text { font-size: 12px; color: rgba(255,255,255,0.55); line-height: 1.5; padding-top: 3px; }
+
+.s6 .right {
+  padding: 50px 46px;
+  display: flex; flex-direction: column; justify-content: center;
+  position: relative; overflow: hidden;
+}
+.s6 .right .orb-r {
+  width: 360px; height: 360px;
+  top: -80px; right: -80px;
+  background: radial-gradient(circle, #ff2266 0%, #6600cc 45%, transparent 75%);
+  filter: blur(44px); opacity: 0.4;
+}
+.s6 .right-content { position: relative; z-index: 2; }
+.s6 .right-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(255,150,100,0.7); margin-bottom: 18px;
+}
+.s6 .right h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; color: #fff; line-height: 1.35; margin-bottom: 16px;
+}
+.s6 .gold-divider { width: 36px; height: 1px; background: rgba(255,180,60,0.6); margin-bottom: 20px; }
+.s6 .check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 13px; }
+.s6 .check-mark { color: rgba(255,180,60,0.8); font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+.s6 .check-text { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+
+
+/* ═══════════════════════════════════════════
+   SLIDE 7 — CLOSING
+═══════════════════════════════════════════ */
+.s7 {
+  background: #0a0010;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 60px 80px;
+  position: relative;
+}
+.s7 .orb-main-close {
+  width: 640px; height: 480px;
+  top: 50%; left: 50%; transform: translate(-50%, -52%);
+  background: radial-gradient(ellipse at 50% 55%,
+    #ff6b35 0%, #e8294a 20%, #8b1a6b 45%, #2d0b4e 70%, transparent 90%);
+  filter: blur(55px); opacity: 0.6;
+}
+.s7 .orb-close-teal {
+  width: 200px; height: 200px;
+  top: 30px; left: 60px;
+  background: radial-gradient(circle, #00e5cc 0%, transparent 70%);
+  filter: blur(30px); opacity: 0.25;
+}
+.s7 h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 58px; font-weight: 700; color: #fff;
+  line-height: 1.02;
+  text-shadow: 0 0 100px rgba(255,80,50,0.4), 0 0 160px rgba(180,0,255,0.25);
+  position: relative; z-index: 2; margin-bottom: 18px;
+}
+.s7 .divider {
+  width: 64px; height: 1px;
+  background: rgba(255,180,60,0.6);
+  margin: 0 auto 20px; position: relative; z-index: 2;
+}
+.s7 .body-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 14px;
+  color: rgba(255,220,180,0.65);
+  line-height: 1.7; max-width: 480px; margin: 0 auto 32px;
+  position: relative; z-index: 2;
+}
+.s7 .cta {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid rgba(255,180,60,0.5);
+  color: rgba(255,210,120,0.9);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  padding: 14px 36px;
+  position: relative; z-index: 2; text-decoration: none;
+  transition: background 0.2s, border-color 0.2s;
+}
+.s7 .cta:hover {
+  background: rgba(255,180,60,0.1);
+  border-color: rgba(255,180,60,0.8);
+}
+
+</style>
+</head>
+<body>
+
+  <!-- ═══ SLIDE 1 ═══ -->
+  <div class="slide-num">01 / 07</div>
+  <div class="slide s1">
+    <div class="orb orb-main"></div>
+    <div class="orb orb-teal"></div>
+    <div class="orb orb-pink"></div>
+    <div class="orb orb-bottom"></div>
+    <div class="inner">
+      <div>
+        <div class="eyebrow">An Invitation</div>
+        <div class="title">BudDrops</div>
+        <div class="tagline">Where the people who know the most<br>get treated like they matter most.</div>
+      </div>
+      <div class="footer">
+        <div class="dot"></div>
+        <div class="footer-text">For Budtenders</div>
+        <div class="dot"></div>
+        <div class="footer-text">By Invitation</div>
+        <div class="dot"></div>
+        <div class="footer-text">No Strings</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 2 ═══ -->
+  <div class="slide-num">02 / 07</div>
+  <div class="slide s2">
+    <div class="left">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="left-content">
+        <div class="label">The Idea</div>
+        <h2>This isn't a loyalty program.<br>This isn't a sales pitch.</h2>
+        <p>It's a private network built entirely around one belief:</p>
+        <div class="divider"></div>
+        <div class="quote">Budtenders deserve<br>to be celebrated.</div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="orb orb-c"></div>
+      <div class="right-content">
+        <h2>You are the experts.</h2>
+        <p>Every day, you guide customers through decisions that matter — helping them sleep, manage pain, find calm, or just have a great time. You do it with expertise, empathy, and patience.</p>
+        <p>Most brands talk at you. We built something different.</p>
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">No Sales Quotas</div>
+            <div class="card-sub">Zero strings attached</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Real Appreciation</div>
+            <div class="card-sub">Experiences + recognition</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Insider Access</div>
+            <div class="card-sub">First to know, first to experience</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 3 ═══ -->
+  <div class="slide-num">03 / 07</div>
+  <div class="slide s3">
+    <div class="orb orb-center"></div>
+    <div class="orb orb-teal"></div>
+    <div class="eyebrow">Your Invitation</div>
+    <h2>You're invited to join.</h2>
+    <div class="sub">Membership is by invitation only — and yours has arrived.</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-title">Receive Your Invite</div>
+        <div class="step-body">A private link sent directly to you</div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-title">Create Your Profile</div>
+        <div class="step-body">Quick, simple, and fully verified</div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-title">Access BudDrops</div>
+        <div class="step-body">Drops, events, education &amp; community</div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-title">Stay Exclusive</div>
+        <div class="step-body">Active budtenders only. Always curated.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 4 ═══ -->
+  <div class="slide-num">04 / 07</div>
+  <div class="slide s4">
+    <div class="orb orb-bg"></div>
+    <div class="header">
+      <div class="header-text">What Membership Looks Like</div>
+    </div>
+    <div class="cols">
+      <div class="col">
+        <div class="col-icon" style="color:rgba(255,180,60,0.8);">★</div>
+        <div class="col-title">Experiences</div>
+        <div class="col-divider" style="background:rgba(255,180,60,0.5);"></div>
+        <div class="item"><span class="dash" style="color:rgba(255,180,60,0.7);">—</span>Private brand events &amp; tastings</div>
+        <div class="item"><span class="dash" style="color:rgba(255,180,60,0.7);">—</span>Behind-the-scenes facility tours</div>
+        <div class="item"><span class="dash" style="color:rgba(255,180,60,0.7);">—</span>Early access to new releases</div>
+        <div class="item"><span class="dash" style="color:rgba(255,180,60,0.7);">—</span>Member-only educational sessions</div>
+      </div>
+      <div class="col">
+        <div class="col-icon" style="color:rgba(80,220,160,0.8);">♦</div>
+        <div class="col-title">Swag &amp; Product</div>
+        <div class="col-divider" style="background:rgba(80,220,160,0.5);"></div>
+        <div class="item"><span class="dash" style="color:rgba(80,220,160,0.7);">—</span>Limited-run drops, claimed first</div>
+        <div class="item"><span class="dash" style="color:rgba(80,220,160,0.7);">—</span>Branded gear you'll actually want</div>
+        <div class="item"><span class="dash" style="color:rgba(80,220,160,0.7);">—</span>Experimental SKUs before anyone else</div>
+        <div class="item"><span class="dash" style="color:rgba(80,220,160,0.7);">—</span>Seasonal appreciation packages</div>
+      </div>
+      <div class="col">
+        <div class="col-icon" style="color:rgba(255,100,180,0.8);">♥</div>
+        <div class="col-title">Appreciation</div>
+        <div class="col-divider" style="background:rgba(255,100,180,0.5);"></div>
+        <div class="item"><span class="dash" style="color:rgba(255,100,180,0.7);">—</span>Recognition inside a network of peers</div>
+        <div class="item"><span class="dash" style="color:rgba(255,100,180,0.7);">—</span>Feedback that actually shapes products</div>
+        <div class="item"><span class="dash" style="color:rgba(255,100,180,0.7);">—</span>A brand that knows your name</div>
+        <div class="item"><span class="dash" style="color:rgba(255,100,180,0.7);">—</span>Community built around your craft</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 5 ═══ -->
+  <div class="slide-num">05 / 07</div>
+  <div class="slide s5">
+    <div class="orb orb-fire"></div>
+    <div class="orb orb-teal-accent"></div>
+    <div class="label">The Drop System</div>
+    <h2>Scarcity is the feature.</h2>
+    <div class="sub">Not everyone gets everything — and that's what makes it mean something.</div>
+    <div class="drops">
+      <div class="drop">
+        <div class="drop-bar" style="background:linear-gradient(90deg,#ffaa00,#ff6600);"></div>
+        <div class="drop-inner">
+          <div class="drop-type" style="color:rgba(255,180,60,0.8);">Type A</div>
+          <div class="drop-title">Physical Product</div>
+          <div class="drop-badge" style="color:rgba(255,180,60,0.7);">Most Rare</div>
+          <div class="drop-body">Limited strain batches, experimental concentrates, first-run formats. Hard cap. First claim. One per verified member.</div>
+        </div>
+      </div>
+      <div class="drop">
+        <div class="drop-bar" style="background:linear-gradient(90deg,#00ffd0,#0099cc);"></div>
+        <div class="drop-inner">
+          <div class="drop-type" style="color:rgba(80,220,200,0.8);">Type B</div>
+          <div class="drop-title">Early Access</div>
+          <div class="drop-badge" style="color:rgba(80,220,200,0.7);">Most Common</div>
+          <div class="drop-body">Product launches 2–4 weeks before the public. Confidence and authority before customers ask the question.</div>
+        </div>
+      </div>
+      <div class="drop">
+        <div class="drop-bar" style="background:linear-gradient(90deg,#cc88ff,#6644ff);"></div>
+        <div class="drop-inner">
+          <div class="drop-type" style="color:rgba(180,140,255,0.8);">Type C</div>
+          <div class="drop-title">Concept Access</div>
+          <div class="drop-badge" style="color:rgba(180,140,255,0.7);">Zero Cost · High Signal</div>
+          <div class="drop-body">Packaging concepts, flavor directions, experimental SKUs. You see it first. Your feedback shapes the final product.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 6 ═══ -->
+  <div class="slide-num">06 / 07</div>
+  <div class="slide s6">
+    <div class="left">
+      <div class="orb orb-l"></div>
+      <div class="orb orb-l2"></div>
+      <div class="left-content">
+        <div class="label">Built for Trust</div>
+        <h2>This network is real — and verified.</h2>
+        <div class="body-text">Verification protects you as much as it protects us. It means every member earned their place.</div>
+        <div class="layers">
+          <div class="layer">
+            <div class="layer-num">1</div>
+            <div class="layer-text">Dispensary name, role, and work contact at signup</div>
+          </div>
+          <div class="layer">
+            <div class="layer-num">2</div>
+            <div class="layer-text">State agent card for physical product drops only</div>
+          </div>
+          <div class="layer">
+            <div class="layer-num">3</div>
+            <div class="layer-text">Soft re-confirmation every 6–12 months</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="orb orb-r"></div>
+      <div class="right-content">
+        <div class="right-label">Your Privacy</div>
+        <h3>Your information is never sold, shared, or used for advertising.</h3>
+        <div class="gold-divider"></div>
+        <div class="check">
+          <div class="check-mark">✓</div>
+          <div class="check-text">Your credential is stored securely</div>
+        </div>
+        <div class="check">
+          <div class="check-mark">✓</div>
+          <div class="check-text">Access controlled by you</div>
+        </div>
+        <div class="check">
+          <div class="check-mark">✓</div>
+          <div class="check-text">Exit at any time, no questions asked</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SLIDE 7 ═══ -->
+  <div class="slide-num">07 / 07</div>
+  <div class="slide s7">
+    <div class="orb orb-main-close"></div>
+    <div class="orb orb-close-teal"></div>
+    <h2>For Those Who<br>Know the Most.</h2>
+    <div class="divider"></div>
+    <div class="body-text">You were invited because you've earned it.<br>BudDrops exists to give back — no agenda, no quota, no strings.</div>
+    <a class="cta" href="#">Accept Your Invitation →</a>
+  </div>
+
+</body>
+</html>
