@@ -568,17 +568,6 @@ input[type="date"].fi{color-scheme:dark;}
 // MAIN COMPONENT
 // ════════════════════════════════════════════════════════════════════════════
 export default function MarketingHub() {
-  const [mounted, setMounted] = useState(false);
-  const [unlocked, setUnlocked] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    if (sessionStorage.getItem("ch-auth") === "1") setUnlocked(true);
-  }, []);
-
-  // Don't render anything until client is mounted (prevents SSR mismatch)
-  if (!mounted) return null;
-  if (!unlocked) return <PasswordGate onUnlock={() => setUnlocked(true)} />;
 
   // Core state
   const [strategy, setStrategy] = useState(DEFAULT_STRATEGY);
