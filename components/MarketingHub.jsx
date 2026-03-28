@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 // localStorage shim — makes window.storage work outside Claude artifact sandbox
@@ -339,9 +340,115 @@ html,body{background:var(--bg);min-height:100vh;}
 .cmp-empty-icon{font-size:28px;display:block;margin-bottom:10px;opacity:.4;}
 
 /* MAIN */
-.main{flex:1;min-width:0;overflow-y:auto;transition:margin-right .35s cubic-bezier(.4,0,.2,1);}
+.main{flex:1;min-width:0;overflow-y:auto;transition:margin-right .35s cubic-bezier(.4,0,.2,1);height:100%;}
 .main.nr{margin-right:var(--nw);}
-.hub{background:var(--bg);color:var(--text);font-family:var(--bf);font-size:14px;line-height:1.5;}
+/* ── ASSET LIBRARY (DAM) ── */
+.dam-wrap{display:flex;height:100%;min-height:calc(100vh - 57px);}
+.dam-sb{width:210px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;background:var(--surface);}
+.dam-sb::-webkit-scrollbar{width:3px;}
+.dam-sb::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);}
+.dam-sb-hdr{padding:14px 14px 5px;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--text-muted);font-weight:700;}
+.dam-sb-btn{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;font-family:var(--bf);font-size:11.5px;color:var(--text-dim);transition:all .13s;}
+.dam-sb-btn:hover{background:rgba(255,255,255,.04);color:var(--text);}
+.dam-sb-btn.on{background:var(--gold-dim);color:var(--gold);}
+.dam-sb-ico{font-size:11px;width:15px;text-align:center;flex-shrink:0;}
+.dam-sb-cnt{margin-left:auto;font-size:9px;opacity:.32;}
+.dam-sb-div{height:1px;background:var(--border2);margin:6px 12px;}
+.dam-sb-btn.sub{padding-left:30px;font-size:11px;color:var(--text-muted);}
+.dam-sb-btn.sub.on{color:var(--gold);background:var(--gold-dim);}
+.dam-chev{margin-left:auto;font-size:9px;opacity:.4;transition:transform .2s;}
+.dam-chev.open{transform:rotate(90deg);}
+.dam-main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.dam-bar{padding:11px 18px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border2);flex-shrink:0;}
+.dam-sw{position:relative;flex:1;}
+.dam-si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--text-muted);pointer-events:none;}
+.dam-search{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 11px 7px 30px;color:var(--text);font-family:var(--bf);font-size:12px;outline:none;transition:border-color .15s;box-sizing:border-box;}
+.dam-search:focus{border-color:rgba(201,168,76,.3);}
+.dam-vbtn{width:27px;height:27px;display:grid;place-items:center;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;font-size:12px;transition:all .12s;}
+.dam-vbtn.on{border-color:rgba(201,168,76,.4);color:var(--gold);background:var(--gold-dim);}
+.dam-add{display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:7px;border:1px solid rgba(201,168,76,.28);background:var(--gold-dim);color:var(--gold);font-family:var(--bf);font-size:11px;font-weight:600;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;transition:all .14s;white-space:nowrap;}
+.dam-add:hover{background:rgba(201,168,76,.18);}
+.dam-body{flex:1;overflow-y:auto;padding:16px 18px;}
+.dam-cnt{font-size:10px;color:var(--text-muted);margin-bottom:12px;}
+.dam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;}
+.dam-list{display:flex;flex-direction:column;gap:4px;}
+.dam-card{background:var(--surface);border:1px solid var(--border2);border-radius:11px;overflow:hidden;cursor:pointer;transition:all .17s;position:relative;}
+.dam-card:hover{border-color:rgba(255,255,255,.13);background:var(--surface2);transform:translateY(-2px);box-shadow:0 8px 26px rgba(0,0,0,.28);}
+.dam-card-thumb{aspect-ratio:4/3;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.dam-card-thumb img{width:100%;height:100%;object-fit:cover;opacity:.88;position:absolute;inset:0;}
+.dam-card-fb{font-size:36px;opacity:.18;}
+.dam-card-acts{position:absolute;top:6px;right:6px;display:flex;gap:3px;opacity:0;transition:opacity .13s;}
+.dam-card:hover .dam-card-acts{opacity:1;}
+.dam-iact{width:22px;height:22px;border-radius:5px;border:none;background:rgba(7,7,15,.85);color:rgba(255,255,255,.7);cursor:pointer;display:grid;place-items:center;font-size:10px;backdrop-filter:blur(8px);transition:all .11s;}
+.dam-iact:hover{background:var(--gold);color:var(--bg);}
+.dam-iact.del:hover{background:#e07b6a;color:#fff;}
+.dam-card-body{padding:8px 10px;}
+.dam-card-name{font-size:11px;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px;}
+.dam-card-meta{display:flex;align-items:center;gap:5px;}
+.dam-bchip{font-size:8px;padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;}
+.dam-row{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:8px;border:1px solid var(--border2);background:rgba(255,255,255,.02);cursor:pointer;transition:all .12s;}
+.dam-row:hover{background:var(--surface2);border-color:rgba(255,255,255,.1);}
+.dam-row-thumb{width:34px;height:34px;border-radius:6px;background:var(--surface2);overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;}
+.dam-row-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;}
+.dam-row-name{flex:1;font-size:12px;color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dam-row-type{font-size:10px;color:var(--text-muted);min-width:120px;}
+.dam-row-date{font-size:10px;color:var(--text-muted);min-width:78px;text-align:right;}
+.dam-row-acts{display:flex;gap:3px;opacity:0;transition:opacity .12s;}
+.dam-row:hover .dam-row-acts{opacity:1;}
+.dam-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;color:var(--text-muted);gap:12px;text-align:center;}
+/* DAM Preview overlay */
+.dam-preview{position:fixed;inset:0;z-index:200;background:rgba(7,7,15,.97);display:flex;flex-direction:column;}
+.dam-phdr{padding:11px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.dam-ptitle{flex:1;font-size:13px;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dam-pwrap{flex:1;display:flex;overflow:hidden;}
+.dam-pbody{flex:1;position:relative;overflow:hidden;background:#08080f;display:flex;align-items:center;justify-content:center;}
+.dam-pbody iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.dam-ghost{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.dam-ghost img{width:100%;height:100%;object-fit:contain;filter:blur(3px) brightness(.55);opacity:.18;}
+.dam-ploading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:none;z-index:2;}
+.dam-noembed{display:flex;flex-direction:column;align-items:center;gap:18px;}
+@keyframes damSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.dam-spin{animation:damSpin 2s linear infinite;font-size:30px;opacity:.22;}
+.dam-psb{width:236px;border-left:1px solid var(--border);padding:16px;overflow-y:auto;flex-shrink:0;}
+.dam-mlbl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:3px;font-weight:700;}
+.dam-mval{font-size:12px;color:var(--text-dim);margin-bottom:12px;}
+.dam-ptag{display:inline-block;font-size:9px;padding:2px 7px;border-radius:100px;background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);margin:2px 2px 0 0;}
+.dam-plink{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text-dim);font-family:var(--bf);font-size:11px;cursor:pointer;transition:all .12s;margin-bottom:6px;box-sizing:border-box;}
+.dam-plink:hover{background:var(--surface3);border-color:rgba(255,255,255,.15);}
+.dam-pnote{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;border-radius:8px;border:1px solid rgba(201,168,76,.2);background:var(--gold-dim);color:var(--gold);font-family:var(--bf);font-size:11px;cursor:pointer;transition:all .12s;margin-bottom:6px;box-sizing:border-box;}
+.dam-pnote:hover{background:rgba(201,168,76,.18);}
+.dam-pdel{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:7px;border-radius:8px;border:1px solid rgba(224,123,106,.2);background:transparent;color:rgba(224,123,106,.6);font-family:var(--bf);font-size:11px;cursor:pointer;transition:all .12s;box-sizing:border-box;}
+.dam-pdel:hover{background:rgba(224,123,106,.06);}
+/* DAM Add/Settings modal */
+.dam-overlay{position:fixed;inset:0;z-index:300;background:rgba(7,7,15,.88);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.dam-modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;}
+.dam-mhdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.dam-mtitle{font-size:18px;font-weight:400;color:var(--text);font-family:var(--df);}
+.dam-mclose{width:27px;height:27px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;font-size:16px;display:grid;place-items:center;}
+.dam-field{margin-bottom:12px;}
+.dam-field label{display:block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:5px;font-weight:700;}
+.dam-fi,.dam-fsel,.dam-fta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-family:var(--bf);font-size:13px;outline:none;transition:border-color .15s;box-sizing:border-box;}
+.dam-fi:focus,.dam-fsel:focus,.dam-fta:focus{border-color:rgba(201,168,76,.4);}
+.dam-fsel option,.dam-fsel optgroup{background:var(--surface);}
+.dam-frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dam-mfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+.dam-btn{padding:7px 15px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-family:var(--bf);font-size:12px;cursor:pointer;transition:all .12s;}
+.dam-btn:hover{background:var(--surface2);}
+.dam-btn-gold{background:var(--gold-dim);border-color:rgba(201,168,76,.3);color:var(--gold);font-weight:600;}
+.dam-btn-gold:hover{background:rgba(201,168,76,.18);}
+.dam-btn-gold:disabled{opacity:.35;cursor:not-allowed;}
+.dam-folder-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.dam-folder-lbl{font-size:11px;color:var(--text-dim);width:90px;flex-shrink:0;}
+/* DAM inline note */
+.dam-innote{padding:10px 18px;border-bottom:1px solid var(--border2);background:rgba(201,168,76,.03);flex-shrink:0;}
+.dam-inlbl{font-size:9px;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-bottom:5px;}
+.dam-inrow{display:flex;gap:7px;}
+.dam-inta{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 9px;color:var(--text);font-family:var(--bf);font-size:12px;line-height:1.55;resize:none;outline:none;min-height:48px;transition:border-color .13s;}
+.dam-inta:focus{border-color:rgba(201,168,76,.36);}
+.dam-inpost{align-self:flex-end;padding:6px 11px;border-radius:7px;border:none;background:var(--gold);color:var(--bg);font-family:var(--bf);font-size:11px;font-weight:700;cursor:pointer;}
+.dam-inpost:disabled{opacity:.35;cursor:not-allowed;}
+
+.hub{background:var(--bg);color:var(--text);font-family:var(--bf);font-size:14px;line-height:1.5;height:100%;}
 
 /* HERO */
 .hero{position:relative;overflow:hidden;}
@@ -624,6 +731,21 @@ export default function MarketingHub() {
   const [hlInitId, setHlInitId] = useState(null);
   const [showAddBrandInit, setShowAddBrandInit] = useState(null);
   const [showBriefUpload, setShowBriefUpload] = useState(null);
+  // ── ASSET LIBRARY STATE ──────────────────────────────────────────────────────
+  const [damAssets,    setDamAssets]    = useState(() => { try { const s = localStorage.getItem("dam_v2_assets"); return s ? JSON.parse(s) : []; } catch { return []; } });
+  const [damType,      setDamType]      = useState("all");
+  const [damBrand,     setDamBrand]     = useState("all");
+  const [damSearch,    setDamSearch]    = useState("");
+  const [damView,      setDamView]      = useState("grid");
+  const [damMerchOpen, setDamMerchOpen] = useState(false);
+  const [damAddOpen,   setDamAddOpen]   = useState(false);
+  const [damPreview,   setDamPreview]   = useState(null);
+  const [damConfig,    setDamConfig]    = useState(() => { try { const s = localStorage.getItem("dam_config"); return s ? JSON.parse(s) : {clientId:""}; } catch { return {clientId:""}; } });
+  const [damFolders,   setDamFolders]   = useState(() => { try { const s = localStorage.getItem("dam_folders"); return s ? JSON.parse(s) : {}; } catch { return {}; } });
+  const [damConnected, setDamConnected] = useState(false);
+  const [damSyncing,   setDamSyncing]   = useState(false);
+  const [damDriveAssets, setDamDriveAssets] = useState([]);
+  const [damSettingsOpen, setDamSettingsOpen] = useState(false);
   const [teamView, setTeamView] = useState(null); // "orgchart" | "members"
   const [concepts, setConcepts] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-concepts"); return v ? JSON.parse(v) : []; } catch { return []; } }); // [{id, name, html, createdAt}]
   const [activeConceptId, setActiveConceptId] = useState(null);
@@ -745,6 +867,10 @@ export default function MarketingHub() {
     setShowWhoModal(false);
   };
 
+
+  useEffect(() => { try { localStorage.setItem("dam_v2_assets", JSON.stringify(damAssets)); } catch {} }, [damAssets]);
+  useEffect(() => { try { localStorage.setItem("dam_config", JSON.stringify(damConfig)); } catch {} }, [damConfig]);
+  useEffect(() => { try { localStorage.setItem("dam_folders", JSON.stringify(damFolders)); } catch {} }, [damFolders]);
   const addNote = () => {
     if (!noteText.trim() || !currentUser) return;
     setNotes(p => [{ id: `n-${Date.now()}`, author: currentUser.name, color: currentUser.color, text: noteText.trim(), ts: new Date().toISOString() }, ...p]);
@@ -786,7 +912,7 @@ export default function MarketingHub() {
       {showWhoModal && <WhoModal whoName={whoName} setWhoName={setWhoName} whoRole={whoRole} setWhoRole={setWhoRole} onSave={saveUser} orgRoles={orgRoles} />}
       {selectedMember && <TeamMemberModal member={selectedMember} currentUser={currentUser} onClose={() => setSelectedMember(null)} onUpdate={updateMemberProfile} />}
       {showCampaignModal && <CampaignModal currentUser={currentUser} pillars={strategy.pillars} onClose={() => setShowCampaignModal(false)} onSave={(c) => { setCampaigns(p => [c, ...p]); setShowCampaignModal(false); }} onSaveAsInit={saveCampaignAsInit} />}
-      {selectedCampaign && <CampaignDetailModal campaign={selectedCampaign} pillars={strategy.pillars} onClose={() => setSelectedCampaign(null)} onSaveAsInit={(init) => { saveCampaignAsInit(init); setCampaigns(p => p.map(c => c.id === selectedCampaign.id ? { ...c, status: "approved" } : c)); setSelectedCampaign(null); }} />}
+      {selectedCampaign && <CampaignDetailModal campaign={selectedCampaign} pillars={strategy.pillars} onClose={() => setSelectedCampaign(null)} onNote={(ctx) => { openNoteWithContext(ctx); }} onSaveAsInit={(init) => { saveCampaignAsInit(init); setCampaigns(p => p.map(c => c.id === selectedCampaign.id ? { ...c, status: "approved" } : c)); setSelectedCampaign(null); }} />}
 
       <div className="page">
         {/* ── HEADER ── */}
@@ -850,6 +976,7 @@ export default function MarketingHub() {
                     { id: "campaigns",   icon: "🚀", label: "Campaigns" },
                     { id: "concepts",    icon: "🎨", label: "Concepts" },
                     { id: "timeline",    icon: "📅", label: "Timeline" },
+                    { id: "dam",         icon: "◈",  label: "Asset Library" },
                   ].map(t => (
                     <button key={t.id} className={`lsb-tab ${leftTab === t.id ? "on" : ""}`} onClick={() => { setLeftTab(t.id); setActiveBrand(null); }}>
                       <span className="lsb-icon">{t.icon}</span>
@@ -885,7 +1012,7 @@ export default function MarketingHub() {
                 </nav>
 
                 {/* Channels / Campaigns hint */}
-                {(leftTab === "channels" || leftTab === "campaigns" || leftTab === "concepts" || leftTab === "initiatives" || leftTab === "timeline") && (
+                {(leftTab === "channels" || leftTab === "campaigns" || leftTab === "concepts" || leftTab === "initiatives" || leftTab === "timeline" || leftTab === "dam") && (
                   <div style={{ padding: "6px 16px 10px", fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
                     Content shown on the right →
                   </div>
@@ -1124,6 +1251,29 @@ export default function MarketingHub() {
             {/* ── TIMELINE ── */}
             {leftTab === "timeline" && !activeBrand && (
               <GanttViewer ganttHtml={ganttHtml} onUpdate={canEdit ? setGanttHtml : null} canEdit={canEdit} />
+            )}
+
+            {leftTab === "dam" && !activeBrand && (
+              <AssetLibrary
+                assets={damAssets} setAssets={setDamAssets}
+                driveAssets={damDriveAssets} setDriveAssets={setDamDriveAssets}
+                activeType={damType} setActiveType={setDamType}
+                activeBrand={damBrand} setActiveBrand={setDamBrand}
+                search={damSearch} setSearch={setDamSearch}
+                view={damView} setView={setDamView}
+                merchOpen={damMerchOpen} setMerchOpen={setDamMerchOpen}
+                addOpen={damAddOpen} setAddOpen={setDamAddOpen}
+                preview={damPreview} setPreview={setDamPreview}
+                config={damConfig} setConfig={setDamConfig}
+                folders={damFolders} setFolders={setDamFolders}
+                connected={damConnected} setConnected={setDamConnected}
+                syncing={damSyncing} setSyncing={setDamSyncing}
+                settingsOpen={damSettingsOpen} setSettingsOpen={setDamSettingsOpen}
+                currentUser={currentUser}
+                hubBrands={brands}
+                hubCampaigns={campaigns}
+                onNote={openNoteWithContext}
+              />
             )}
 
             {/* ── COMPANY / BRAND DETAIL FULL VIEW ── */}
@@ -1516,7 +1666,7 @@ export default function MarketingHub() {
       {/* MODALS */}
       {detail && <DetailModal init={initiatives.find(i => i.id === detail.id) || detail} getAccent={getAccent} onClose={() => setDetail(null)} onFileClick={(id) => { setDetail(null); setFileModal(id); }} />}
       {fileModal && <FileUploadModal initiative={initiatives.find(i => i.id === fileModal)} onClose={() => setFileModal(null)} onSave={(url, name) => saveFile(fileModal, url, name)} />}
-      {conceptModal && (() => { const init = initiatives.find(i => i.id === conceptModal); if (!init) return null; const html = conceptHtmlCache.current[init.id] || init.htmlConcept; return html ? <ConceptViewerModal init={{...init, htmlConcept: html}} onClose={() => setConceptModal(null)} onUpload={() => { setConceptModal(null); setConceptUpload(init.id); }} /> : null; })()}
+      {conceptModal && (() => { const init = initiatives.find(i => i.id === conceptModal); if (!init) return null; const html = conceptHtmlCache.current[init.id] || init.htmlConcept; return html ? <ConceptViewerModal init={{...init, htmlConcept: html}} onClose={() => setConceptModal(null)} onUpload={() => { setConceptModal(null); setConceptUpload(init.id); }} onNote={(ctx) => { setConceptModal(null); openNoteWithContext(ctx); }} /> : null; })()}
       {conceptUpload && <ConceptHtmlUploadModal initName={initiatives.find(i => i.id === conceptUpload)?.title || ""} onClose={() => setConceptUpload(null)} onSave={(html, name) => saveConceptHtml(conceptUpload, html, name)} />}
       {showAddInit && <AddInitiativeModal pillars={strategy.pillars} brands={brands} preselectedBrand={null}
         existing={typeof showAddInit === "string" ? initiatives.find(i => i.id === showAddInit) : null}
@@ -3076,12 +3226,29 @@ function TeamMemberModal({ member, currentUser, onClose, onUpdate }) {
 // CAMPAIGN MODAL — AI Brief Generator
 // ════════════════════════════════════════════════════════════════════════════
 function CampaignModal({ currentUser, pillars, onClose, onSave, onSaveAsInit }) {
+  const [tab, setTab] = useState("write"); // "write" | "upload"
   const [concept, setConcept] = useState("");
   const [brand, setBrand] = useState("Headchange");
   const [objective, setObjective] = useState("");
   const [loading, setLoading] = useState(false);
   const [brief, setBrief] = useState(null);
   const [err, setErr] = useState("");
+  // Upload tab state
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadFileData, setUploadFileData] = useState(null);
+  const [uploadDragging, setUploadDragging] = useState(false);
+  const fileRef = useRef();
+  const ACCEPTED = [".pdf",".doc",".docx",".txt",".md",".png",".jpg",".jpeg",".webp"];
+
+  const readUploadFile = (f) => {
+    if (!f) return;
+    const ext = "." + f.name.split(".").pop().toLowerCase();
+    if (!ACCEPTED.some(a => ext === a)) { setErr("Unsupported file. Try PDF, Word, image, or text."); return; }
+    setUploadFile(f); setErr(""); setBrief(null);
+    const reader = new FileReader();
+    reader.onload = e => setUploadFileData(e.target.result);
+    reader.readAsDataURL(f);
+  };
 
   const generate = async () => {
     if (!concept.trim()) return;
@@ -3105,43 +3272,128 @@ function CampaignModal({ currentUser, pillars, onClose, onSave, onSaveAsInit }) 
     setLoading(false);
   };
 
+  const parseBriefFile = async () => {
+    if (!uploadFile || !uploadFileData) return;
+    setLoading(true); setErr("");
+    try {
+      const ext = uploadFile.name.split(".").pop().toLowerCase();
+      const isImage = ["png","jpg","jpeg","webp"].includes(ext);
+      const isText = ["txt","md"].includes(ext);
+      const base64 = uploadFileData.split(",")[1];
+      const mediaType = uploadFile.type || (ext === "pdf" ? "application/pdf" : isImage ? `image/${ext}` : "text/plain");
+      let msgContent;
+      if (isText) {
+        msgContent = [{ type: "text", text: `Marketing brief document:\n\n${atob(base64)}\n\nExtract the key information.` }];
+      } else if (isImage) {
+        msgContent = [{ type: "image", source: { type: "base64", media_type: mediaType, data: base64 } }, { type: "text", text: "This is a marketing brief. Extract the key information." }];
+      } else {
+        msgContent = [{ type: "document", source: { type: "base64", media_type: mediaType, data: base64 } }, { type: "text", text: "This is a marketing brief. Extract the key information." }];
+      }
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: `You are a senior cannabis marketing strategist for Curador Brands operating in Missouri. Extract the brief details and return ONLY valid JSON, no markdown: {"title":"...","objective":"...","targetAudience":"...","keyMessages":["..."],"channels":["..."],"timeline":"...","estimatedBudget":"...","kpis":["..."],"description":"..."}. Use sensible defaults for any missing fields.`,
+          messages: [{ role: "user", content: msgContent }],
+        }),
+      });
+      const data = await res.json();
+      const text = data.content?.map(c => c.text || "").join("") || "";
+      setBrief(JSON.parse(text.replace(/```json|```/g, "").trim()));
+    } catch (e) { setErr("Couldn't parse the brief — try a clearer PDF or a different file."); }
+    setLoading(false);
+  };
+
   const saveCampaign = (status = "idea") => {
-    const c = { id: `cmp-${Date.now()}`, title: brief?.title || concept, concept, brand, objective, brief, status, createdBy: currentUser?.name || "Team", createdAt: new Date().toISOString() };
+    const c = { id: `cmp-${Date.now()}`, title: brief?.title || concept || uploadFile?.name || "Untitled", concept, brand, objective, brief, status, createdBy: currentUser?.name || "Team", createdAt: new Date().toISOString(), _briefFile: uploadFile?.name || null };
     onSave(c);
   };
+
+  const tabStyle = (t) => ({
+    padding: "7px 18px", fontSize: 12, fontWeight: 500, borderRadius: 7, border: "none", cursor: "pointer",
+    background: tab === t ? "rgba(201,168,76,.12)" : "transparent",
+    color: tab === t ? "var(--gold)" : "var(--text-muted)",
+    transition: "all .15s",
+  });
 
   return (
     <div className="overlay" onClick={onClose}>
       <div className="modal xwide" onClick={e => e.stopPropagation()}>
         <div className="mhdr">
-          <div><div className="mtitle">New Campaign Idea</div><div className="msub">Describe your concept · AI generates a full brief</div></div>
+          <div><div className="mtitle">New Campaign Brief</div><div className="msub">Write a concept or upload an existing brief</div></div>
           <button className="mclose" onClick={onClose}>×</button>
         </div>
         <div className="mbody">
+          {!brief && (
+            <div style={{ display: "flex", gap: 4, marginBottom: 18, padding: "4px", background: "var(--surface2)", borderRadius: 10, width: "fit-content" }}>
+              <button style={tabStyle("write")} onClick={() => { setTab("write"); setErr(""); }}>✦ Write Concept</button>
+              <button style={tabStyle("upload")} onClick={() => { setTab("upload"); setErr(""); }}>↑ Upload Brief</button>
+            </div>
+          )}
           {!brief ? (
-            <>
-              <div className="ff"><label className="fl">Campaign Concept *</label><textarea className="fta" style={{ minHeight: 88 }} placeholder="e.g. A terpene education series targeting dispensary budtenders — educational content that positions Headchange as the craft authority..." value={concept} onChange={e => setConcept(e.target.value)} /></div>
-              <div className="frow">
-                <div className="ff">
-                  <label className="fl">Primary Brand</label>
-                  <select className="fsel" value={brand} onChange={e => setBrand(e.target.value)}>
-                    {["Headchange", "Bubbles", "Safebet", "All Brands"].map(b => <option key={b}>{b}</option>)}
-                  </select>
+            tab === "write" ? (
+              <>
+                <div className="ff"><label className="fl">Campaign Concept *</label><textarea className="fta" style={{ minHeight: 88 }} placeholder="e.g. A terpene education series targeting dispensary budtenders — educational content that positions Headchange as the craft authority..." value={concept} onChange={e => setConcept(e.target.value)} /></div>
+                <div className="frow">
+                  <div className="ff">
+                    <label className="fl">Primary Brand</label>
+                    <select className="fsel" value={brand} onChange={e => setBrand(e.target.value)}>
+                      {["Headchange", "Bubbles", "Safebet", "All Brands"].map(b => <option key={b}>{b}</option>)}
+                    </select>
+                  </div>
+                  <div className="ff"><label className="fl">Core Objective</label><input className="fi" placeholder="e.g. Increase brand awareness" value={objective} onChange={e => setObjective(e.target.value)} /></div>
                 </div>
-                <div className="ff"><label className="fl">Core Objective</label><input className="fi" placeholder="e.g. Increase brand awareness" value={objective} onChange={e => setObjective(e.target.value)} /></div>
-              </div>
-              {loading && <div className="ai-loading"><div className="ai-dot" /><div className="ai-dot" /><div className="ai-dot" /><span>Generating brief…</span></div>}
-              {err && <div style={{ padding: "10px 12px", background: "rgba(224,123,106,.08)", border: "1px solid rgba(224,123,106,.2)", borderRadius: 8, fontSize: 12, color: "#e07b6a", marginTop: 8 }}>{err}</div>}
-            </>
+              </>
+            ) : (
+              <>
+                <div
+                  onDragOver={e => { e.preventDefault(); setUploadDragging(true); }}
+                  onDragLeave={() => setUploadDragging(false)}
+                  onDrop={e => { e.preventDefault(); setUploadDragging(false); readUploadFile(e.dataTransfer.files[0]); }}
+                  onClick={() => fileRef.current?.click()}
+                  style={{ border: `2px dashed ${uploadDragging ? "var(--gold)" : "var(--border2)"}`, borderRadius: 12, padding: "36px 24px", textAlign: "center", cursor: "pointer", transition: "all .15s", background: uploadDragging ? "rgba(201,168,76,.04)" : "var(--surface2)", marginBottom: 12 }}>
+                  <input ref={fileRef} type="file" accept=".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.webp" style={{ display: "none" }} onChange={e => readUploadFile(e.target.files[0])} />
+                  {uploadFile ? (
+                    <div>
+                      <div style={{ fontSize: 28, marginBottom: 8 }}>📄</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>{uploadFile.name}</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4 }}>{(uploadFile.size / 1024).toFixed(0)} KB · Click to change</div>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: 28, marginBottom: 8, opacity: .4 }}>📎</div>
+                      <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Drop a brief here or click to browse</div>
+                      <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 4, opacity: .7 }}>PDF · Word · Image · Text</div>
+                    </div>
+                  )}
+                </div>
+                <div className="frow">
+                  <div className="ff">
+                    <label className="fl">Primary Brand</label>
+                    <select className="fsel" value={brand} onChange={e => setBrand(e.target.value)}>
+                      {["Headchange", "Bubbles", "Safebet", "All Brands"].map(b => <option key={b}>{b}</option>)}
+                    </select>
+                  </div>
+                </div>
+              </>
+            )
           ) : (
             <BriefDisplay brief={brief} />
           )}
+          {loading && <div className="ai-loading"><div className="ai-dot" /><div className="ai-dot" /><div className="ai-dot" /><span>{tab === "upload" ? "Reading brief…" : "Generating brief…"}</span></div>}
+          {err && <div style={{ padding: "10px 12px", background: "rgba(224,123,106,.08)", border: "1px solid rgba(224,123,106,.2)", borderRadius: 8, fontSize: 12, color: "#e07b6a", marginTop: 8 }}>{err}</div>}
         </div>
         <div className="mfoot">
           {!brief ? (
-            <><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-gold" disabled={!concept.trim() || loading} onClick={generate}>✦ Generate Brief</button></>
+            tab === "write" ? (
+              <><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-gold" disabled={!concept.trim() || loading} onClick={generate}>✦ Generate Brief</button></>
+            ) : (
+              <><button className="btn" onClick={onClose}>Cancel</button><button className="btn btn-gold" disabled={!uploadFile || loading} onClick={parseBriefFile}>✦ Parse Brief</button></>
+            )
           ) : (
-            <><button className="btn" onClick={() => setBrief(null)}>← Regenerate</button><button className="btn" onClick={() => saveCampaign("brief")}>Save as Brief</button><button className="btn btn-gold" onClick={() => saveCampaign("approved")}>Save & Approve</button></>
+            <><button className="btn" onClick={() => { setBrief(null); setUploadFile(null); setUploadFileData(null); }}>← Back</button><button className="btn" onClick={() => saveCampaign("brief")}>Save as Brief</button><button className="btn btn-gold" onClick={() => saveCampaign("approved")}>Save & Approve</button></>
           )}
         </div>
       </div>
@@ -3149,9 +3401,12 @@ function CampaignModal({ currentUser, pillars, onClose, onSave, onSaveAsInit }) 
   );
 }
 
-function CampaignDetailModal({ campaign, pillars, onClose, onSaveAsInit }) {
+function CampaignDetailModal({ campaign, pillars, onClose, onSaveAsInit, onNote }) {
   const [pillar, setPillar] = useState(pillars[0] || "");
   const [quarter, setQuarter] = useState("Q2 2026");
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const submitNote = () => { if (onNote && noteText.trim()) { onNote({ section:"Campaigns", type:"Campaign", label:campaign.title, id:campaign.id, prefill:noteText.trim() }); setNoteText(""); setNoteOpen(false); } };
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -3161,8 +3416,27 @@ function CampaignDetailModal({ campaign, pillars, onClose, onSaveAsInit }) {
             <div className="mtitle">{campaign.title}</div>
             <div className="msub">{campaign.brand} · Created by {campaign.createdBy}</div>
           </div>
-          <button className="mclose" onClick={onClose}>×</button>
+          <div style={{ display:"flex", gap:8, alignItems:"center" }}>
+            <button className="btn btn-sm" onClick={() => setNoteOpen(o => !o)} style={{ borderColor: noteOpen ? "var(--gold)":"var(--border)", color: noteOpen ? "var(--gold)":"var(--text-muted)" }}>✎ Note</button>
+            <button className="mclose" onClick={onClose}>×</button>
+          </div>
         </div>
+        {noteOpen && (
+          <div style={{ padding:"12px 24px", borderBottom:"1px solid var(--border)", background:"rgba(201,168,76,.03)" }}>
+            <div style={{ fontSize:10, color:"var(--gold)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:6, fontWeight:600 }}>
+              Note on: <span style={{ color:"var(--text)" }}>{campaign.title}</span>
+            </div>
+            <div style={{ display:"flex", gap:8 }}>
+              <textarea value={noteText} onChange={e => setNoteText(e.target.value)} autoFocus
+                onKeyDown={e => { if (e.key==="Enter" && (e.metaKey||e.ctrlKey)) submitNote(); }}
+                placeholder="Add your note here… (⌘↵ to post)"
+                style={{ flex:1, background:"var(--surface2)", border:"1px solid var(--border)", borderRadius:8, padding:"8px 11px", color:"var(--text)", fontFamily:"var(--bf)", fontSize:13, lineHeight:1.6, resize:"none", outline:"none", minHeight:64, transition:"border-color .15s" }}
+                onFocus={e => e.target.style.borderColor="rgba(201,168,76,.35)"}
+                onBlur={e => e.target.style.borderColor="var(--border)"} />
+              <button onClick={submitNote} disabled={!noteText.trim()} style={{ alignSelf:"flex-end", padding:"6px 14px", borderRadius:7, border:"none", background:"var(--gold)", color:"var(--bg)", fontFamily:"var(--bf)", fontSize:11, fontWeight:600, cursor:"pointer", opacity:noteText.trim()?1:.4 }}>Post →</button>
+            </div>
+          </div>
+        )}
         <div className="mbody">
           {campaign.brief ? <BriefDisplay brief={campaign.brief} /> : (
             <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.75 }}>{campaign.concept}</div>
@@ -3953,8 +4227,11 @@ If a field is not present, use a sensible default. Always return valid JSON only
 // ════════════════════════════════════════════════════════════════════════════
 // CONCEPT VIEWER MODAL — full-screen HTML concept viewer for initiatives
 // ════════════════════════════════════════════════════════════════════════════
-function ConceptViewerModal({ init, onClose, onUpload }) {
+function ConceptViewerModal({ init, onClose, onUpload, onNote }) {
   const color = getChannelColor(init.channel);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const submitNote = () => { if (onNote && noteText.trim()) { onNote({ section:"Concepts", type:"Concept", label:init.title, id:init.id, prefill:noteText.trim() }); setNoteText(""); setNoteOpen(false); } };
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", background: "#07070f" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderBottom: "1px solid rgba(255,255,255,.07)", background: "rgba(7,7,15,.95)", backdropFilter: "blur(16px)", flexShrink: 0 }}>
@@ -3971,9 +4248,26 @@ function ConceptViewerModal({ init, onClose, onUpload }) {
         <div style={{ display: "flex", gap: 8 }}>
           <button className="btn btn-sm" onClick={() => { const blob = new Blob([init.htmlConcept], { type: "text/html" }); window.open(URL.createObjectURL(blob), "_blank"); }}>Open Full Screen ↗</button>
           <button className="btn btn-sm" onClick={onUpload}>↺ Replace</button>
+          <button className="btn btn-sm" onClick={() => setNoteOpen(o => !o)} style={{ borderColor: noteOpen ? "var(--gold)":"rgba(255,255,255,.1)", color: noteOpen ? "var(--gold)":"var(--text-muted)" }}>✎ Note</button>
           <button onClick={onClose} style={{ width: 30, height: 30, borderRadius: 7, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontSize: 16, display: "grid", placeItems: "center" }}>×</button>
         </div>
       </div>
+      {noteOpen && (
+        <div style={{ padding:"12px 24px", borderBottom:"1px solid rgba(255,255,255,.07)", background:"rgba(7,7,15,.97)", flexShrink:0 }}>
+          <div style={{ fontSize:10, color:"var(--gold)", letterSpacing:".08em", textTransform:"uppercase", marginBottom:6, fontWeight:600 }}>
+            Note on concept: <span style={{ color:"#fff" }}>{init.title}</span>
+          </div>
+          <div style={{ display:"flex", gap:8 }}>
+            <textarea value={noteText} onChange={e => setNoteText(e.target.value)} autoFocus
+              onKeyDown={e => { if (e.key==="Enter" && (e.metaKey||e.ctrlKey)) submitNote(); }}
+              placeholder="Add your note… (⌘↵ to post)"
+              style={{ flex:1, background:"rgba(255,255,255,.05)", border:"1px solid rgba(255,255,255,.1)", borderRadius:8, padding:"8px 11px", color:"#fff", fontFamily:"var(--bf)", fontSize:13, lineHeight:1.6, resize:"none", outline:"none", minHeight:64, transition:"border-color .15s" }}
+              onFocus={e => e.target.style.borderColor="rgba(201,168,76,.5)"}
+              onBlur={e => e.target.style.borderColor="rgba(255,255,255,.1)"} />
+            <button onClick={submitNote} disabled={!noteText.trim()} style={{ alignSelf:"flex-end", padding:"6px 14px", borderRadius:7, border:"none", background:"var(--gold)", color:"#07070f", fontFamily:"var(--bf)", fontSize:11, fontWeight:600, cursor:"pointer", opacity:noteText.trim()?1:.4 }}>Post →</button>
+          </div>
+        </div>
+      )}
       <iframe srcDoc={init.htmlConcept} title={init.title} sandbox="allow-scripts allow-same-origin allow-forms allow-downloads" style={{ flex: 1, border: "none", width: "100%", background: "#fff" }} />
     </div>
   );
@@ -4522,6 +4816,422 @@ function GanttViewer({ ganttHtml, onUpdate, canEdit }) {
         title="Timeline"
         sandbox="allow-scripts allow-same-origin allow-downloads allow-forms"
       />
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ASSET LIBRARY — native hub component
+// ════════════════════════════════════════════════════════════════════════════
+
+const DAM_ASSET_CATS = [
+  { id:"all",        label:"All Assets",          icon:"◈" },
+  { id:"logo",       label:"Logos & Brand ID",    icon:"◉" },
+  { id:"photo",      label:"Photography",          icon:"⬚" },
+  { id:"social-img", label:"Social Media Images",  icon:"▣" },
+  { id:"social-vid", label:"Social / Video",       icon:"▶" },
+  { id:"print",      label:"Print / Posters",      icon:"⬜" },
+  { id:"education",  label:"Budtender Education",  icon:"◎" },
+  { id:"menu",       label:"Menu Assets",          icon:"≡" },
+  { id:"web",        label:"Website / Digital",    icon:"⬡" },
+  { id:"brief",      label:"Briefs & Docs",        icon:"▤" },
+  { id:"concept",    label:"HTML Concepts",        icon:"✦" },
+];
+
+const DAM_MERCH_CATS = [
+  { id:"merch",          label:"Merch",    icon:"🛍" },
+  { id:"merch-tee",      label:"Tees",     icon:"👕" },
+  { id:"merch-hoodie",   label:"Hoodies",  icon:"🧥" },
+  { id:"merch-hat",      label:"Hats",     icon:"🧢" },
+  { id:"merch-sticker",  label:"Stickers", icon:"🏷" },
+  { id:"merch-lanyard",  label:"Lanyards", icon:"🪪" },
+  { id:"merch-other",    label:"Other",    icon:"✦" },
+];
+
+const DAM_ALL_TYPES = [
+  {id:"logo",label:"Logos & Brand ID"},{id:"photo",label:"Photography"},
+  {id:"social-img",label:"Social Media Images"},{id:"social-vid",label:"Social / Video"},
+  {id:"print",label:"Print / Posters"},{id:"education",label:"Budtender Education"},
+  {id:"menu",label:"Menu Assets"},{id:"web",label:"Website / Digital"},
+  {id:"brief",label:"Briefs & Docs"},{id:"concept",label:"HTML Concepts"},
+  {id:"merch-tee",label:"Tee"},{id:"merch-hoodie",label:"Hoodie"},
+  {id:"merch-hat",label:"Hat"},{id:"merch-sticker",label:"Sticker"},
+  {id:"merch-lanyard",label:"Lanyard"},{id:"merch-other",label:"Other Merch"},
+];
+
+const DAM_TYPE_EMOJI = {
+  logo:"🎨",photo:"🖼️","social-img":"📸","social-vid":"🎬",print:"🖨️",
+  education:"📚",menu:"🍃",web:"🌐",brief:"📄",concept:"✦",merch:"🛍",
+  "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
+  "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",
+};
+
+const DAM_BRANDS_DEFAULT = [
+  { id:"all",        name:"All Brands",  color:"#c9a84c" },
+  { id:"curador",    name:"CÚRADOR",     color:"#4d9e8e" },
+  { id:"headchange", name:"Head Change", color:"#c9a84c" },
+  { id:"safebet",    name:"Safe Bet",    color:"#8b7fc0" },
+  { id:"bubbles",    name:"Bubbles",     color:"#7ec8c8" },
+  { id:"airo",       name:"Airo",        color:"#a0c878" },
+];
+
+function damGetDriveId(url) {
+  if (!url) return null;
+  let m = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  return null;
+}
+function damThumb(asset) {
+  if (asset.thumbnailUrl) return asset.thumbnailUrl;
+  const id = damGetDriveId(asset.driveUrl);
+  return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w400` : null;
+}
+function damEmbed(url) {
+  const id = damGetDriveId(url);
+  return id ? `https://drive.google.com/file/d/${id}/preview` : null;
+}
+function damFmtDate(ts) {
+  return new Date(ts).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+}
+
+function AssetLibrary({
+  assets, setAssets, driveAssets, setDriveAssets,
+  activeType, setActiveType, activeBrand, setActiveBrand,
+  search, setSearch, view, setView,
+  merchOpen, setMerchOpen, addOpen, setAddOpen,
+  preview, setPreview, config, setConfig,
+  folders, setFolders, connected, setConnected,
+  syncing, setSyncing, settingsOpen, setSettingsOpen,
+  currentUser, hubBrands, hubCampaigns, onNote,
+}) {
+  const isAdmin = currentUser?.name === "Sean";
+
+  const damBrands = useCallback(() => {
+    if (!hubBrands) return DAM_BRANDS_DEFAULT;
+    return [
+      { id:"all", name:"All Brands", color:"#c9a84c" },
+      ...Object.values(hubBrands).map(b => ({ id:b.id, name:b.name, color:b.color||"#c9a84c" }))
+    ];
+  }, [hubBrands]);
+
+  const resolvedBrands = damBrands();
+  const campaignList = hubCampaigns?.length
+    ? hubCampaigns.map(c => c.title || c.name || c).filter(Boolean)
+    : ["General","BudDrops","HashNotes","Hash HQ","Safe Bet Launch","Bubbles Social","How To Hash"];
+
+  // Merge drive + manual
+  const allAssets = useCallback(() => {
+    const map = new Map();
+    assets.forEach(a => map.set(a.id, a));
+    driveAssets.forEach(a => map.set(a.id, a));
+    return Array.from(map.values());
+  }, [assets, driveAssets])();
+
+  const filtered = allAssets.filter(a => {
+    if (activeBrand !== "all" && a.brandId !== activeBrand) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      if (!a.name.toLowerCase().includes(q) && !(a.tags||"").toLowerCase().includes(q)) return false;
+    }
+    if (activeType === "all") return true;
+    if (activeType === "merch") return a.type.startsWith("merch-");
+    return a.type === activeType;
+  });
+
+  const countFor = (id) => {
+    const base = allAssets.filter(a => activeBrand==="all"||a.brandId===activeBrand);
+    if (id==="all") return base.length;
+    if (id==="merch") return base.filter(a=>a.type.startsWith("merch-")).length;
+    return base.filter(a=>a.type===id).length;
+  };
+
+  const getBrandColor = (id) => resolvedBrands.find(b=>b.id===id)?.color||"#c9a84c";
+  const getBrandName  = (id) => resolvedBrands.find(b=>b.id===id)?.name||id;
+
+  const addAsset = (a) => { setAssets(p => [a,...p]); setAddOpen(false); };
+  const delAsset = (id) => {
+    if (!confirm("Remove this asset?")) return;
+    setAssets(p=>p.filter(a=>a.id!==id));
+    setDriveAssets(p=>p.filter(a=>a.id!==id));
+  };
+
+  return (
+    <div className="dam-wrap">
+      {/* Sidebar */}
+      <div className="dam-sb">
+        <div className="dam-sb-hdr">Brands</div>
+        {resolvedBrands.map(b => (
+          <button key={b.id} className={`dam-sb-btn ${activeBrand===b.id?"on":""}`}
+            onClick={() => setActiveBrand(b.id)}>
+            <div style={{width:7,height:7,borderRadius:"50%",background:b.color,opacity:activeBrand===b.id?1:.35,flexShrink:0}}/>
+            {b.name}
+            {b.id!=="all" && <span className="dam-sb-cnt">{allAssets.filter(a=>a.brandId===b.id).length||""}</span>}
+          </button>
+        ))}
+
+        <div className="dam-sb-div"/>
+        <div className="dam-sb-hdr">Asset Type</div>
+        {DAM_ASSET_CATS.map(t => (
+          <button key={t.id} className={`dam-sb-btn ${activeType===t.id?"on":""}`}
+            onClick={() => setActiveType(t.id)}>
+            <span className="dam-sb-ico">{t.icon}</span>
+            {t.label}
+            {t.id!=="all" && <span className="dam-sb-cnt">{countFor(t.id)||""}</span>}
+          </button>
+        ))}
+
+        <div className="dam-sb-div"/>
+        <button className={`dam-sb-btn ${activeType==="merch"||activeType.startsWith("merch-")?"on":""}`}
+          onClick={() => { setMerchOpen(o=>!o); setActiveType("merch"); }}>
+          <span className="dam-sb-ico">🛍</span>
+          Merch
+          <span className="dam-sb-cnt">{countFor("merch")||""}</span>
+          <span className={`dam-chev ${merchOpen?"open":""}`}>▶</span>
+        </button>
+        {merchOpen && DAM_MERCH_CATS.filter(m=>m.id!=="merch").map(m => (
+          <button key={m.id} className={`dam-sb-btn sub ${activeType===m.id?"on":""}`}
+            onClick={() => setActiveType(m.id)}>
+            <span className="dam-sb-ico">{m.icon}</span>
+            {m.label}
+            <span className="dam-sb-cnt">{countFor(m.id)||""}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Main */}
+      <div className="dam-main">
+        <div className="dam-bar">
+          <div className="dam-sw">
+            <span className="dam-si">⌕</span>
+            <input className="dam-search" placeholder="Search name, tags…"
+              value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
+          <button className={`dam-vbtn ${view==="grid"?"on":""}`} onClick={() => setView("grid")}>⊞</button>
+          <button className={`dam-vbtn ${view==="list"?"on":""}`} onClick={() => setView("list")}>☰</button>
+          <button className="dam-add" onClick={() => setAddOpen(true)}>+ Add Asset</button>
+        </div>
+
+        <div className="dam-body">
+          {filtered.length > 0 && <div className="dam-cnt">{filtered.length} asset{filtered.length!==1?"s":""}</div>}
+
+          {allAssets.length === 0 ? (
+            <div className="dam-empty">
+              <div style={{fontSize:44,opacity:.18}}>◈</div>
+              <div style={{fontSize:14,color:"var(--text-dim)"}}>No assets yet</div>
+              <div style={{fontSize:11,color:"var(--text-muted)",maxWidth:260,lineHeight:1.75}}>
+                Click + Add Asset and paste a Google Drive link to get started.
+              </div>
+              <button className="dam-add" style={{marginTop:4}} onClick={() => setAddOpen(true)}>+ Add First Asset</button>
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="dam-empty">
+              <div style={{fontSize:44,opacity:.18}}>⌕</div>
+              <div style={{fontSize:13,color:"var(--text-dim)"}}>No assets match</div>
+            </div>
+          ) : view === "grid" ? (
+            <div className="dam-grid">
+              {filtered.map(a => (
+                <div key={a.id} className="dam-card" onClick={() => setPreview(a)}>
+                  <div className="dam-card-thumb">
+                    {damThumb(a) && <img src={damThumb(a)} alt={a.name} onError={e=>{e.target.style.display="none";}} />}
+                    <span className="dam-card-fb">{DAM_TYPE_EMOJI[a.type]||"📁"}</span>
+                    <div className="dam-card-acts">
+                      {onNote && <button className="dam-iact" onClick={e=>{e.stopPropagation();onNote({section:"Asset Library",type:"Asset",label:a.name,id:a.id});}}>✎</button>}
+                      <button className="dam-iact" onClick={e=>{e.stopPropagation();window.open(a.driveUrl,"_blank");}}>↗</button>
+                      {isAdmin && <button className="dam-iact del" onClick={e=>{e.stopPropagation();delAsset(a.id);}}>✕</button>}
+                    </div>
+                  </div>
+                  <div className="dam-card-body">
+                    <div className="dam-card-name" title={a.name}>{a.name}</div>
+                    <div className="dam-card-meta">
+                      <span className="dam-bchip" style={{background:getBrandColor(a.brandId)+"18",color:getBrandColor(a.brandId)}}>{getBrandName(a.brandId)}</span>
+                      {a.fromDrive && <span style={{fontSize:8,padding:"1px 5px",borderRadius:3,background:"rgba(77,158,142,.12)",color:"#4d9e8e"}}>Drive</span>}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="dam-list">
+              {filtered.map(a => {
+                const td = DAM_ALL_TYPES.find(t=>t.id===a.type);
+                return (
+                  <div key={a.id} className="dam-row" onClick={() => setPreview(a)}>
+                    <div className="dam-row-thumb">
+                      {damThumb(a) && <img src={damThumb(a)} alt="" onError={e=>{e.target.style.display="none";}} />}
+                      <span style={{position:"relative",zIndex:1}}>{DAM_TYPE_EMOJI[a.type]||"📁"}</span>
+                    </div>
+                    <div className="dam-row-name" title={a.name}>{a.name}</div>
+                    <span className="dam-bchip" style={{background:getBrandColor(a.brandId)+"18",color:getBrandColor(a.brandId),fontSize:8,padding:"2px 6px",borderRadius:3,fontWeight:700,letterSpacing:".05em",textTransform:"uppercase"}}>{getBrandName(a.brandId)}</span>
+                    <div className="dam-row-type">{td?.label||a.type}</div>
+                    <div className="dam-row-date">{damFmtDate(a.addedAt)}</div>
+                    <div className="dam-row-acts" onClick={e=>e.stopPropagation()}>
+                      {onNote && <button className="dam-iact" onClick={()=>onNote({section:"Asset Library",type:"Asset",label:a.name,id:a.id})}>✎</button>}
+                      <button className="dam-iact" onClick={()=>window.open(a.driveUrl,"_blank")}>↗</button>
+                      {isAdmin && <button className="dam-iact del" onClick={()=>delAsset(a.id)}>✕</button>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Add modal */}
+      {addOpen && (
+        <div className="dam-overlay" onClick={() => setAddOpen(false)}>
+          <div className="dam-modal" onClick={e=>e.stopPropagation()}>
+            <div className="dam-mhdr">
+              <div className="dam-mtitle">Add Asset</div>
+              <button className="dam-mclose" onClick={() => setAddOpen(false)}>×</button>
+            </div>
+            <DamAddForm
+              brands={resolvedBrands} campaigns={campaignList}
+              defaultType={activeType==="merch"?"merch-tee":activeType==="all"?"photo":activeType}
+              defaultBrand={activeBrand==="all"?"curador":activeBrand}
+              currentUser={currentUser}
+              onSave={addAsset} onCancel={() => setAddOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      {/* Preview */}
+      {preview && (
+        <DamPreview asset={preview} onClose={() => setPreview(null)}
+          onNote={onNote}
+          onDel={isAdmin ? () => { delAsset(preview.id); setPreview(null); } : null} />
+      )}
+    </div>
+  );
+}
+
+function DamAddForm({ brands, campaigns, defaultType, defaultBrand, currentUser, onSave, onCancel }) {
+  const [form, setForm] = useState({
+    name:"", driveUrl:"", brandId:defaultBrand||"curador",
+    type:defaultType||"photo", campaign:"", tags:"", notes:""
+  });
+  const set = (k,v) => setForm(p=>({...p,[k]:v}));
+  const valid = form.name.trim() && form.driveUrl.trim();
+  const save = () => onSave({
+    id:`dam-${Date.now()}`,...form,
+    name:form.name.trim(), driveUrl:form.driveUrl.trim(),
+    addedBy:currentUser?.name||"Team", addedAt:new Date().toISOString()
+  });
+  return (
+    <>
+      <div className="dam-field"><label>Asset Name *</label>
+        <input className="dam-fi" autoFocus placeholder="e.g. Head Change Logo – Full Color" value={form.name} onChange={e=>set("name",e.target.value)} />
+      </div>
+      <div className="dam-field"><label>Google Drive Link *</label>
+        <input className="dam-fi" placeholder="https://drive.google.com/file/d/…" value={form.driveUrl} onChange={e=>set("driveUrl",e.target.value)} />
+      </div>
+      <div className="dam-frow">
+        <div className="dam-field"><label>Brand</label>
+          <select className="dam-fsel" value={form.brandId} onChange={e=>set("brandId",e.target.value)}>
+            {brands.filter(b=>b.id!=="all").map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </div>
+        <div className="dam-field"><label>Asset Type</label>
+          <select className="dam-fsel" value={form.type} onChange={e=>set("type",e.target.value)}>
+            <optgroup label="Digital Assets">
+              {DAM_ASSET_CATS.filter(t=>t.id!=="all").map(t=><option key={t.id} value={t.id}>{t.label}</option>)}
+            </optgroup>
+            <optgroup label="Merch">
+              {DAM_MERCH_CATS.filter(m=>m.id!=="merch").map(m=><option key={m.id} value={m.id}>{m.label}</option>)}
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div className="dam-frow">
+        <div className="dam-field"><label>Campaign</label>
+          <select className="dam-fsel" value={form.campaign} onChange={e=>set("campaign",e.target.value)}>
+            <option value="">None</option>
+            {campaigns.map(c=><option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="dam-field"><label>Tags</label>
+          <input className="dam-fi" placeholder="launch, Q2, print…" value={form.tags} onChange={e=>set("tags",e.target.value)} />
+        </div>
+      </div>
+      <div className="dam-field"><label>Notes</label>
+        <textarea className="dam-fta" rows={2} placeholder="Usage notes, specs…" value={form.notes} onChange={e=>set("notes",e.target.value)} />
+      </div>
+      <div className="dam-mfoot">
+        <button className="dam-btn" onClick={onCancel}>Cancel</button>
+        <button className="dam-btn dam-btn-gold" disabled={!valid} onClick={save}>Save Asset</button>
+      </div>
+    </>
+  );
+}
+
+function DamPreview({ asset, onClose, onNote, onDel }) {
+  const [loaded,   setLoaded]   = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+  const bc    = (DAM_BRANDS_DEFAULT.find(b=>b.id===asset.brandId)?.color)||"#c9a84c";
+  const td    = DAM_ALL_TYPES.find(t=>t.id===asset.type);
+  const thumb = (() => { if (asset.thumbnailUrl) return asset.thumbnailUrl; const id = damGetDriveId(asset.driveUrl); return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w1200` : null; })();
+  const embed = damEmbed(asset.driveUrl);
+
+  const postNote = () => {
+    if (!noteText.trim()||!onNote) return;
+    onNote({section:"Asset Library",type:"Asset",label:asset.name,id:asset.id,prefill:noteText.trim()});
+    setNoteText(""); setNoteOpen(false);
+  };
+
+  return (
+    <div className="dam-preview">
+      <div className="dam-phdr">
+        <div style={{width:8,height:8,borderRadius:"50%",background:bc,flexShrink:0}}/>
+        <div className="dam-ptitle">{asset.name}</div>
+        {onNote && <button className="dam-pnote" style={{width:"auto",marginBottom:0,marginRight:8}} onClick={() => setNoteOpen(o=>!o)}>✎ Note</button>}
+        <button onClick={onClose} style={{width:28,height:28,borderRadius:7,border:"1px solid var(--border)",background:"transparent",color:"var(--text-muted)",cursor:"pointer",fontSize:16,display:"grid",placeItems:"center"}}>×</button>
+      </div>
+      {noteOpen && (
+        <div className="dam-innote">
+          <div className="dam-inlbl">Note on: <span style={{color:"var(--text)",fontWeight:400,textTransform:"none",letterSpacing:0}}>{asset.name}</span></div>
+          <div className="dam-inrow">
+            <textarea className="dam-inta" autoFocus placeholder="Add a note… (⌘↵ to post)" value={noteText} onChange={e=>setNoteText(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))postNote();}} />
+            <button className="dam-inpost" disabled={!noteText.trim()} onClick={postNote}>Post →</button>
+          </div>
+        </div>
+      )}
+      <div className="dam-pwrap">
+        <div className="dam-pbody">
+          {embed ? (
+            <>
+              {thumb && <div className="dam-ghost"><img src={thumb} alt=""/></div>}
+              {!loaded && <div className="dam-ploading"><span className="dam-spin">◈</span><span style={{fontSize:10,color:"var(--text-muted)",letterSpacing:".06em",textTransform:"uppercase"}}>Loading preview…</span></div>}
+              <iframe src={embed} title={asset.name} allow="autoplay" style={{opacity:loaded?.9:0,transition:"opacity .4s",zIndex:loaded?3:1}} onLoad={()=>setLoaded(true)} />
+            </>
+          ) : (
+            <div className="dam-noembed">
+              <div style={{fontSize:64,opacity:.18}}>{DAM_TYPE_EMOJI[asset.type]||"📁"}</div>
+              <div style={{fontSize:13,color:"var(--text-dim)"}}>{asset.name}</div>
+              <button className="dam-plink" style={{width:"auto",padding:"9px 20px"}} onClick={()=>window.open(asset.driveUrl,"_blank")}>Open in Google Drive ↗</button>
+            </div>
+          )}
+        </div>
+        <div className="dam-psb">
+          <div className="dam-mlbl">Type</div>
+          <div className="dam-mval">{td?.label||asset.type}</div>
+          {asset.campaign&&<><div className="dam-mlbl">Campaign</div><div className="dam-mval">{asset.campaign}</div></>}
+          <div className="dam-mlbl">Added by</div>
+          <div className="dam-mval">{asset.addedBy}</div>
+          <div className="dam-mlbl">Date</div>
+          <div className="dam-mval">{damFmtDate(asset.addedAt)}</div>
+          {asset.tags&&<><div className="dam-mlbl">Tags</div><div style={{marginBottom:12}}>{asset.tags.split(",").map(t=>t.trim()).filter(Boolean).map(t=><span key={t} className="dam-ptag">{t}</span>)}</div></>}
+          {asset.notes&&<><div className="dam-mlbl">Notes</div><div style={{fontSize:12,color:"var(--text-dim)",lineHeight:1.65,marginBottom:12}}>{asset.notes}</div></>}
+          <div style={{marginTop:8}}>
+            <button className="dam-plink" onClick={()=>window.open(asset.driveUrl,"_blank")}>🗂 View in Google Drive ↗</button>
+            {onNote&&<button className="dam-pnote" onClick={()=>setNoteOpen(o=>!o)}>✎ Add Note</button>}
+            {onDel&&<button className="dam-pdel" onClick={onDel}>✕ Remove Asset</button>}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
