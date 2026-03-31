@@ -712,7 +712,7 @@ export default function MarketingHub({ initialUserName }) {
   const [notes, setNotes] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-notes"); return v ? JSON.parse(v) : []; } catch { return []; } });
   const [noteText, setNoteText] = useState("");
   const [currentUser, setCurrentUser] = useState(() => { try { const v = localStorage.getItem("ns_ns-user"); return v ? JSON.parse(v) : null; } catch { return null; } });
-  const isAdmin = currentUser?.name === "Sean";
+  const isAdmin = currentUser?.name?.toLowerCase() === "sean";
   const canEdit = isAdmin;
   const canAddContent = true; // everyone can add campaigns, concepts, notes, download
   const [showWhoModal, setShowWhoModal] = useState(() => {
@@ -725,7 +725,7 @@ export default function MarketingHub({ initialUserName }) {
   // Auto-set user from login gate name selection
   useEffect(() => {
     if (initialUserName) {
-      const role = initialUserName === "Sean" ? "creative" : "content";
+      const role = initialUserName?.toLowerCase() === "sean" ? "creative" : "content";
       const color = colorForName(initialUserName);
       const user = { name: initialUserName, color, role };
       setCurrentUser(user);
@@ -2783,7 +2783,7 @@ function MembersGridView({ teamMembers, currentUser, orgRoles, onSelect, onChang
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 14 }}>
       {teamMembers.map(m => {
         const roleLabel = orgRoles.find(r => r.id === m.role)?.title || "Team Member";
-        const isMe = currentUser?.name === m.name;
+        const isMe = currentUser?.name?.toLowerCase() === m.name?.toLowerCase();
         return (
           <div key={m.name} onClick={() => onSelect(m)} style={{
             padding: "18px 18px 16px", borderRadius: 13, cursor: "pointer",
@@ -3251,7 +3251,7 @@ function TeamMemberModal({ member, currentUser, onClose, onUpdate }) {
   const [skillsText, setSkillsText] = useState((member.skills || []).join("\n"));
   const [strengthsText, setStrengthsText] = useState((member.strengths || []).join("\n"));
   const [keyPointsText, setKeyPointsText] = useState((member.keyPoints || []).join("\n"));
-  const isMe = currentUser?.name === member.name;
+  const isMe = currentUser?.name?.toLowerCase() === member.name?.toLowerCase();
   const roleLabel = ORG_ROLES.find(r => r.id === member.role)?.title || member.role || "Team Member";
   const displayTitle = member.title || roleLabel;
 
