@@ -9,10 +9,13 @@ const DAM_ASSET_CATS = [
   { id:"all",        label:"All Assets",          icon:"◈" },
   { id:"logo",       label:"Logos & Brand ID",    icon:"◉" },
   { id:"photo",      label:"Photography",          icon:"⬚" },
-  { id:"photo-product",   label:"Product Photography", icon:"📷", sub:true },
-  { id:"photo-lifestyle", label:"Lifestyle",           icon:"🌿", sub:true },
+  { id:"photo-product",   label:"Product Photography", icon:"📷", sub:true, parent:"photo" },
+  { id:"photo-lifestyle", label:"Lifestyle",           icon:"🌿", sub:true, parent:"photo" },
   { id:"social-img", label:"Social Media Images",  icon:"▣" },
   { id:"social-vid", label:"Social / Video",       icon:"▶" },
+  { id:"event",      label:"Events",               icon:"🎪" },
+  { id:"event-photo", label:"Photography",         icon:"📷", sub:true, parent:"event" },
+  { id:"event-video", label:"Videos",              icon:"🎬", sub:true, parent:"event" },
   { id:"print",      label:"Print / Posters",      icon:"⬜" },
   { id:"education",  label:"Budtender Education",  icon:"◎" },
   { id:"menu",       label:"Menu Assets",          icon:"≡" },
@@ -74,6 +77,7 @@ const ALL_PKG_IDS = new Set(Object.values(DAM_PACKAGING).flat().map(p=>p.id));
 const DAM_ALL_TYPES = [
   {id:"logo",label:"Logos & Brand ID"},{id:"photo",label:"Photography"},
   {id:"photo-product",label:"Product Photography"},{id:"photo-lifestyle",label:"Lifestyle"},
+  {id:"event",label:"Events"},{id:"event-photo",label:"Event Photography"},{id:"event-video",label:"Event Videos"},
   {id:"social-img",label:"Social Media Images"},{id:"social-vid",label:"Social / Video"},
   {id:"print",label:"Print / Posters"},{id:"education",label:"Budtender Education"},
   {id:"menu",label:"Menu Assets"},{id:"web",label:"Website / Digital"},
@@ -86,7 +90,7 @@ const DAM_ALL_TYPES = [
 ];
 
 const DAM_TYPE_EMOJI = {
-  logo:"🎨",photo:"🖼️","photo-product":"📷","photo-lifestyle":"🌿","social-img":"📸","social-vid":"🎬",print:"🖨️",
+  logo:"🎨",photo:"🖼️","photo-product":"📷","photo-lifestyle":"🌿","social-img":"📸","social-vid":"🎬",event:"🎪","event-photo":"📷","event-video":"🎬",print:"🖨️",
   education:"📚",menu:"🍃",web:"🌐",brief:"📄",concept:"✦",merch:"🛍",
   "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
   "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",
@@ -136,6 +140,7 @@ export default function AssetLibrary({
 }) {
   const isAdmin = currentUser?.name === "Sean";
   const [photoOpen, setPhotoOpen] = useState(false);
+  const [eventOpen, setEventOpen] = useState(false);
 
   const damBrands = useCallback(() => {
     if (!hubBrands) return DAM_BRANDS_DEFAULT;
@@ -171,6 +176,7 @@ export default function AssetLibrary({
     if (activeType === "merch") return a.type.startsWith("merch-");
     if (activeType === "packaging") return ALL_PKG_IDS.has(a.type);
     if (activeType === "photo") return a.type === "photo" || a.type.startsWith("photo-");
+    if (activeType === "event") return a.type === "event" || a.type.startsWith("event-");
     return a.type === activeType;
   });
 
@@ -180,6 +186,7 @@ export default function AssetLibrary({
     if (id==="merch") return base.filter(a=>a.type.startsWith("merch-")).length;
     if (id==="packaging") return base.filter(a=>ALL_PKG_IDS.has(a.type)).length;
     if (id==="photo") return base.filter(a=>a.type==="photo"||a.type.startsWith("photo-")).length;
+    if (id==="event") return base.filter(a=>a.type==="event"||a.type.startsWith("event-")).length;
     return base.filter(a=>a.type===id).length;
   };
 
@@ -232,14 +239,26 @@ export default function AssetLibrary({
               <span className={`dam-chev ${photoOpen?"open":""}`}>▶</span>
             </button>
           );
-          if (t.sub) return photoOpen ? (
-            <button key={t.id} className={`dam-sb-btn sub ${activeType===t.id?"on":""}`}
-              onClick={() => setActiveType(t.id)}>
+          if (t.id === "event") return (
+            <button key={t.id} className={`dam-sb-btn ${activeType==="event"||activeType.startsWith("event-")?"on":""}`}
+              onClick={() => { setEventOpen(o=>!o); setActiveType("event"); }}>
               <span className="dam-sb-ico">{t.icon}</span>
               {t.label}
-              <span className="dam-sb-cnt">{countFor(t.id)||""}</span>
+              <span className="dam-sb-cnt">{countFor("event")||""}</span>
+              <span className={`dam-chev ${eventOpen?"open":""}`}>▶</span>
             </button>
-          ) : null;
+          );
+          if (t.sub) {
+            const isOpen = t.parent === "event" ? eventOpen : photoOpen;
+            return isOpen ? (
+              <button key={t.id} className={`dam-sb-btn sub ${activeType===t.id?"on":""}`}
+                onClick={() => setActiveType(t.id)}>
+                <span className="dam-sb-ico">{t.icon}</span>
+                {t.label}
+                <span className="dam-sb-cnt">{countFor(t.id)||""}</span>
+              </button>
+            ) : null;
+          }
           return (
             <button key={t.id} className={`dam-sb-btn ${activeType===t.id?"on":""}`}
               onClick={() => setActiveType(t.id)}>
