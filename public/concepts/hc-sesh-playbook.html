@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HeadChange Sesh — Full Operations & Content Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amber: #C8861A;
+    --amber-light: #E8A83A;
+    --amber-pale: #F5C97A;
+    --amber-glow: rgba(200, 134, 26, 0.15);
+    --dark: #0D0B08;
+    --dark-2: #141108;
+    --dark-3: #1E180E;
+    --dark-4: #281F0F;
+    --cream: #F0E8D8;
+    --cream-dim: #B8AD98;
+    --white: #FDFAF5;
+    --rule: rgba(200, 134, 26, 0.25);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--dark);
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    line-height: 1.75;
+    font-size: 15px;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    padding: 60px 40px;
+    background: radial-gradient(ellipse at 50% 60%, #2A1C06 0%, var(--dark) 70%);
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: 
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(200,134,26,0.03) 61px),
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(200,134,26,0.03) 61px);
+    pointer-events: none;
+  }
+
+  .cover-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 28px;
+    opacity: 0.8;
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 8vw, 92px);
+    font-weight: 900;
+    line-height: 0.95;
+    color: var(--white);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .cover-title em {
+    font-style: italic;
+    color: var(--amber-light);
+  }
+
+  .cover-sub {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 2.5vw, 26px);
+    font-style: italic;
+    color: var(--amber-pale);
+    margin-bottom: 40px;
+    font-weight: 400;
+  }
+
+  .cover-rule {
+    width: 80px;
+    height: 1px;
+    background: var(--amber);
+    margin: 0 auto 40px;
+  }
+
+  .cover-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--cream-dim);
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cover-meta span { opacity: 0.7; }
+  .cover-meta strong { color: var(--amber-pale); font-weight: 500; }
+
+  .cover-scroll {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    color: var(--amber);
+    opacity: 0.5;
+    text-transform: uppercase;
+  }
+
+  /* ── NAV ── */
+  .toc-nav {
+    background: var(--dark-2);
+    border-bottom: 1px solid var(--rule);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .toc-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .toc-inner::-webkit-scrollbar { display: none; }
+
+  .toc-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    text-decoration: none;
+    padding: 14px 18px;
+    border-right: 1px solid var(--rule);
+    white-space: nowrap;
+    transition: color 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toc-link:hover { color: var(--amber-light); background: var(--amber-glow); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 40px; }
+
+  /* ── SECTION HEADER ── */
+  .section-block {
+    padding: 80px 0 60px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+
+  .section-title em { font-style: italic; color: var(--amber-light); }
+
+  .section-desc {
+    font-size: 15px;
+    color: var(--cream-dim);
+    max-width: 640px;
+    line-height: 1.8;
+    margin-bottom: 48px;
+  }
+
+  /* ── PHASE CARDS ── */
+  .phase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+
+  .phase-card {
+    background: var(--dark-2);
+    padding: 32px;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .phase-card:hover { background: var(--dark-3); }
+
+  .phase-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 64px;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--amber-glow);
+    line-height: 1;
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    color: rgba(200,134,26,0.12);
+  }
+
+  .phase-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 8px;
+  }
+
+  .phase-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .phase-timing {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--amber-pale);
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+
+  .phase-items {
+    list-style: none;
+  }
+
+  .phase-items li {
+    font-size: 13px;
+    color: var(--cream-dim);
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(200,134,26,0.07);
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.5;
+  }
+
+  .phase-items li::before {
+    content: '→';
+    color: var(--amber);
+    font-size: 11px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── NEW: DATA CAPTURE ADDITION ── */
+  .add-on {
+    background: linear-gradient(135deg, var(--dark-3), var(--dark-4));
+    border: 1px solid var(--amber);
+    border-left: 4px solid var(--amber);
+    padding: 24px 28px;
+    margin-top: 16px;
+  }
+
+  .add-on-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber-pale);
+    margin-bottom: 10px;
+  }
+
+  .add-on-items {
+    list-style: none;
+  }
+
+  .add-on-items li {
+    font-size: 13px;
+    color: var(--cream);
+    padding: 5px 0 5px 20px;
+    line-height: 1.65;
+    position: relative;
+  }
+
+  .add-on-items li::before {
+    content: '◆';
+    color: var(--amber);
+    font-size: 8px;
+    position: absolute;
+    left: 0;
+    top: 8px;
+  }
+
+  /* ── STRATEGY COLUMNS ── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 720px) {
+    .two-col { grid-template-columns: 1fr; }
+    .container { padding: 0 20px; }
+    .cover-meta { gap: 20px; }
+  }
+
+  .strategy-card {
+    background: var(--dark-2);
+    border: 1px solid var(--rule);
+    padding: 32px;
+  }
+
+  .strategy-card-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 12px;
+  }
+
+  .strategy-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .strategy-card ul {
+    list-style: none;
+  }
+
+  .strategy-card ul li {
+    font-size: 13px;
+    color: var(--cream-dim);
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(200,134,26,0.07);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+
+  .strategy-card ul li::before {
+    content: '—';
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+
+  /* ── SHOT LIST TABLE ── */
+  .shot-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 40px;
+  }
+
+  .shot-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--amber);
+    background: var(--dark-3);
+  }
+
+  .shot-table td {
+    font-size: 13px;
+    color: var(--cream-dim);
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(200,134,26,0.08);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .shot-table tr:hover td { background: var(--amber-glow); color: var(--cream); }
+
+  .badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+
+  .badge-photo { background: rgba(200,134,26,0.2); color: var(--amber-pale); border: 1px solid var(--amber); }
+  .badge-video { background: rgba(90,50,10,0.4); color: var(--amber-light); border: 1px solid rgba(200,134,26,0.4); }
+  .badge-both { background: rgba(200,134,26,0.35); color: var(--white); border: 1px solid var(--amber-light); }
+
+  /* ── TIMELINE ── */
+  .timeline {
+    position: relative;
+    margin-bottom: 48px;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 140px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+
+  .timeline-row {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    position: relative;
+  }
+
+  .timeline-time {
+    width: 140px;
+    flex-shrink: 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    text-align: right;
+    padding: 20px 24px 20px 0;
+    line-height: 1.4;
+  }
+
+  .timeline-dot {
+    width: 0;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .timeline-dot::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 26px;
+    width: 10px;
+    height: 10px;
+    background: var(--amber);
+    border: 2px solid var(--dark);
+    border-radius: 50%;
+  }
+
+  .timeline-content {
+    flex: 1;
+    padding: 16px 0 16px 28px;
+    border-bottom: 1px solid rgba(200,134,26,0.06);
+  }
+
+  .timeline-content h4 {
+    font-family: 'Jost', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .timeline-content p {
+    font-size: 12px;
+    color: var(--cream-dim);
+    line-height: 1.6;
+  }
+
+  /* ── POST-SESH RECYCLING MATRIX ── */
+  .matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+
+  @media (max-width: 860px) {
+    .matrix { grid-template-columns: 1fr; }
+    .timeline::before { left: 100px; }
+    .timeline-time { width: 100px; }
+  }
+
+  .matrix-cell {
+    background: var(--dark-2);
+    padding: 28px 24px;
+  }
+
+  .matrix-cell-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 10px;
+  }
+
+  .matrix-cell-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 14px;
+  }
+
+  .matrix-cell ul { list-style: none; }
+  .matrix-cell ul li {
+    font-size: 12px;
+    color: var(--cream-dim);
+    padding: 4px 0;
+    line-height: 1.5;
+    display: flex;
+    gap: 6px;
+  }
+
+  .matrix-cell ul li::before { content: '·'; color: var(--amber); font-size: 16px; line-height: 1.1; flex-shrink: 0; }
+
+  /* ── CAPTURE FORM SPEC ── */
+  .spec-block {
+    background: var(--dark-3);
+    border: 1px solid var(--rule);
+    padding: 36px;
+    margin-bottom: 32px;
+  }
+
+  .spec-block h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 20px;
+  }
+
+  .spec-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(200,134,26,0.08);
+  }
+
+  .spec-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--amber-pale);
+    width: 140px;
+    flex-shrink: 0;
+    padding-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  .spec-val {
+    font-size: 13px;
+    color: var(--cream);
+    line-height: 1.6;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .checklist-group {
+    background: var(--dark-2);
+    border: 1px solid var(--rule);
+    padding: 28px;
+  }
+
+  .checklist-group h4 {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .checklist-group ul { list-style: none; }
+
+  .checklist-group ul li {
+    font-size: 13px;
+    color: var(--cream-dim);
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(200,134,26,0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    line-height: 1.5;
+  }
+
+  .check-box {
+    width: 14px;
+    height: 14px;
+    border: 1px solid rgba(200,134,26,0.4);
+    flex-shrink: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .check-box.checked { background: var(--amber); border-color: var(--amber); }
+
+  /* ── PULL QUOTE ── */
+  .pull-quote {
+    border-left: 3px solid var(--amber);
+    padding: 24px 32px;
+    margin: 48px 0;
+    background: var(--dark-3);
+  }
+
+  .pull-quote p {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-style: italic;
+    color: var(--amber-pale);
+    line-height: 1.5;
+  }
+
+  .pull-quote cite {
+    display: block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--cream-dim);
+    margin-top: 12px;
+    font-style: normal;
+    text-transform: uppercase;
+  }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--dark-2);
+    border-top: 1px solid var(--rule);
+    padding: 60px 0;
+    text-align: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--amber);
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .footer-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+    opacity: 0.5;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .toc-nav { display: none; }
+    .cover { min-height: auto; padding: 40px; }
+    body { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="cover-eyebrow">HeadChange Brands — Internal SOP Document</div>
+  <h1 class="cover-title"><em>Sesh</em><br>Operations &amp;<br>Content Strategy</h1>
+  <p class="cover-sub">Full-Cycle Playbook: Execution, Data Capture &amp; Post-Event Amplification</p>
+  <div class="cover-rule"></div>
+  <div class="cover-meta">
+    <span><strong>Version</strong> 2.0</span>
+    <span><strong>Audience</strong> Internal / Project Owners</span>
+    <span><strong>Event Type</strong> B2B Budtender + Industry Appreciation</span>
+    <span><strong>Brand</strong> HeadChange</span>
+  </div>
+  <div class="cover-scroll">Scroll to begin ↓</div>
+</section>
+
+<!-- NAV -->
+<nav class="toc-nav">
+  <div class="toc-inner">
+    <a href="#overview" class="toc-link">Overview</a>
+    <a href="#phase1" class="toc-link">Phase 1 — Discovery</a>
+    <a href="#phase2" class="toc-link">Phase 2 — Lockdown</a>
+    <a href="#phase3" class="toc-link">Phase 3 — Inventory</a>
+    <a href="#phase4" class="toc-link">Phase 4 — Final Sprint</a>
+    <a href="#capture" class="toc-link">Data Capture</a>
+    <a href="#content" class="toc-link">Content Team</a>
+    <a href="#post-sesh" class="toc-link">Post-Sesh</a>
+    <a href="#checklist" class="toc-link">Master Checklist</a>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<section id="overview" class="section-block">
+  <div class="container">
+    <div class="section-label">Strategic Overview</div>
+    <h2 class="section-title">The Sesh is a <em>Cultural Asset.</em><br>We treat it like one.</h2>
+    <p class="section-desc">The HeadChange Sesh is not a product demo — it is our most important B2B relationship investment with the budtenders and industry professionals who move our product. This document expands the core SOP to layer in data collection, content production, and post-event engagement so every Sesh compounds in value long after last dab.</p>
+
+    <div class="pull-quote">
+      <p>"Every Sesh should generate three things: genuine appreciation for the people in that room, a data asset we own, and content that fuels six weeks of brand presence."</p>
+      <cite>— HeadChange Brand Principle</cite>
+    </div>
+
+    <div class="phase-grid" style="margin-bottom:0">
+      <div class="phase-card">
+        <div class="phase-num">1</div>
+        <div class="phase-badge">T-Minus 5–6 Weeks</div>
+        <div class="phase-name">Discovery Gate</div>
+        <div class="phase-timing">Lock Core 12 Variables</div>
+        <ul class="phase-items">
+          <li>Date, City, Venue, Cost, Capacity</li>
+          <li>Partners, F&B, Security, Music</li>
+          <li>Trigger outreach to external sources</li>
+        </ul>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">2</div>
+        <div class="phase-badge">T-Minus 4 Weeks</div>
+        <div class="phase-name">Admin &amp; Design Lockdown</div>
+        <div class="phase-timing">Digital Infrastructure + Big Four Flyers</div>
+        <ul class="phase-items">
+          <li>Launch Eventbrite + Smartwaiver</li>
+          <li>Main Event, Check-In, Dab Bar, Lucid Rewards flyers</li>
+          <li>Apache Case audit + kit restock</li>
+        </ul>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">3</div>
+        <div class="phase-badge">T-Minus 2 Weeks</div>
+        <div class="phase-name">Inventory Pull</div>
+        <div class="phase-timing">Concentrates + Hardware</div>
+        <ul class="phase-items">
+          <li>3–4 cases (48–64 units) from partner dispensary</li>
+          <li>Temp Tech, DC Cobra Coils, Quad Enail Box</li>
+          <li>Terp Sou Vides thermal verification</li>
+        </ul>
+      </div>
+      <div class="phase-card">
+        <div class="phase-num">4</div>
+        <div class="phase-badge">T-Minus 1 Week</div>
+        <div class="phase-name">Final Sprint</div>
+        <div class="phase-timing">Logistics → Physical Execution</div>
+        <ul class="phase-items">
+          <li>Airbnb, travel, security confirmation</li>
+          <li>Wednesday concentrate pull + inventory log</li>
+          <li>Thursday Apache audit, Friday consumable resupply</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 1 -->
+<section id="phase1" class="section-block">
+  <div class="container">
+    <div class="section-label">Phase 1 — T-Minus 5–6 Weeks</div>
+    <h2 class="section-title">The Discovery <em>Gate</em></h2>
+    <p class="section-desc">Finalize the "Core 12" variables across two partner meetings. No external outreach begins until Meeting 2 is signed off.</p>
+
+    <div class="two-col">
+      <div class="strategy-card">
+        <div class="strategy-card-label">Meeting 1 — Internal / Partner</div>
+        <div class="strategy-card-title">Establish the Foundation</div>
+        <ul>
+          <li>Lock Event Date &amp; Missouri City</li>
+          <li>Confirm Venue Name, Venue Cost</li>
+          <li>Set Capacity parameters</li>
+          <li>Assign internal Project Owners</li>
+        </ul>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-label">Meeting 2 — Partner / Venue</div>
+        <div class="strategy-card-title">Confirm All Externals</div>
+        <ul>
+          <li>Venue Address (Eventbrite/Smartwaiver)</li>
+          <li>Partners, F&amp;B (Pappo's / Sister Cities)</li>
+          <li>Security: 5th Meridian</li>
+          <li>Music talent, Plus-Up costs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="add-on">
+      <div class="add-on-label">◆ Phase 1 Addition — Content &amp; Data Planning</div>
+      <ul class="add-on-items">
+        <li>Book <strong>videographer</strong> and <strong>photographer</strong> at Meeting 1 — these are non-negotiable line items, not afterthoughts.</li>
+        <li>Define the <strong>data capture goal</strong>: target number of email + phone registrations for this Sesh.</li>
+        <li>Confirm Eventbrite collects <strong>email + phone</strong> as required fields — verify this before launch in Phase 2.</li>
+        <li>Assign a <strong>Content Lead</strong> (internal or external) who will own the shot list and post-sesh delivery timeline.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 2 -->
+<section id="phase2" class="section-block">
+  <div class="container">
+    <div class="section-label">Phase 2 — T-Minus 4 Weeks</div>
+    <h2 class="section-title">Admin &amp; Design <em>Lockdown</em></h2>
+    <p class="section-desc">Build the digital infrastructure and prep physical kits. The "Big Four" flyers are the visual backbone of the event experience.</p>
+
+    <div class="two-col">
+      <div class="strategy-card">
+        <div class="strategy-card-label">Digital Infrastructure</div>
+        <div class="strategy-card-title">Eventbrite + Smartwaiver</div>
+        <ul>
+          <li>Launch Eventbrite with required fields: Name, Email, Phone, Brand/Dispensary</li>
+          <li>Launch Smartwaiver with QR code for check-in</li>
+          <li>Test full registration flow end-to-end</li>
+          <li>Confirm Eventbrite data exports to Google Sheet or CRM</li>
+        </ul>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-label">The Big Four Flyers</div>
+        <div class="strategy-card-title">Design Deliverables</div>
+        <ul>
+          <li>Main Event Flyer — Eventbrite / Socials</li>
+          <li>Check-In Flyer — Smartwaiver QR code</li>
+          <li>Dab Bar Menu — specific cultivars / profiles</li>
+          <li>Lucid Rewards Flyer — signup QR</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="add-on">
+      <div class="add-on-label">◆ Phase 2 Addition — 5th Flyer: Data Capture CTA</div>
+      <ul class="add-on-items">
+        <li>Design a <strong>"Stay in the Loop" flyer</strong> — a dedicated sign-up QR that routes to a branded form (not just Eventbrite) for post-event newsletter + SMS opt-in.</li>
+        <li>The form should capture: First Name, Phone, Email, Dispensary/Brand affiliation, Brand preference (HeadChange / Safe Bet / Bubbles). Use Google Forms, Typeform, or the Curador Intake Portal architecture.</li>
+        <li>Confirm with Postscript/Klaviyo that phone numbers captured via this form can flow into the SMS list automatically.</li>
+        <li>Kit Audit: add the 5th flyer (10 printed units) to the Apache Case 2 manifest.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 3 -->
+<section id="phase3" class="section-block">
+  <div class="container">
+    <div class="section-label">Phase 3 — T-Minus 2 Weeks</div>
+    <h2 class="section-title">The Inventory <em>Pull</em></h2>
+    <p class="section-desc">Secure the concentrates and hardware. This phase also finalizes the content crew brief so they arrive knowing exactly what to capture.</p>
+
+    <div class="two-col">
+      <div class="strategy-card">
+        <div class="strategy-card-label">Concentrates</div>
+        <div class="strategy-card-title">The Sample Run</div>
+        <ul>
+          <li>Select cultivars for Dab Bar Menu</li>
+          <li>Pickup 3–4 cases (48–64 units) from partner dispensary (e.g., Cookies)</li>
+          <li>Log every gram by strain and batch for Empty Jar Audit</li>
+        </ul>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-label">Hardware</div>
+        <div class="strategy-card-title">Equipment Check</div>
+        <ul>
+          <li>2+ Temp Tech devices — test and charge</li>
+          <li>DC Cobra Coils + Quad Enail Box</li>
+          <li>Terp Sou Vides — charged for thermal floor verification</li>
+          <li>Confirm power supply available at venue for each dab station</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="add-on">
+      <div class="add-on-label">◆ Phase 3 Addition — Content Crew Brief</div>
+      <ul class="add-on-items">
+        <li>Send the videographer and photographer the <strong>shot list</strong> (see Content Team section) and venue walk-through photos if available.</li>
+        <li>Share the event timeline (load-in through close) so they can plan coverage arcs.</li>
+        <li>Confirm deliverable format: RAW + JPEG for photo, 4K ProRes or H.264 for video, delivered via shared Drive folder within <strong>72 hours post-event</strong>.</li>
+        <li>Define social-first vertical cuts needed (9:16 for Reels/TikTok) vs. archival horizontal.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PHASE 4 -->
+<section id="phase4" class="section-block">
+  <div class="container">
+    <div class="section-label">Phase 4 — T-Minus 1 Week</div>
+    <h2 class="section-title">The Final <em>Sprint</em></h2>
+    <p class="section-desc">Transition from digital planning to physical execution across Monday through Sunday. Every day has a specific focus and owner.</p>
+
+    <div class="timeline">
+      <div class="timeline-row">
+        <div class="timeline-time">Mon – Tue</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Logistics Lockdown</h4>
+          <p>Airbnb / travel confirmed. Security final call with 5th Meridian — guard count (door vs. street parking), 4-hour window. Travel and supply check with full team. Print + laminate all five flyers from Phase 2.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Wed</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Concentrate Pull + Plus-Up Fulfillment</h4>
+          <p>Visit Cookies / NatureMED. Secure 3–4 cases of concentrates. Log every gram by strain and batch. Final shopping for Plus-Up supplies (DIY Bead station, Mario Kart prizes, drinks, bonfire materials).</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Thu</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Apache Case Audit</h4>
+          <p>Open every case — verify all counts. Rig Case 1: 3 Rigs + 1 backup, 6+ Bangers. Production Case 1: 500 wristbands, iPad charged. Production Case 2: 200+ stickers, Lanyards bundled. DC Coil Burn-In test to 550°F.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Fri</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Consumable Resupply</h4>
+          <p>2+ gallons 91–99% ISO. 3+ fresh packs Glob Mops / HC Swabs. 4+ packs Alcohol Wipes. 3 gallons distilled water. F&amp;B final sync text to Pappo's Pizza or Sister Cities — confirm delivery address.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Sun</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Travel &amp; Prep</h4>
+          <p>Load van in order of use: Production Cases 1 &amp; 2 first (check-in), Rig Case last. Final text to Project Owners (Cory, Ian, Matt) with Airbnb address and Monday Call Time.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="add-on">
+      <div class="add-on-label">◆ Phase 4 Addition — Content Crew Logistics</div>
+      <ul class="add-on-items">
+        <li><strong>Thursday:</strong> Share final venue load-in time and parking instructions with videographer and photographer.</li>
+        <li><strong>Friday:</strong> Confirm content crew call time — recommend arriving <strong>30–45 minutes before doors open</strong> to capture setup, product styling, and empty-room ambiance shots.</li>
+        <li><strong>Sunday:</strong> Add content crew to the staff brief text. Include call time, venue address, and point-of-contact for day-of.</li>
+        <li>Pack <strong>product styling kit</strong> for hero shots: branded mat, jars, tools, dab bar arrangement. Assign a team member to style each product shot.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- DATA CAPTURE -->
+<section id="capture" class="section-block">
+  <div class="container">
+    <div class="section-label">Data Strategy</div>
+    <h2 class="section-title">Capturing the <em>Room</em></h2>
+    <p class="section-desc">Every person in that room is a warm industry contact. We should leave with their information and their permission to stay in touch. This section defines exactly how we collect and activate that data.</p>
+
+    <div class="spec-block">
+      <h3>Eventbrite Registration — Required Fields</h3>
+      <div class="spec-row">
+        <div class="spec-key">First + Last Name</div>
+        <div class="spec-val">Standard. Used for check-in list, waiver matching, and personalization.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Email Address</div>
+        <div class="spec-val">Primary CRM field. Must export to Klaviyo after each event. Tag with: <em>Sesh-[City]-[YYYY-MM]</em></div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Phone Number</div>
+        <div class="spec-val">Required for SMS opt-in. Route to Postscript. Tag: <em>HeadChange-Sesh</em>. Confirm TCPA opt-in language is in Eventbrite copy.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Dispensary / Brand</div>
+        <div class="spec-val">Custom field. Critical for B2B segmentation — who works where, which accounts to activate.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Role</div>
+        <div class="spec-val">Dropdown: Budtender / Manager / Brand Rep / Industry / Other. Helps segment post-sesh communications.</div>
+      </div>
+    </div>
+
+    <div class="spec-block">
+      <h3>On-Site "Stay in the Loop" Capture</h3>
+      <div class="spec-row">
+        <div class="spec-key">Capture Point</div>
+        <div class="spec-val">QR code on printed flyer + table tent at every dab station and at check-in. Links to a branded Google Form or Typeform (HeadChange color palette).</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Form Fields</div>
+        <div class="spec-val">First Name, Phone, Email, Dispensary/Brand, Fave HeadChange product (optional). Keep it short — under 30 seconds to complete.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">The CTA</div>
+        <div class="spec-val">"Get first access to new drops, exclusive Sesh invites, and HeadChange merch." Value-first language. Not "join our mailing list."</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Incentive</div>
+        <div class="spec-val">Consider offering a small merch item (sticker pack, branded dab mat) for on-site sign-ups. Creates a moment, reinforces brand.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Automation</div>
+        <div class="spec-val">Form submission triggers: (1) welcome email via Klaviyo within 1 hour. (2) SMS welcome via Postscript. Both reference the Sesh they just attended.</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="strategy-card">
+        <div class="strategy-card-label">Post-Event Data Hygiene</div>
+        <div class="strategy-card-title">Clean + Segment Immediately</div>
+        <ul>
+          <li>Export Eventbrite list within 24 hours of event close</li>
+          <li>Tag all contacts: Sesh-[City]-[Date] in Klaviyo</li>
+          <li>Identify dispensary clusters (3+ people from same account = priority follow-up)</li>
+          <li>Flag VIPs, glassblowers, industry guests for direct outreach</li>
+          <li>Merge any duplicates between Eventbrite + on-site form</li>
+        </ul>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-label">Compliance Notes</div>
+        <div class="strategy-card-title">Stay Clean, Stay Legal</div>
+        <ul>
+          <li>Include clear SMS opt-in language on Eventbrite and on-site form</li>
+          <li>Retain TCPA consent records for all SMS contacts</li>
+          <li>All email sends must include unsubscribe link</li>
+          <li>Do not add Sesh contacts to general consumer lists without re-consent</li>
+          <li>Cannabis marketing compliance varies by state — review before sending to cross-state contacts</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTENT TEAM -->
+<section id="content" class="section-block">
+  <div class="container">
+    <div class="section-label">Content Capture</div>
+    <h2 class="section-title">The Shot <em>List</em></h2>
+    <p class="section-desc">Both photographer and videographer should receive this brief in Phase 3. Every shot category has a defined purpose — nothing gets captured without intent.</p>
+
+    <table class="shot-table">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Specific Shots</th>
+          <th>Format</th>
+          <th>Usage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Setup &amp; Atmosphere</strong></td>
+          <td>Empty venue before doors — lighting mood, dab bar arrangement, product styling, signage, Apache cases staged</td>
+          <td><span class="badge badge-both">Photo + Video</span></td>
+          <td>Instagram, brand archive, future event promotion</td>
+        </tr>
+        <tr>
+          <td><strong>Product Hero Shots</strong></td>
+          <td>HeadChange concentrate jars on branded mat, close-ups of rosin texture, dab tool + banger details, cultivar labels</td>
+          <td><span class="badge badge-photo">Photo Priority</span></td>
+          <td>Social posts, email campaigns, sales sheets</td>
+        </tr>
+        <tr>
+          <td><strong>The Dab Bar in Action</strong></td>
+          <td>Dabtender loading a dab, hot-swap rotation, banger in coil, Sou Vide thermal check, attendee receiving dab</td>
+          <td><span class="badge badge-both">Photo + Video</span></td>
+          <td>Reels, TikTok, how-to content, brand credibility</td>
+        </tr>
+        <tr>
+          <td><strong>Crowd &amp; Culture</strong></td>
+          <td>Groups at the dab bar, conversations between attendees, laughter, wristbands, reactions, community energy</td>
+          <td><span class="badge badge-both">Photo + Video</span></td>
+          <td>"People" content — highest organic engagement</td>
+        </tr>
+        <tr>
+          <td><strong>Partner Features</strong></td>
+          <td>Glassblowers at work or display, head shop partners, artists, F&amp;B vendors (Pappo's setup), DJ/musician</td>
+          <td><span class="badge badge-both">Photo + Video</span></td>
+          <td>Partner co-posts, tagging, cross-promotion</td>
+        </tr>
+        <tr>
+          <td><strong>Branded Moments</strong></td>
+          <td>HeadChange signage lit up, wristbands on wrists, lanyards, stickers being handed out, merch table</td>
+          <td><span class="badge badge-photo">Photo Priority</span></td>
+          <td>Brand identity posts, stories</td>
+        </tr>
+        <tr>
+          <td><strong>Testimonial / Interview</strong></td>
+          <td>Opt-in 30-second to 1-minute clips: budtenders sharing what they love about HeadChange concentrates. Casual, authentic, unscripted.</td>
+          <td><span class="badge badge-video">Video Priority</span></td>
+          <td>Short-form social, newsletter embed, B2B credibility</td>
+        </tr>
+        <tr>
+          <td><strong>Close &amp; Wrap</strong></td>
+          <td>Last dabs, group shots with Project Owners, team wrap photo, empty jars lined up for audit shot</td>
+          <td><span class="badge badge-both">Photo + Video</span></td>
+          <td>Archive, internal recap, "End of Night" story post</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="spec-block">
+      <h3>Content Crew Deliverables &amp; Timeline</h3>
+      <div class="spec-row">
+        <div class="spec-key">Delivery Window</div>
+        <div class="spec-val">All files delivered to shared Google Drive folder within <strong>72 hours</strong> of event close.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Photo Format</div>
+        <div class="spec-val">RAW files + exported JPEGs (2400px+ on long edge, sRGB). Organized by shot category folder.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Video Format</div>
+        <div class="spec-val">4K H.264 or ProRes master files. Pre-cut social verticals (9:16, 15–30 seconds) in a separate subfolder. No music added — deliver clean audio so we can add licensed music.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Selects Call</div>
+        <div class="spec-val">Photographer delivers a "selects folder" of their top 30–40 edited JPEGs within 72 hours. Full RAW delivery can follow within 7 days.</div>
+      </div>
+      <div class="spec-row">
+        <div class="spec-key">Usage Rights</div>
+        <div class="spec-key">Confirm in contract: HeadChange Brands / Curador owns full usage rights for marketing, social, print, and digital. Photographer credited on organic posts.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POST-SESH -->
+<section id="post-sesh" class="section-block">
+  <div class="container">
+    <div class="section-label">Post-Event Strategy</div>
+    <h2 class="section-title">Content <em>Recycling</em> &amp; Follow-Through</h2>
+    <p class="section-desc">The Sesh ends at the venue. The value compounds for weeks after. This is the content recycling matrix and engagement sequence that turns one night into six weeks of brand momentum.</p>
+
+    <div class="matrix">
+      <div class="matrix-cell">
+        <div class="matrix-cell-label">T+0 to T+48hrs</div>
+        <div class="matrix-cell-title">The Immediate Window</div>
+        <ul>
+          <li>Post 1–2 candid photos to Stories while event is live (assigned to Social Lead)</li>
+          <li>Tag venue, partners, glassblowers immediately for co-shares</li>
+          <li>Send same-night or next-morning "Thank you for coming" SMS via Postscript to all attendees</li>
+          <li>Deploy welcome email sequence in Klaviyo to new list captures</li>
+          <li>Export Eventbrite attendee list + merge with on-site sign-ups</li>
+        </ul>
+      </div>
+      <div class="matrix-cell">
+        <div class="matrix-cell-label">T+3 to T+7 Days</div>
+        <div class="matrix-cell-title">The Core Drop</div>
+        <ul>
+          <li>Post photo gallery (3–5 selects) to Instagram feed — caption focuses on community, not product</li>
+          <li>Post Reels cut from event video — dab bar action, crowd energy, testimonials</li>
+          <li>Send post-sesh email to attendee list: recap, photo gallery link, what's next</li>
+          <li>Direct DMs or personal text to identified VIPs, dispensary managers, key budtenders</li>
+          <li>Share content with partner dispensary for their own channels</li>
+        </ul>
+      </div>
+      <div class="matrix-cell">
+        <div class="matrix-cell-label">T+2 to T+6 Weeks</div>
+        <div class="matrix-cell-title">The Long Tail</div>
+        <ul>
+          <li>Weekly social posts from event content library — product shots, behind-the-scenes, testimonial clips</li>
+          <li>Feature budtender testimonials in HeadChange newsletter with their name + dispensary</li>
+          <li>Use event photos in sales materials and future event promotion</li>
+          <li>Build a "Sesh Recap" blog post or brand archive page on the website</li>
+          <li>Brief sales team on dispensary contacts captured — hand off for account follow-up</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif; font-size:24px; color:var(--white); margin-bottom:24px;">Post-Sesh Email Sequence</h3>
+
+    <div class="timeline">
+      <div class="timeline-row">
+        <div class="timeline-time">Email 1<br>24–48 hrs</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>The Thank You</h4>
+          <p>Personal, warm. Acknowledges them by name if possible. "Last night was something special — thanks for being part of it." Include 2–3 photos from the event. No hard sell.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Email 2<br>5–7 days</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>The Recap + Education</h4>
+          <p>Share the full event photo gallery. Include a short piece of educational content tied to what was served — concentrate profiles, temperature guide, or a "How To Hash" excerpt. Positions HeadChange as a knowledge brand.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Email 3<br>2–3 weeks</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>The Ask</h4>
+          <p>"Where can you find HeadChange in your store?" or "Share your feedback — what would make the next Sesh even better?" Soft call-to-action that opens a conversation and surfaces sales opportunities.</p>
+        </div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-time">Ongoing</div>
+        <div class="timeline-dot"></div>
+        <div class="timeline-content">
+          <h4>Monthly Newsletter — Sesh Alumni Segment</h4>
+          <p>All Sesh attendees move into the HeadChange newsletter segment. They get: new drop announcements, next Sesh invitations, educational content, and the occasional exclusive offer. This is the long game — building a true community of industry insiders.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MASTER CHECKLIST -->
+<section id="checklist" class="section-block">
+  <div class="container">
+    <div class="section-label">Master Checklist</div>
+    <h2 class="section-title">Nothing Gets <em>Assumed</em></h2>
+    <p class="section-desc">Case-based checklist for load-in. Assign a Float or Barback to check off each case. New sections added for content crew and data capture materials.</p>
+
+    <div class="checklist-grid">
+      <div class="checklist-group">
+        <h4>Case 1 — Rig &amp; Glass</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3 Main Heady Rigs + 1 Backup</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>6+ Quartz Bangers (inspect for cracks/chazzing)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>DC Cobra Coils + Quad Enail Box</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3 Terp Sou Vides (thermal verification)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>4–5 ISO Tanks/Glass Pumps</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3 packs Glob Mops / HC Swabs</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Paper towels + microfiber towels</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3–6 HeadChange Mood Mats</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>6–10+ Dab tools</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>10+ Carb cap marbles + pillars</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3+ Alcohol prep wipe packs</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3+ Torches + 2+ Butane</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <h4>Case 2 — Production &amp; Admin</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>5x Waiver QR flyers</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>7x Dab Bar Menus (updated cultivars)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>5x Lucid Rewards QR flyers</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>10x "Stay in the Loop" sign-up flyers ◆ NEW</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>300 Wristbands</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>5–10 Paper Waivers (Smartwaiver backup)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>5–10 Table Tents</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>5–10 Flash Sheets</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>iPad (Square/Merch) — charged</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>1 Cash Bag</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <h4>Case 3 — Utility &amp; Plus-Ups</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>3+ Heavy-duty extension cables</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Power blocks for DC Coils</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Scissors</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Lanyards (HC &amp; Safe Bet)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>200+ Assorted Stickers</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Distilled water for rigs (3 gal)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Attendee drinks / cooler + ice</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>2 gal 91–99% ISO</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>4+ packs Alcohol Wipes</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <h4>◆ Content Crew Kit — NEW</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Photographer confirmed — call time shared</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Videographer confirmed — call time shared</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Shot list sent and acknowledged</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Product styling kit packed (branded mat, jars, tools)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Shared Drive folder created for asset delivery</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Content Lead assigned for day-of direction</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Talent release language in Smartwaiver</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <h4>◆ Data Capture Kit — NEW</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Eventbrite registration exported + reviewed pre-event</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>"Stay in the Loop" form live and tested</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>QR codes printed — test scan confirmed</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Klaviyo flow armed and tested (welcome email)</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Postscript welcome SMS tested</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Incentive merch ready for on-site sign-ups</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Post-sesh email draft written + scheduled</li>
+        </ul>
+      </div>
+
+      <div class="checklist-group">
+        <h4>Hot-Swap Protocol Reference</h4>
+        <ul>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>DC Coils stay ON — constant heat maintained</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Banger held at 500/600°F in coil</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Post-dab: dry-swab then wet-swab immediately</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Carbon buildup → swap to fresh banger from kit</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Dirty glass into deep ISO dunk tank to reset</li>
+          <li><span class="check-box" onclick="this.classList.toggle('checked')"></span>Guest always sees a pristine station — zero downtime</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-logo">HeadChange</div>
+    <div class="footer-sub">Sesh SOP v2.0 — Curador Brands Internal Document — Confidential</div>
+  </div>
+</footer>
+
+</body>
+</html>
