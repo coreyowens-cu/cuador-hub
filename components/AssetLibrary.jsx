@@ -32,19 +32,23 @@ const DAM_MERCH_CATS = [
 // Brand-specific packaging subcategories
 const DAM_PACKAGING = {
   headchange: [
-    { id:"pkg-hc-case",        label:"Case Packaging" },
     { id:"pkg-hc-conc-box",    label:"Concentrate Box" },
+    { id:"pkg-hc-conc-case",   label:"Concentrate Case" },
     { id:"pkg-hc-box-sticker", label:"Box Sticker" },
     { id:"pkg-hc-jar-wrap",    label:"Jar Wrap" },
     { id:"pkg-hc-jar-lid",     label:"Jar Lid" },
     { id:"pkg-hc-jar-qr",      label:"Jar QR" },
     { id:"pkg-hc-510-cart",    label:"510 Cart Package" },
+    { id:"pkg-hc-510-case",    label:"510 Cart Case" },
     { id:"pkg-hc-aio-cart",    label:"All-in-One Cart Package" },
+    { id:"pkg-hc-aio-case",    label:"All-in-One Cart Case" },
   ],
   safebet: [
     { id:"pkg-sb-preroll",     label:"Pre-Roll Package" },
     { id:"pkg-sb-510-cart",    label:"510 Cart Package" },
+    { id:"pkg-sb-510-case",    label:"510 Cart Case" },
     { id:"pkg-sb-aio-cart",    label:"All-in-One Cart Package" },
+    { id:"pkg-sb-aio-case",    label:"All-in-One Cart Case" },
     { id:"pkg-sb-feco",        label:"FECO Package" },
     { id:"pkg-sb-qr-sticker",  label:"QR Sticker" },
   ],
