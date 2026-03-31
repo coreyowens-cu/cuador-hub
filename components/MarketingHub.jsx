@@ -853,6 +853,12 @@ export default function MarketingHub({ initialUserName }) {
           .then(html => { conceptHtmlCache.current[init.id] = html; })
           .catch(() => {});
       }
+      // Load user-uploaded HTML concepts from Supabase
+      if (!init._conceptUrl && init.htmlConceptName && !conceptHtmlCache.current[init.id]) {
+        window.storage.get(`ns-concept-html-${init.id}`, true)
+          .then(res => { if (res?.value) conceptHtmlCache.current[init.id] = res.value; })
+          .catch(() => {});
+      }
     });
   }, [ready]);
   useEffect(() => { if (ready) window.storage.set("ns-notes", JSON.stringify(notes), true).catch(() => {}); }, [notes, ready]);
@@ -913,7 +919,12 @@ export default function MarketingHub({ initialUserName }) {
   };
 
   const saveFile = (id, url, name) => { setInitiatives(p => p.map(x => x.id !== id ? x : { ...x, fileUrl: url, fileName: name })); setFileModal(null); };
-  const saveConceptHtml = (id, html, name) => { setInitiatives(p => p.map(x => x.id !== id ? x : { ...x, htmlConcept: html, htmlConceptName: name })); setConceptUpload(null); };
+  const saveConceptHtml = (id, html, name) => {
+    setInitiatives(p => p.map(x => x.id !== id ? x : { ...x, htmlConcept: html, htmlConceptName: name }));
+    conceptHtmlCache.current[id] = html;
+    window.storage.set(`ns-concept-html-${id}`, html, true).catch(() => {});
+    setConceptUpload(null);
+  };
   const addInit = (init) => { setInitiatives(p => [...p, init]); setShowAddInit(false); };
   const deleteInit = (id) => setInitiatives(p => p.filter(x => x.id !== id));
   const updateInit = (id, updates) => setInitiatives(p => p.map(x => x.id === id ? { ...x, ...updates } : x));
