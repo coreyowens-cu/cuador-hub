@@ -2855,17 +2855,15 @@ function TeamPanel({ teamMembers, currentUser, orgRoles, onSelect, onChangeUser,
     const role = orgRoles.find(r => r.id === roleId);
     if (!role) return null;
     const members = membersForRole(roleId);
-    const isMe = currentUser?.role === roleId;
     const populated = members.length > 0;
     return (
       <div
-        className={`org-node ${populated ? "populated" : ""} ${isMe ? "me" : ""}`}
+        className={`org-node ${populated ? "populated" : ""}`}
         onClick={() => populated && onSelect(members[0])}
         title={`${role.title}${members.length ? ` — ${members.map(m => m.name).join(", ")}` : " — vacant"}`}
       >
         <div className="org-box" style={{ fontSize: compact ? "8px" : "9px", padding: compact ? "4px 6px" : "5px 9px" }}>
           {role.title}
-          {isMe && <span style={{ display: "block", fontSize: 7, color: "var(--gold)", marginTop: 1, letterSpacing: ".08em" }}>YOU</span>}
         </div>
         {populated && (
           <div className="org-avs">
