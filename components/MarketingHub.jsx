@@ -111,6 +111,23 @@ const DEFAULT_CAMPAIGNS = [
   { id:"cmp-hc-julian", title:"HC × Julian Bast Collab", concept:"Artist Collaboration Series Vol. 01 — a limited-run merchandise capsule with multidisciplinary artist Julian Bast (Name Brand Tattoo, Ann Arbor MI).", brand:"Headchange", objective:"Launch the Head Change Artist Collaboration Series with a limited pre-sale drop featuring 2 original graphics, co-branded apparel, and collectible packaging. Target June 2025.", brief:null, status:"idea", createdBy:"Brand Team", createdAt:"2026-01-01T00:00:00.000Z", _briefFile:null, _briefFileData:null, _briefFileType:null, _fromConcept:null, _htmlName:"HC × Julian Bast Collab Brief", _conceptUrl:"/concepts/hc-julian-bast.html" },
 ];
 
+const DEFAULT_CAMPAIGN_TIMELINE = [
+  {
+    id: "ctl-hc-julian",
+    campaignId: "cmp-hc-julian",
+    title: "HC × Julian Bast",
+    brand: "Headchange",
+    color: "#c9a84c",
+    cost: 0,
+    startDate: "2026-04-01",
+    endDate: "2026-06-30",
+    elements: [
+      { id: "el-julian-prod", label: "Production Lead Time", startDate: "2026-04-01", endDate: "2026-04-20", cost: 0 },
+      { id: "el-julian-design", label: "Design & Approvals", startDate: "2026-04-21", endDate: "2026-05-15", cost: 0 },
+    ],
+  },
+];
+
 const CHANNELS = [
   "01 · Packaging & QR Journey",
   "02 · In-House Loyalty & Rewards",
@@ -667,6 +684,43 @@ input[type="date"].fi{color-scheme:dark;}
 .dfield-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
 .dfield-val{font-size:13px;color:var(--text);}
 
+/* ── CAMPAIGN TIMELINE PANEL ── */
+.ctl-wrap{display:flex;flex-direction:column;gap:0;}
+.ctl-grid-hdr{display:flex;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:5;}
+.ctl-label-col{width:260px;flex-shrink:0;padding:9px 14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:500;border-right:1px solid var(--border);}
+.ctl-cost-col{width:120px;flex-shrink:0;padding:9px 14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-muted);font-weight:500;text-align:right;border-right:1px solid var(--border);}
+.ctl-bar-area{flex:1;display:flex;}
+.ctl-month-cell{flex:1;padding:9px 0;font-size:9px;text-align:center;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;border-right:1px solid var(--border2);font-weight:500;}
+.ctl-month-cell:last-child{border-right:none;}
+.ctl-row{display:flex;align-items:center;border-bottom:1px solid var(--border2);min-height:44px;}
+.ctl-row:hover{background:rgba(255,255,255,.012);}
+.ctl-row.el-row{min-height:36px;background:rgba(255,255,255,.005);}
+.ctl-row-label{width:260px;flex-shrink:0;padding:8px 14px;border-right:1px solid var(--border);display:flex;align-items:center;gap:7px;min-height:inherit;}
+.ctl-row.el-row .ctl-row-label{padding-left:28px;}
+.ctl-row-cost{width:120px;flex-shrink:0;border-right:1px solid var(--border);padding:4px 10px;text-align:right;}
+.ctl-cost-input{width:100%;background:transparent;border:none;outline:none;color:var(--gold);font-family:var(--bf);font-size:12px;font-weight:600;text-align:right;cursor:text;}
+.ctl-cost-input::placeholder{color:var(--text-muted);font-weight:400;}
+.ctl-bar-track{flex:1;position:relative;height:100%;min-height:inherit;cursor:default;overflow:hidden;}
+.ctl-month-grid{position:absolute;inset:0;display:flex;pointer-events:none;}
+.ctl-month-stripe{flex:1;border-right:1px solid var(--border2);}
+.ctl-month-stripe:nth-child(even){background:rgba(255,255,255,.008);}
+.ctl-month-stripe:last-child{border-right:none;}
+.ctl-bar{position:absolute;top:50%;transform:translateY(-50%);height:18px;border-radius:4px;display:flex;align-items:center;user-select:none;}
+.ctl-row.el-row .ctl-bar{height:12px;border-radius:3px;opacity:.85;}
+.ctl-handle{position:absolute;top:0;bottom:0;width:8px;cursor:ew-resize;display:flex;align-items:center;justify-content:center;z-index:2;}
+.ctl-handle-l{left:-1px;border-radius:3px 0 0 3px;}
+.ctl-handle-r{right:-1px;border-radius:0 3px 3px 0;}
+.ctl-handle-pip{width:2px;height:10px;background:rgba(255,255,255,.55);border-radius:1px;}
+.ctl-date-label{position:absolute;left:50%;transform:translateX(-50%);top:calc(100% + 2px);font-size:9px;color:var(--text-muted);white-space:nowrap;pointer-events:none;}
+.ctl-row-name{font-size:12px;font-weight:500;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ctl-row.el-row .ctl-row-name{font-size:11px;color:var(--text-dim);font-weight:400;}
+.ctl-el-label-input{background:transparent;border:none;outline:none;color:var(--text-dim);font-family:var(--bf);font-size:11px;width:100%;cursor:text;}
+.ctl-el-label-input:focus{color:var(--text);}
+.ctl-add-el-btn{font-size:10px;padding:2px 7px;border-radius:5px;border:1px dashed rgba(255,255,255,.1);background:transparent;color:var(--text-muted);cursor:pointer;font-family:var(--bf);transition:all .13s;flex-shrink:0;}
+.ctl-add-el-btn:hover{border-color:rgba(201,168,76,.35);color:var(--gold);}
+.ctl-del-btn{width:18px;height:18px;border-radius:4px;border:1px solid rgba(224,123,106,.25);background:transparent;color:rgba(224,123,106,.5);cursor:pointer;font-size:10px;display:grid;place-items:center;flex-shrink:0;transition:all .12s;line-height:1;}
+.ctl-del-btn:hover{border-color:rgba(224,123,106,.6);color:#e07b6a;background:rgba(224,123,106,.06);}
+.ctl-brand-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 /* GANTT */
 .gv-wrap{display:flex;flex-direction:column;height:calc(100vh - 57px);}
 .gv-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 44px 9px;border-bottom:1px solid var(--border);flex-shrink:0;}
@@ -753,6 +807,8 @@ export default function MarketingHub({ initialUserName }) {
   const [orgRoles, setOrgRoles] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-orgroles"); return v ? JSON.parse(v) : ORG_ROLES; } catch { return ORG_ROLES; } });
   const [selectedMember, setSelectedMember] = useState(null);
   const [campaigns, setCampaigns] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-campaigns"); return v ? JSON.parse(v) : []; } catch { return []; } });
+  const [campaignTimeline, setCampaignTimeline] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-camp-timeline"); return v ? JSON.parse(v) : DEFAULT_CAMPAIGN_TIMELINE; } catch { return DEFAULT_CAMPAIGN_TIMELINE; } });
+  const [campaignView, setCampaignView] = useState("briefs"); // "briefs" | "timeline"
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [hlInitId, setHlInitId] = useState(null);
@@ -830,6 +886,13 @@ export default function MarketingHub({ initialUserName }) {
           setCampaigns(mergedCamps);
         } else {
           setCampaigns(DEFAULT_CAMPAIGNS);
+        }
+        const ctlRaw = await window.storage.get("ns-camp-timeline", true).catch(() => null);
+        if (ctlRaw) {
+          const loadedCtl = JSON.parse(ctlRaw.value);
+          const mergedCtl = [...loadedCtl];
+          DEFAULT_CAMPAIGN_TIMELINE.forEach(def => { if (!mergedCtl.find(x => x.id === def.id)) mergedCtl.push(def); });
+          setCampaignTimeline(mergedCtl);
         }
         if (u) { setCurrentUser(JSON.parse(u.value)); }
         else setShowWhoModal(true);
@@ -910,6 +973,7 @@ export default function MarketingHub({ initialUserName }) {
   useEffect(() => { if (ready) window.storage.set("ns-team", JSON.stringify(teamMembers), true).catch(() => {}); }, [teamMembers, ready]);
   useEffect(() => { if (ready) window.storage.set("ns-orgroles", JSON.stringify(orgRoles), true).catch(() => {}); }, [orgRoles, ready]);
   useEffect(() => { if (ready) window.storage.set("ns-campaigns", JSON.stringify(campaigns), true).catch(() => {}); }, [campaigns, ready]);
+  useEffect(() => { if (ready) window.storage.set("ns-camp-timeline", JSON.stringify(campaignTimeline), true).catch(() => {}); }, [campaignTimeline, ready]);
   useEffect(() => {
     if (!ready) return;
     // Save metadata only (no html) to shared storage
@@ -999,7 +1063,24 @@ export default function MarketingHub({ initialUserName }) {
       <style>{css}</style>
       {showWhoModal && <WhoModal whoName={whoName} setWhoName={setWhoName} whoRole={whoRole} setWhoRole={setWhoRole} onSave={saveUser} orgRoles={orgRoles} />}
       {selectedMember && <TeamMemberModal member={selectedMember} currentUser={currentUser} onClose={() => setSelectedMember(null)} onUpdate={updateMemberProfile} />}
-      {showCampaignModal && <CampaignModal currentUser={currentUser} pillars={strategy.pillars} onClose={() => setShowCampaignModal(false)} onSave={(c) => { setCampaigns(p => [c, ...p]); setShowCampaignModal(false); }} onSaveAsInit={saveCampaignAsInit} />}
+      {showCampaignModal && <CampaignModal currentUser={currentUser} pillars={strategy.pillars} onClose={() => setShowCampaignModal(false)} onSave={(c) => {
+        setCampaigns(p => [c, ...p]);
+        const today = new Date().toISOString().slice(0, 10);
+        const threeMonths = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+        const brandEntry = Object.values(brands).find(b => b.name === c.brand);
+        setCampaignTimeline(p => [{
+          id: `ctl-${Date.now()}`,
+          campaignId: c.id,
+          title: c.title,
+          brand: c.brand || "CÚRADOR",
+          color: brandEntry?.color || "#c9a84c",
+          cost: 0,
+          startDate: today,
+          endDate: threeMonths,
+          elements: [],
+        }, ...p]);
+        setShowCampaignModal(false);
+      }} onSaveAsInit={saveCampaignAsInit} />}
       {selectedCampaign && <CampaignDetailModal campaign={selectedCampaign} pillars={strategy.pillars} onClose={() => setSelectedCampaign(null)} onNote={(ctx) => addNoteWithContext(ctx)} onSaveAsInit={(init) => { saveCampaignAsInit(init); setCampaigns(p => p.map(c => c.id === selectedCampaign.id ? { ...c, status: "approved" } : c)); setSelectedCampaign(null); }}
         onViewConcept={selectedCampaign._fromConcept ? () => { setLeftTab("concepts"); setActiveBrand(null); setActiveConceptId(selectedCampaign._fromConcept); setSelectedCampaign(null); } : null}
         campaignHtml={campaignCacheVersion >= 0 ? campaignHtmlCache.current[selectedCampaign.id] : null}
@@ -1357,7 +1438,7 @@ export default function MarketingHub({ initialUserName }) {
 
             {leftTab === "campaigns" && !activeBrand && (
               <div style={{ padding: "32px 44px", minHeight: "100vh" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
                   <div>
                     <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
                     <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Campaigns</div>
@@ -1365,7 +1446,17 @@ export default function MarketingHub({ initialUserName }) {
                   </div>
                   {canAddContent && <button className="btn btn-gold" style={{ marginTop: 8 }} onClick={() => setShowCampaignModal(true)}>+ New Brief</button>}
                 </div>
-                <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} onDelete={canEdit ? deleteCampaign : null} fullWidth />
+                {/* View tabs */}
+                <div style={{ display: "flex", gap: 4, marginBottom: 24 }}>
+                  {[["briefs","📋 Briefs"],["timeline","📅 Timeline"]].map(([v, label]) => (
+                    <button key={v} onClick={() => setCampaignView(v)}
+                      style={{ padding: "6px 16px", borderRadius: 7, border: `1px solid ${campaignView === v ? "rgba(201,168,76,.4)" : "var(--border)"}`, background: campaignView === v ? "var(--gold-dim)" : "transparent", color: campaignView === v ? "var(--gold)" : "var(--text-muted)", fontFamily: "var(--bf)", fontSize: 12, fontWeight: campaignView === v ? 600 : 400, cursor: "pointer", letterSpacing: ".04em", transition: "all .15s" }}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                {campaignView === "briefs" && <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} onDelete={canEdit ? deleteCampaign : null} fullWidth />}
+                {campaignView === "timeline" && <CampaignTimelinePanel campaignTimeline={campaignTimeline} setCampaignTimeline={setCampaignTimeline} campaigns={campaigns} brands={brands} />}
               </div>
             )}
 
@@ -1380,8 +1471,9 @@ export default function MarketingHub({ initialUserName }) {
                 brands={brands}
                 canEdit={canAddContent}
                 onPushToCampaign={(concept) => {
+                  const campId = `cmp-${Date.now()}`;
                   const campaign = {
-                    id: `cmp-${Date.now()}`, title: concept.name,
+                    id: campId, title: concept.name,
                     concept: concept.description || concept.name,
                     brand: brands[concept.brandId]?.name || "CÚRADOR",
                     objective: concept.description || "",
@@ -1395,6 +1487,20 @@ export default function MarketingHub({ initialUserName }) {
                   };
                   setCampaigns(p => [campaign, ...p]);
                   setConcepts(p => p.map(c => c.id === concept.id ? { ...c, status: "campaign" } : c));
+                  const today = new Date().toISOString().slice(0, 10);
+                  const threeMonths = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
+                  const brand = brands[concept.brandId];
+                  setCampaignTimeline(p => [{
+                    id: `ctl-${Date.now()}`,
+                    campaignId: campId,
+                    title: concept.name,
+                    brand: brand?.name || "CÚRADOR",
+                    color: brand?.color || "#c9a84c",
+                    cost: 0,
+                    startDate: today,
+                    endDate: threeMonths,
+                    elements: [],
+                  }, ...p]);
                 }}
                 onPushToInitiative={(concept, channel, html) => {
                   const init = {
@@ -5221,6 +5327,233 @@ function ConceptsPanel({ concepts, activeConceptId, setActiveConceptId, onAdd, o
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─── CAMPAIGN TIMELINE PANEL ─── */
+function CampaignTimelinePanel({ campaignTimeline, setCampaignTimeline, campaigns, brands }) {
+  const dragRef = useRef(null);
+
+  // Build 12-month rolling window starting from current month
+  const now = new Date();
+  const windowStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const months = [];
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(windowStart.getFullYear(), windowStart.getMonth() + m, 1);
+    months.push(d);
+  }
+  const rangeStart = months[0].getTime();
+  const rangeEnd = new Date(months[11].getFullYear(), months[11].getMonth() + 1, 0, 23, 59, 59).getTime();
+  const rangeDur = rangeEnd - rangeStart || 1;
+
+  const dateToPercent = (dateStr) => {
+    if (!dateStr) return 0;
+    const t = new Date(dateStr + "T12:00:00").getTime();
+    return Math.max(0, Math.min(100, ((t - rangeStart) / rangeDur) * 100));
+  };
+
+  const percentToDate = (pct) => {
+    const t = rangeStart + (pct / 100) * rangeDur;
+    return new Date(t).toISOString().slice(0, 10);
+  };
+
+  const fmtCost = (v) => {
+    const n = parseFloat(String(v).replace(/[^0-9.]/g, "")) || 0;
+    if (n === 0) return "$0";
+    return "$" + n.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  };
+
+  const updateEntry = (id, patch) => setCampaignTimeline(p => p.map(e => e.id === id ? { ...e, ...patch } : e));
+  const updateElement = (entryId, elId, patch) => setCampaignTimeline(p => p.map(e => e.id !== entryId ? e : { ...e, elements: e.elements.map(el => el.id === elId ? { ...el, ...patch } : el) }));
+  const deleteElement = (entryId, elId) => setCampaignTimeline(p => p.map(e => e.id !== entryId ? e : { ...e, elements: e.elements.filter(el => el.id !== elId) }));
+  const addElement = (entryId) => {
+    setCampaignTimeline(p => p.map(e => {
+      if (e.id !== entryId) return e;
+      return { ...e, elements: [...e.elements, { id: `el-${Date.now()}`, label: "New Element", startDate: e.startDate, endDate: e.endDate, cost: 0 }] };
+    }));
+  };
+
+  const startDrag = (e, entryId, elId, handle) => {
+    e.preventDefault();
+    const track = e.currentTarget.closest(".ctl-bar-track");
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    dragRef.current = { entryId, elId, handle, rect };
+
+    const onMove = (mv) => {
+      if (!dragRef.current) return;
+      const { entryId: eid, elId: kid, handle: h, rect: r } = dragRef.current;
+      const rawPct = ((mv.clientX - r.left) / r.width) * 100;
+      const pct = Math.max(0, Math.min(100, rawPct));
+      const newDate = percentToDate(pct);
+      if (kid) {
+        setCampaignTimeline(p => p.map(en => {
+          if (en.id !== eid) return en;
+          return { ...en, elements: en.elements.map(el => {
+            if (el.id !== kid) return el;
+            if (h === "start") {
+              const endPct = dateToPercent(el.endDate);
+              if (pct >= endPct) return el;
+              return { ...el, startDate: newDate };
+            } else {
+              const startPct = dateToPercent(el.startDate);
+              if (pct <= startPct) return el;
+              return { ...el, endDate: newDate };
+            }
+          })};
+        }));
+      } else {
+        setCampaignTimeline(p => p.map(en => {
+          if (en.id !== eid) return en;
+          if (h === "start") {
+            const endPct = dateToPercent(en.endDate);
+            if (pct >= endPct) return en;
+            return { ...en, startDate: newDate };
+          } else {
+            const startPct = dateToPercent(en.startDate);
+            if (pct <= startPct) return en;
+            return { ...en, endDate: newDate };
+          }
+        }));
+      }
+    };
+    const onUp = () => {
+      dragRef.current = null;
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  const renderBar = (color, startDate, endDate, entryId, elId = null) => {
+    const leftPct = dateToPercent(startDate);
+    const rightPct = dateToPercent(endDate);
+    const widthPct = Math.max(0.5, rightPct - leftPct);
+    const barColor = elId ? color + "bb" : color;
+    return (
+      <div className="ctl-bar" style={{ left: `${leftPct}%`, width: `${widthPct}%`, background: barColor }}>
+        {/* Left handle */}
+        <div className="ctl-handle ctl-handle-l" onMouseDown={e => startDrag(e, entryId, elId, "start")} style={{ background: "rgba(0,0,0,.25)" }}>
+          <div className="ctl-handle-pip" />
+        </div>
+        {/* Right handle */}
+        <div className="ctl-handle ctl-handle-r" onMouseDown={e => startDrag(e, entryId, elId, "end")} style={{ background: "rgba(0,0,0,.25)" }}>
+          <div className="ctl-handle-pip" />
+        </div>
+      </div>
+    );
+  };
+
+  const totalCost = (entry) => {
+    const base = parseFloat(String(entry.cost).replace(/[^0-9.]/g, "")) || 0;
+    const elTotal = (entry.elements || []).reduce((s, el) => s + (parseFloat(String(el.cost).replace(/[^0-9.]/g, "")) || 0), 0);
+    return base + elTotal;
+  };
+
+  if (campaignTimeline.length === 0) {
+    return (
+      <div style={{ padding: "48px 24px", textAlign: "center", border: "2px dashed var(--border)", borderRadius: 14 }}>
+        <div style={{ fontSize: 28, marginBottom: 12, opacity: .3 }}>📅</div>
+        <div style={{ fontSize: 14, color: "var(--text-muted)", marginBottom: 6 }}>No timeline entries yet</div>
+        <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Timeline entries are created automatically when you add a campaign</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ctl-wrap" style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, overflow: "hidden" }}>
+      {/* Header row with month labels */}
+      <div className="ctl-grid-hdr">
+        <div className="ctl-label-col">Campaign</div>
+        <div className="ctl-cost-col">Budget</div>
+        <div className="ctl-bar-area">
+          {months.map((m, i) => (
+            <div key={i} className="ctl-month-cell">
+              {m.toLocaleString("en", { month: "short" })} <span style={{ opacity: .5 }}>{String(m.getFullYear()).slice(2)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Campaign rows */}
+      {campaignTimeline.map(entry => {
+        const brand = Object.values(brands).find(b => b.name === entry.brand);
+        const color = entry.color || brand?.color || "#c9a84c";
+        const tc = totalCost(entry);
+        return (
+          <div key={entry.id}>
+            {/* Campaign row */}
+            <div className="ctl-row" style={{ borderLeft: `3px solid ${color}` }}>
+              <div className="ctl-row-label">
+                <div className="ctl-brand-dot" style={{ background: color }} />
+                <span className="ctl-row-name" title={entry.title}>{entry.title}</span>
+                <button className="ctl-add-el-btn" title="Add sub-element" onClick={() => addElement(entry.id)}>+</button>
+              </div>
+              <div className="ctl-row-cost">
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 1 }}>
+                  {tc > 0 ? fmtCost(tc) : ""}
+                </div>
+                <input
+                  className="ctl-cost-input"
+                  value={entry.cost || ""}
+                  onChange={e => updateEntry(entry.id, { cost: e.target.value })}
+                  placeholder="$0"
+                  title="Campaign base cost"
+                />
+              </div>
+              <div className="ctl-bar-track">
+                <div className="ctl-month-grid">
+                  {months.map((_, i) => <div key={i} className="ctl-month-stripe" />)}
+                </div>
+                {entry.startDate && entry.endDate && renderBar(color, entry.startDate, entry.endDate, entry.id)}
+                {entry.startDate && entry.endDate && (
+                  <div style={{ position: "absolute", bottom: 2, left: `${dateToPercent(entry.startDate)}%`, fontSize: 9, color: "var(--text-muted)", pointerEvents: "none", whiteSpace: "nowrap", paddingLeft: 4 }}>
+                    {fmtDate(entry.startDate)} – {fmtDate(entry.endDate)}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Element rows */}
+            {(entry.elements || []).map(el => (
+              <div key={el.id} className="ctl-row el-row" style={{ borderLeft: `3px solid ${color}55` }}>
+                <div className="ctl-row-label">
+                  <div style={{ width: 4, height: 4, borderRadius: "50%", background: color, opacity: .5, flexShrink: 0, marginLeft: 2 }} />
+                  <input
+                    className="ctl-el-label-input"
+                    value={el.label}
+                    onChange={e => updateElement(entry.id, el.id, { label: e.target.value })}
+                    title="Element label"
+                  />
+                  <button className="ctl-del-btn" title="Remove" onClick={() => deleteElement(entry.id, el.id)}>×</button>
+                </div>
+                <div className="ctl-row-cost">
+                  <input
+                    className="ctl-cost-input"
+                    style={{ fontSize: 11 }}
+                    value={el.cost || ""}
+                    onChange={e => updateElement(entry.id, el.id, { cost: e.target.value })}
+                    placeholder="$0"
+                  />
+                </div>
+                <div className="ctl-bar-track">
+                  <div className="ctl-month-grid">
+                    {months.map((_, i) => <div key={i} className="ctl-month-stripe" />)}
+                  </div>
+                  {el.startDate && el.endDate && renderBar(color, el.startDate, el.endDate, entry.id, el.id)}
+                  {el.startDate && el.endDate && (
+                    <div style={{ position: "absolute", bottom: 1, left: `${dateToPercent(el.startDate)}%`, fontSize: 8, color: "var(--text-muted)", pointerEvents: "none", whiteSpace: "nowrap", paddingLeft: 4 }}>
+                      {fmtDate(el.startDate)} – {fmtDate(el.endDate)}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
