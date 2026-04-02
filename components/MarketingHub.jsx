@@ -881,15 +881,7 @@ export default function MarketingHub({ initialUserName }) {
           window.storage.get("ns-timeline", true),
         ]);
         if (s) setStrategy(JSON.parse(s.value));
-        const PURGE_IDS = new Set(["init-hc-sms", "init-sb-sms", "init-bub-sms"]);
-        if (i) {
-          // Saved data is the source of truth — no merging defaults back in
-          const loaded = JSON.parse(i.value).filter(x => !PURGE_IDS.has(x.id));
-          console.log("📦 Loaded", loaded.length, "initiatives from storage");
-          setInitiatives(loaded);
-        } else {
-          console.log("📦 No saved initiatives found, using defaults");
-        }
+        // initiatives are loaded synchronously in useState initializer — skip here to avoid race conditions
         if (n) setNotes(JSON.parse(n.value));
         if (g) setGanttHtml(g.value);
         if (tl) setTimelineItems(JSON.parse(tl.value));
@@ -939,23 +931,7 @@ export default function MarketingHub({ initialUserName }) {
   }, []);
 
   useEffect(() => { if (ready) window.storage.set("ns-strategy", JSON.stringify(strategy), true).catch(() => {}); }, [strategy, ready]);
-  // One-time dedup: remove initiatives with duplicate titles, keep first occurrence
-  useEffect(() => {
-    if (!ready) return;
-    const seen = new Set();
-    const deduped = initiatives.filter(i => {
-      const key = (i.title || "").trim().toLowerCase();
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-    if (deduped.length < initiatives.length) {
-      console.log(`🧹 Removed ${initiatives.length - deduped.length} duplicate initiative(s)`);
-      setInitiatives(deduped);
-    }
-  }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Save initiatives on every change — write synchronously to localStorage
+  // Save initiatives — backup write on any state change (primary write is synchronous in deleteInit)
   useEffect(() => {
     if (!ready) return;
     const PURGE_IDS = new Set(["init-hc-sms", "init-sb-sms", "init-bub-sms"]);
