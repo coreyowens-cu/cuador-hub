@@ -105,7 +105,10 @@ const DEFAULT_INITIATIVES = [
   {id:"init-hc-sms",   title:"SMS + Newsletter Strategy",  description:"Head Change pilot SMS and newsletter strategy, scalable across the full Curador portfolio. Two-channel system — CURADOR Signal newsletter paired with targeted SMS — built around audience segmentation, high-impact content cadence, and a crawl-walk-run rollout framework.", owner:"Brand Team", channel:"03 · Email & SMS Marketing",              startDate:"2026-01-01", endDate:"", revolving:true,  fileUrl:null, fileName:null, _brief:null, brandId:"headchange", htmlConcept:null, htmlConceptName:"SMS + Newsletter Strategy", _conceptUrl:"/concepts/hc-sms-newsletter.html"},
   {id:"init-sb-sms",   title:"SMS + Newsletter Strategy",  description:"Safe Bet SMS and newsletter strategy — scalable from the Head Change pilot. Two-channel system pairing targeted SMS with the CURADOR Signal newsletter, built around audience segmentation, high-impact content cadence, and a crawl-walk-run rollout framework.",                         owner:"Brand Team", channel:"03 · Email & SMS Marketing",              startDate:"2026-01-01", endDate:"", revolving:true,  fileUrl:null, fileName:null, _brief:null, brandId:"safebet",    htmlConcept:null, htmlConceptName:"SMS + Newsletter Strategy", _conceptUrl:"/concepts/hc-sms-newsletter.html"},
   {id:"init-bub-sms",  title:"SMS + Newsletter Strategy",  description:"Bubbles SMS and newsletter strategy — scalable from the Head Change pilot. Two-channel system pairing targeted SMS with the CURADOR Signal newsletter, built around audience segmentation, high-impact content cadence, and a crawl-walk-run rollout framework.",                            owner:"Brand Team", channel:"03 · Email & SMS Marketing",              startDate:"2026-01-01", endDate:"", revolving:true,  fileUrl:null, fileName:null, _brief:null, brandId:"bubbles",    htmlConcept:null, htmlConceptName:"SMS + Newsletter Strategy",    _conceptUrl:"/concepts/hc-sms-newsletter.html"},
-  {id:"init-hc-julian",title:"HC × Julian Bast Collab",    description:"Artist Collaboration Series Vol. 01 — a limited-run merchandise capsule with multidisciplinary artist Julian Bast (Name Brand Tattoo, Ann Arbor MI). Launching June 2025 as a limited pre-sale drop featuring 2 original graphics, co-branded apparel, and collectible packaging.", owner:"Brand Team", channel:"13 · Brand Merchandise Programs",       startDate:"2025-06-01", endDate:"", revolving:false, fileUrl:null, fileName:null, _brief:null, brandId:"headchange", htmlConcept:null, htmlConceptName:"HC × Julian Bast Collab Brief", _conceptUrl:"/concepts/hc-julian-bast.html"},
+];
+
+const DEFAULT_CAMPAIGNS = [
+  { id:"cmp-hc-julian", title:"HC × Julian Bast Collab", concept:"Artist Collaboration Series Vol. 01 — a limited-run merchandise capsule with multidisciplinary artist Julian Bast (Name Brand Tattoo, Ann Arbor MI).", brand:"Headchange", objective:"Launch the Head Change Artist Collaboration Series with a limited pre-sale drop featuring 2 original graphics, co-branded apparel, and collectible packaging. Target June 2025.", brief:null, status:"idea", createdBy:"Brand Team", createdAt:"2026-01-01T00:00:00.000Z", _briefFile:null, _briefFileData:null, _briefFileType:null, _fromConcept:null, _htmlName:"HC × Julian Bast Collab Brief", _conceptUrl:"/concepts/hc-julian-bast.html" },
 ];
 
 const CHANNELS = [
@@ -820,7 +823,14 @@ export default function MarketingHub({ initialUserName }) {
         const oc = await window.storage.get("ns-orgconns", true).catch(()=>null);
         if (op) window.__savedOrgPos = JSON.parse(op.value);
         if (oc) window.__savedOrgConns = JSON.parse(oc.value);
-        if (ca) setCampaigns(JSON.parse(ca.value));
+        if (ca) {
+          const loadedCamps = JSON.parse(ca.value);
+          const mergedCamps = [...loadedCamps];
+          DEFAULT_CAMPAIGNS.forEach(def => { if (!mergedCamps.find(x => x.id === def.id)) mergedCamps.push(def); });
+          setCampaigns(mergedCamps);
+        } else {
+          setCampaigns(DEFAULT_CAMPAIGNS);
+        }
         if (u) { setCurrentUser(JSON.parse(u.value)); }
         else setShowWhoModal(true);
         const [,,,,,,,,, cn] = await Promise.all([
@@ -874,11 +884,17 @@ export default function MarketingHub({ initialUserName }) {
       }
     });
   }, [ready]);
-  // Load campaign HTML concepts from storage on startup
+  // Load campaign HTML concepts from storage or _conceptUrl on startup
   useEffect(() => {
     if (!ready) return;
     campaigns.forEach(c => {
-      if (c._htmlName && !campaignHtmlCache.current[c.id]) {
+      if (campaignHtmlCache.current[c.id]) return;
+      if (c._conceptUrl) {
+        fetch(c._conceptUrl)
+          .then(r => r.ok ? r.text() : Promise.reject(r.status))
+          .then(html => { campaignHtmlCache.current[c.id] = html; setCampaignCacheVersion(v => v + 1); })
+          .catch(() => {});
+      } else if (c._htmlName) {
         window.storage.get(`ns-camp-html-${c.id}`, true)
           .then(res => { if (res?.value) { campaignHtmlCache.current[c.id] = res.value; setCampaignCacheVersion(v => v + 1); } })
           .catch(() => {});
