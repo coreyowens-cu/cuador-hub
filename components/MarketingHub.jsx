@@ -838,6 +838,22 @@ export default function MarketingHub({ initialUserName }) {
   const [concepts, setConcepts] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-concepts"); return v ? JSON.parse(v) : []; } catch { return []; } }); // [{id, name, html, createdAt}]
   const [activeConceptId, setActiveConceptId] = useState(null);
 
+  // One-time localStorage surgery: remove known stale duplicate initiative IDs
+  // that were removed from DEFAULT_INITIATIVES but may still exist in saved storage
+  useEffect(() => {
+    const STALE_IDS = ["init-sb-sms", "init-bub-sms"];
+    try {
+      const raw = localStorage.getItem("shared_ns_ns-initiatives");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const cleaned = parsed.filter(i => !STALE_IDS.includes(i.id));
+        if (cleaned.length < parsed.length) {
+          localStorage.setItem("shared_ns_ns-initiatives", JSON.stringify(cleaned));
+        }
+      }
+    } catch {}
+  }, []);
+
   // Load
   useEffect(() => {
     (async () => {
