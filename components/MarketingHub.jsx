@@ -1159,7 +1159,51 @@ export default function MarketingHub({ initialUserName }) {
                   {[
                     { id: "company",     icon: "✦",  label: "Marketing Vision" },
                     { id: "initiatives", icon: "📌", label: "Initiatives" },
-                    { id: "campaigns",   icon: "🚀", label: "Campaigns" },
+                  ].map(t => (
+                    <button key={t.id} className={`lsb-tab ${leftTab === t.id ? "on" : ""}`} onClick={() => { setLeftTab(t.id); setActiveBrand(null); }}>
+                      <span className="lsb-icon">{t.icon}</span>
+                      {lsbOpen && <span className="lsb-lbl">{t.label}</span>}
+                    </button>
+                  ))}
+
+                  {/* Campaigns — with inline dropdown */}
+                  <button className={`lsb-tab ${leftTab === "campaigns" ? "on" : ""}`} onClick={() => { setLeftTab("campaigns"); setActiveBrand(null); }}>
+                    <span className="lsb-icon">🚀</span>
+                    {lsbOpen && <span className="lsb-lbl">Campaigns</span>}
+                    {lsbOpen && (
+                      <span style={{ marginLeft: "auto", fontSize: 10, opacity: .5, transition: "transform .18s", display: "inline-block", transform: leftTab === "campaigns" ? "rotate(90deg)" : "rotate(0deg)" }}>▶</span>
+                    )}
+                  </button>
+                  {leftTab === "campaigns" && lsbOpen && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 1, paddingLeft: 8, marginTop: 1 }}>
+                      {[
+                        { id: "briefs",    icon: "📋", label: "Briefs" },
+                        { id: "timeline",  icon: "📅", label: "Timeline" },
+                      ].map(item => (
+                        <div key={item.id} style={{ display: "flex", alignItems: "center" }}>
+                          <button
+                            onClick={() => setCampaignView(item.id)}
+                            className={`lsb-tab ${campaignView === item.id ? "on" : ""}`}
+                            style={{ flex: 1, paddingLeft: 20, fontSize: 11, opacity: campaignView === item.id ? 1 : .75 }}
+                          >
+                            <span className="lsb-icon" style={{ fontSize: 11 }}>{item.icon}</span>
+                            <span className="lsb-lbl">{item.label}</span>
+                          </button>
+                          {item.id === "timeline" && (
+                            <button
+                              title="Pop out timeline"
+                              onClick={() => window.open("/campaign-timeline", "_blank", "width=1500,height=800,resizable=yes,scrollbars=yes")}
+                              style={{ width: 22, height: 22, borderRadius: 5, border: "1px solid rgba(255,255,255,.08)", background: "transparent", color: "var(--text-muted)", fontSize: 10, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginRight: 4, transition: "all .15s" }}
+                              onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,.4)"; e.currentTarget.style.color = "var(--gold)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.08)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+                            >↗</button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {[
                     { id: "concepts",    icon: "🎨", label: "Concepts" },
                     { id: "timeline",    icon: "📅", label: "Timeline" },
                   ].map(t => (
@@ -1438,33 +1482,38 @@ export default function MarketingHub({ initialUserName }) {
 
             {leftTab === "campaigns" && !activeBrand && (
               <div style={{ padding: "32px 44px", minHeight: "100vh" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
-                  <div>
-                    <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
-                    <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Campaigns</div>
-                    <div style={{ fontSize: 13, color: "var(--text-dim)" }}>AI-generated briefs and campaign ideas. Click any to view the full brief.</div>
-                  </div>
-                  {canAddContent && <button className="btn btn-gold" style={{ marginTop: 8 }} onClick={() => setShowCampaignModal(true)}>+ New Brief</button>}
-                </div>
-                {/* View tabs */}
-                <div style={{ display: "flex", gap: 4, marginBottom: 24, alignItems: "center" }}>
-                  {[["briefs","📋 Briefs"],["timeline","📅 Timeline"]].map(([v, label]) => (
-                    <button key={v} onClick={() => setCampaignView(v)}
-                      style={{ padding: "6px 16px", borderRadius: 7, border: `1px solid ${campaignView === v ? "rgba(201,168,76,.4)" : "var(--border)"}`, background: campaignView === v ? "var(--gold-dim)" : "transparent", color: campaignView === v ? "var(--gold)" : "var(--text-muted)", fontFamily: "var(--bf)", fontSize: 12, fontWeight: campaignView === v ? 600 : 400, cursor: "pointer", letterSpacing: ".04em", transition: "all .15s" }}>
-                      {label}
-                    </button>
-                  ))}
-                  {campaignView === "timeline" && (
-                    <button
-                      title="Open timeline in new window"
-                      onClick={() => window.open("/campaign-timeline", "_blank", "width=1500,height=800,resizable=yes,scrollbars=yes")}
-                      style={{ marginLeft: "auto", padding: "6px 13px", borderRadius: 7, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontFamily: "var(--bf)", fontSize: 12, cursor: "pointer", letterSpacing: ".04em", transition: "all .15s", display: "flex", alignItems: "center", gap: 5 }}>
-                      ↗ Pop Out
-                    </button>
-                  )}
-                </div>
-                {campaignView === "briefs" && <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} onDelete={canEdit ? deleteCampaign : null} fullWidth />}
-                {campaignView === "timeline" && <CampaignTimelinePanel campaignTimeline={campaignTimeline} setCampaignTimeline={setCampaignTimeline} campaigns={campaigns} brands={brands} />}
+                {campaignView === "briefs" && (
+                  <>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+                      <div>
+                        <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Campaigns</div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)" }}>AI-generated briefs and campaign ideas. Click any to view the full brief.</div>
+                      </div>
+                      {canAddContent && <button className="btn btn-gold" style={{ marginTop: 8 }} onClick={() => setShowCampaignModal(true)}>+ New Brief</button>}
+                    </div>
+                    <CampaignsPanel campaigns={campaigns} onNew={() => setShowCampaignModal(true)} onSelect={setSelectedCampaign} onDelete={canEdit ? deleteCampaign : null} fullWidth />
+                  </>
+                )}
+                {campaignView === "timeline" && (
+                  <>
+                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+                      <div>
+                        <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Timeline</div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)" }}>Visual campaign schedule with costs and sub-elements. Drag bars to adjust dates.</div>
+                      </div>
+                      <button
+                        title="Open timeline in its own window"
+                        onClick={() => window.open("/campaign-timeline", "_blank", "width=1500,height=800,resizable=yes,scrollbars=yes")}
+                        style={{ marginTop: 8, padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontFamily: "var(--bf)", fontSize: 12, cursor: "pointer", letterSpacing: ".04em", transition: "all .15s", display: "flex", alignItems: "center", gap: 6 }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,.4)"; e.currentTarget.style.color = "var(--gold)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+                      >↗ Pop Out</button>
+                    </div>
+                    <CampaignTimelinePanel campaignTimeline={campaignTimeline} setCampaignTimeline={setCampaignTimeline} campaigns={campaigns} brands={brands} />
+                  </>
+                )}
               </div>
             )}
 
