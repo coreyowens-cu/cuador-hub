@@ -860,10 +860,11 @@ export default function MarketingHub({ initialUserName }) {
         if (s) setStrategy(JSON.parse(s.value));
         if (i) {
           const loaded = JSON.parse(i.value);
-          // Merge: add any default initiatives missing from saved data (by ID only)
+          // Merge: add any default initiatives missing from saved data, unless explicitly deleted
+          const deletedDefaults = JSON.parse(localStorage.getItem("shared_ns_ns-deleted-defaults") || "[]");
           const merged = [...loaded];
           DEFAULT_INITIATIVES.forEach(def => {
-            if (!merged.find(x => x.id === def.id)) merged.push(def);
+            if (!merged.find(x => x.id === def.id) && !deletedDefaults.includes(def.id)) merged.push(def);
           });
           // Deduplicate by title — keep first occurrence of each title
           const seen = new Set();
@@ -1064,7 +1065,16 @@ export default function MarketingHub({ initialUserName }) {
     setConceptUpload(null);
   };
   const addInit = (init) => { setInitiatives(p => [...p, init]); setShowAddInit(false); };
-  const deleteInit = (id) => setInitiatives(p => p.filter(x => x.id !== id));
+  const deleteInit = (id) => {
+    setInitiatives(p => p.filter(x => x.id !== id));
+    // If deleting a default initiative, record it so the load merge never re-adds it
+    if (DEFAULT_INITIATIVES.find(d => d.id === id)) {
+      try {
+        const prev = JSON.parse(localStorage.getItem("shared_ns_ns-deleted-defaults") || "[]");
+        localStorage.setItem("shared_ns_ns-deleted-defaults", JSON.stringify([...new Set([...prev, id])]));
+      } catch {}
+    }
+  };
   const updateInit = (id, updates) => setInitiatives(p => p.map(x => x.id === id ? { ...x, ...updates } : x));
   const deleteCampaign = (id) => setCampaigns(p => p.filter(x => x.id !== id));
   const saveStrategy = (s) => { setStrategy(s); setShowEditStrategy(false); };
