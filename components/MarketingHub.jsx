@@ -1037,6 +1037,37 @@ export default function MarketingHub({ initialUserName }) {
   const deleteCampaign = (id) => setCampaigns(p => p.filter(x => x.id !== id));
   const saveStrategy = (s) => { setStrategy(s); setShowEditStrategy(false); };
   const saveCampaignAsInit = (init) => { setInitiatives(p => [...p, init]); };
+  const [initToCampaign, setInitToCampaign] = useState(null);
+  const createCampaignFromInit = (init, campaignData) => {
+    const campId = `cmp-${Date.now()}`;
+    const camp = {
+      id: campId,
+      title: campaignData.title,
+      brand: campaignData.brand,
+      concept: campaignData.concept,
+      objective: campaignData.concept,
+      status: campaignData.status || "brief",
+      brief: null,
+      createdBy: campaignData.createdBy,
+      createdAt: new Date().toISOString(),
+      _fromInitiative: init.id,
+    };
+    setCampaigns(p => [camp, ...p]);
+    const brandEntry = Object.values(brands).find(b => b.name === campaignData.brand);
+    setCampaignTimeline(p => [{
+      id: `ctl-${Date.now()}`,
+      campaignId: campId,
+      title: campaignData.title,
+      brand: campaignData.brand || "CÚRADOR",
+      color: brandEntry?.color || "#c9a84c",
+      cost: campaignData.cost || 0,
+      startDate: campaignData.startDate || new Date().toISOString().slice(0, 10),
+      endDate: campaignData.endDate || new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
+      elements: (campaignData.elements || []).map(el => ({ ...el, id: `el-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` })),
+    }, ...p]);
+    setInitiatives(p => p.map(i => i.id === init.id ? { ...i, _campaignId: campId, _campaignTitle: campaignData.title } : i));
+    setInitToCampaign(null);
+  };
 
   const updateMemberProfile = (name, updates) => {
     setTeamMembers(p => p.map(m => m.name === name ? { ...m, ...updates } : m));
@@ -1944,11 +1975,17 @@ export default function MarketingHub({ initialUserName }) {
                           <div>
                             <div className="card-owner">{init.owner}</div>
                             <div className="card-qtr" style={{ color: getChannelColor(init.channel), fontSize: 10 }}>{(init.channel || "").split(" · ")[1] || init.channel}</div>
-                            
+                            {init._campaignTitle && <div style={{ fontSize: 9, color: "var(--gold)", marginTop: 2, letterSpacing: ".04em" }}>🚀 {init._campaignTitle}</div>}
                           </div>
-                          <button className={`fbtn ${init.fileUrl ? "has" : ""}`} onClick={e => { e.stopPropagation(); setFileModal(init.id); }}>
-                            {init.fileUrl ? "📎 File" : "+ File"}
-                          </button>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end" }}>
+                            <button className={`fbtn ${init.fileUrl ? "has" : ""}`} onClick={e => { e.stopPropagation(); setFileModal(init.id); }}>
+                              {init.fileUrl ? "📎 File" : "+ File"}
+                            </button>
+                            <button onClick={e => { e.stopPropagation(); setInitToCampaign(init); }}
+                              style={{ fontSize: 9, padding: "3px 8px", borderRadius: 5, border: "1px solid rgba(201,168,76,.3)", background: "rgba(201,168,76,.07)", color: "var(--gold)", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600, letterSpacing: ".04em", whiteSpace: "nowrap" }}>
+                              → Campaign
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -2048,7 +2085,8 @@ export default function MarketingHub({ initialUserName }) {
           </div>
         </div>
       )}
-      {detail && <DetailModal init={initiatives.find(i => i.id === detail.id) || detail} getAccent={getAccent} onClose={() => setDetail(null)} onFileClick={(id) => { setDetail(null); setFileModal(id); }} />}
+      {detail && <DetailModal init={initiatives.find(i => i.id === detail.id) || detail} getAccent={getAccent} onClose={() => setDetail(null)} onFileClick={(id) => { setDetail(null); setFileModal(id); }} onCreateCampaign={(init) => { setDetail(null); setInitToCampaign(init); }} />}
+      {initToCampaign && <InitiativeToCampaignModal init={initToCampaign} brands={brands} onClose={() => setInitToCampaign(null)} onSave={(campaignData) => createCampaignFromInit(initToCampaign, campaignData)} />}
       {fileModal && <FileUploadModal initiative={initiatives.find(i => i.id === fileModal)} onClose={() => setFileModal(null)} onSave={(url, name) => saveFile(fileModal, url, name)} />}
       {conceptModal && (() => { const init = initiatives.find(i => i.id === conceptModal); if (!init) return null; const html = (conceptCacheVersion >= 0 && conceptHtmlCache.current[init.id]) || init.htmlConcept; return html ? <ConceptViewerModal init={{...init, htmlConcept: html}} onClose={() => setConceptModal(null)} onUpload={() => { setConceptModal(null); setConceptUpload(init.id); }} onNote={(ctx) => { setConceptModal(null); addNoteWithContext(ctx); }} /> : null; })()}
       {conceptUpload && <ConceptHtmlUploadModal initName={initiatives.find(i => i.id === conceptUpload)?.title || ""} onClose={() => setConceptUpload(null)} onSave={(html, name) => saveConceptHtml(conceptUpload, html, name)} />}
@@ -4063,9 +4101,180 @@ function WhoModal({ whoName, setWhoName, whoRole, setWhoRole, onSave, orgRoles }
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// INITIATIVE → CAMPAIGN MODAL
+// ════════════════════════════════════════════════════════════════════════════
+const CAMPAIGN_STATUSES = ["idea","brief","in-progress","review","approved","live"];
+
+function getDefaultElements(channel) {
+  const ch = (channel || "").toLowerCase();
+  const ts = Date.now();
+  if (ch.includes("social")) return [
+    { label: "Content Creation", startDate: "", endDate: "", cost: "" },
+    { label: "Scheduling & Posting", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("email") || ch.includes("sms")) return [
+    { label: "Copywriting & Design", startDate: "", endDate: "", cost: "" },
+    { label: "List Preparation", startDate: "", endDate: "", cost: "" },
+    { label: "Send Date", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("event")) return [
+    { label: "Venue & Logistics", startDate: "", endDate: "", cost: "" },
+    { label: "Promotion", startDate: "", endDate: "", cost: "" },
+    { label: "Day-Of Execution", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("packaging") || ch.includes("merch")) return [
+    { label: "Design & Approval", startDate: "", endDate: "", cost: "" },
+    { label: "Production Lead Time", startDate: "", endDate: "", cost: "" },
+    { label: "Delivery & Launch", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("loyalty") || ch.includes("reward")) return [
+    { label: "Program Design", startDate: "", endDate: "", cost: "" },
+    { label: "Partner Outreach", startDate: "", endDate: "", cost: "" },
+    { label: "Launch & Promotion", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("pr") || ch.includes("field")) return [
+    { label: "Outreach & Pitching", startDate: "", endDate: "", cost: "" },
+    { label: "Activation", startDate: "", endDate: "", cost: "" },
+  ];
+  if (ch.includes("budtender") || ch.includes("store") || ch.includes("in-store")) return [
+    { label: "Training Materials", startDate: "", endDate: "", cost: "" },
+    { label: "Rep Visits / Execution", startDate: "", endDate: "", cost: "" },
+    { label: "Follow-Up & Recap", startDate: "", endDate: "", cost: "" },
+  ];
+  return [
+    { label: "Brief & Planning", startDate: "", endDate: "", cost: "" },
+    { label: "Production", startDate: "", endDate: "", cost: "" },
+    { label: "Launch", startDate: "", endDate: "", cost: "" },
+  ];
+}
+
+function InitiativeToCampaignModal({ init, brands, onClose, onSave }) {
+  const brandList = Object.values(brands || {});
+  const initBrand = brandList.find(b => b.id === init.brandId) || brandList[0] || null;
+
+  const [title, setTitle] = useState(init.title || "");
+  const [brand, setBrand] = useState(initBrand?.name || "CÚRADOR");
+  const [status, setStatus] = useState("brief");
+  const [concept, setConcept] = useState(init.description || "");
+  const [startDate, setStartDate] = useState(init.startDate || new Date().toISOString().slice(0, 10));
+  const [endDate, setEndDate] = useState(init.endDate || new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10));
+  const [cost, setCost] = useState("");
+  const [elements, setElements] = useState(() => getDefaultElements(init.channel));
+
+  const updateEl = (i, patch) => setElements(p => p.map((el, idx) => idx === i ? { ...el, ...patch } : el));
+  const removeEl = (i) => setElements(p => p.filter((_, idx) => idx !== i));
+  const addEl = () => setElements(p => [...p, { label: "Custom Element", startDate, endDate, cost: "" }]);
+
+  const LBL = { fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 5, display: "block" };
+  const INP = { width: "100%", padding: "8px 11px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", boxSizing: "border-box" };
+
+  return (
+    <div className="overlay" onClick={onClose}>
+      <div className="modal wide" onClick={e => e.stopPropagation()} style={{ maxWidth: 620, maxHeight: "90vh", display: "flex", flexDirection: "column" }}>
+        {/* Header */}
+        <div className="mhdr" style={{ borderTop: "2px solid var(--gold)", borderRadius: "16px 16px 0 0" }}>
+          <div>
+            <div style={{ fontSize: 10, color: "var(--gold)", letterSpacing: ".14em", textTransform: "uppercase", marginBottom: 6, fontWeight: 600 }}>Create Campaign from Initiative</div>
+            <div className="mtitle">{init.title}</div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{init.channel}</div>
+          </div>
+          <button className="mclose" onClick={onClose}>×</button>
+        </div>
+
+        {/* Body */}
+        <div className="mbody" style={{ overflowY: "auto", flex: 1 }}>
+          {/* Campaign Name */}
+          <div style={{ marginBottom: 14 }}>
+            <label style={LBL}>Campaign Title</label>
+            <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Campaign name…" autoFocus style={INP} />
+          </div>
+
+          {/* Brand + Status */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={LBL}>Brand</label>
+              <select value={brand} onChange={e => setBrand(e.target.value)} style={INP}>
+                <option value="CÚRADOR">CÚRADOR</option>
+                {brandList.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label style={LBL}>Status</label>
+              <select value={status} onChange={e => setStatus(e.target.value)} style={INP}>
+                {CAMPAIGN_STATUSES.map(s => <option key={s} value={s}>{s.replace("-", " ").replace(/\b\w/g, c => c.toUpperCase())}</option>)}
+              </select>
+            </div>
+          </div>
+
+          {/* Concept / Summary */}
+          <div style={{ marginBottom: 14 }}>
+            <label style={LBL}>Concept / Summary</label>
+            <textarea value={concept} onChange={e => setConcept(e.target.value)} rows={3} placeholder="Auto-summarized from initiative — edit as needed…" style={{ ...INP, resize: "vertical", lineHeight: 1.65 }} />
+          </div>
+
+          {/* Dates + Budget */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginBottom: 20 }}>
+            <div>
+              <label style={LBL}>Start Date</label>
+              <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} style={INP} />
+            </div>
+            <div>
+              <label style={LBL}>End Date</label>
+              <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} style={INP} />
+            </div>
+            <div>
+              <label style={LBL}>Campaign Budget</label>
+              <input value={cost} onChange={e => setCost(e.target.value)} placeholder="$0" style={{ ...INP, color: "var(--gold)", fontWeight: 600 }} />
+            </div>
+          </div>
+
+          {/* Timeline Sub-Elements */}
+          <div style={{ borderTop: "1px solid var(--border)", paddingTop: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>Timeline Components</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Auto-suggested from pillar — edit labels, dates, and budgets. These become sub-elements on the campaign timeline.</div>
+              </div>
+              <button onClick={addEl} style={{ fontSize: 11, padding: "4px 11px", borderRadius: 6, border: "1px dashed rgba(201,168,76,.3)", background: "transparent", color: "var(--gold)", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600, whiteSpace: "nowrap", flexShrink: 0 }}>+ Add Element</button>
+            </div>
+
+            {elements.map((el, i) => (
+              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 90px 28px", gap: 8, marginBottom: 8, alignItems: "center" }}>
+                <input value={el.label} onChange={e => updateEl(i, { label: e.target.value })} placeholder="Element name…"
+                  style={{ ...INP, padding: "6px 10px" }} />
+                <input type="date" value={el.startDate} onChange={e => updateEl(i, { startDate: e.target.value })}
+                  style={{ ...INP, padding: "6px 8px", fontSize: 11 }} />
+                <input type="date" value={el.endDate} onChange={e => updateEl(i, { endDate: e.target.value })}
+                  style={{ ...INP, padding: "6px 8px", fontSize: 11 }} />
+                <input value={el.cost} onChange={e => updateEl(i, { cost: e.target.value })} placeholder="$0"
+                  style={{ ...INP, padding: "6px 8px", color: "var(--gold)", fontWeight: 600, fontSize: 11 }} />
+                <button onClick={() => removeEl(i)}
+                  style={{ width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(224,123,106,.25)", background: "transparent", color: "#e07b6a", cursor: "pointer", fontSize: 13, display: "grid", placeItems: "center" }}>×</button>
+              </div>
+            ))}
+            {elements.length === 0 && (
+              <div style={{ textAlign: "center", padding: "16px 0", fontSize: 12, color: "var(--text-muted)" }}>No sub-elements yet — click + Add Element to build out the timeline</div>
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mfoot">
+          <button className="btn" onClick={onClose}>Cancel</button>
+          <button disabled={!title.trim()} onClick={() => onSave({ title: title.trim(), brand, status, concept: concept.trim(), startDate, endDate, cost, elements, createdBy: "Team" })}
+            style={{ padding: "9px 22px", borderRadius: 9, border: "none", background: title.trim() ? "linear-gradient(135deg,#c9a84c,#a07030)" : "rgba(255,255,255,.06)", color: title.trim() ? "#07070f" : "var(--text-muted)", fontFamily: "var(--bf)", fontSize: 13, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", cursor: title.trim() ? "pointer" : "not-allowed" }}>
+            🚀 Create Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // DETAIL MODAL
 // ════════════════════════════════════════════════════════════════════════════
-function DetailModal({ init, getAccent, onClose, onFileClick }) {
+function DetailModal({ init, getAccent, onClose, onFileClick, onCreateCampaign }) {
   const acc = getAccent(init.channel);
   return (
     <div className="overlay" onClick={onClose}>
@@ -4131,6 +4340,9 @@ function DetailModal({ init, getAccent, onClose, onFileClick }) {
         </div>
         <div className="mfoot">
           {!init.fileUrl && <button className="btn" onClick={() => { onClose(); onFileClick(init.id); }}>+ Attach File</button>}
+          {onCreateCampaign && (
+            <button className="btn" style={{ borderColor: "rgba(201,168,76,.35)", color: "var(--gold)", fontWeight: 600 }} onClick={() => onCreateCampaign(init)}>🚀 → Campaign</button>
+          )}
           <button className="btn btn-gold" onClick={onClose}>Done</button>
         </div>
       </div>
