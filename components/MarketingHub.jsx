@@ -4316,6 +4316,147 @@ function InitiativeToCampaignModal({ init, brands, onClose, onSave }) {
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// MISSOURI CANNABIS COMPLIANCE KNOWLEDGE BASE
+// Sourced from: 19 CSR 100-1 Admin Rules, Article XIV Sec 1 & 2 (MO Constitution),
+// DCR Adult Use FAQs, DCR General FAQs, Final Rules July 2023, Emergency Rules Jan 2023
+// Last compiled: April 2, 2026
+// ════════════════════════════════════════════════════════════════════════════
+const MO_CANNABIS_COMPLIANCE_KB = `
+# Missouri Cannabis Compliance Reference — CÚRADOR Brands
+*Source: 19 CSR 100-1, Article XIV MO Constitution Sec 1 & 2, DCR FAQs, Final Rules July 2023*
+
+## LEGAL FRAMEWORK
+- Adult-use marijuana legal for consumers 21+ as of December 8, 2022 (Amendment 3, Article XIV Section 2)
+- Medical marijuana legal under Article XIV Section 1 (effective 2018, amended 2022)
+- Regulated by Missouri Dept of Health & Senior Services (DHSS), Division of Cannabis Regulation (DCR)
+- DCR Contact: Cannabisinfo@health.mo.gov | 866-219-0165 | cannabis.mo.gov
+- 2026 Rule Updates (approved March 2026): ownership review moved pre-issuance; fines up to $100,000; product recall procedures for unregulated THC; microbusiness license transfer pathway
+
+## ADVERTISING & MARKETING (Article XIV Sec 2.4(n); Sec 1.3(2)(g))
+- Advertising regulations SHALL BE NO MORE STRINGENT than comparable state alcohol advertising rules
+- Age-gated accounts required — no public-facing cannabis content accessible to under-21
+- No claims of health benefits, therapeutic effects, or medical use in marketing materials
+- Geo-targeting required to restrict reach to legal states (adults 21+)
+- Influencer partnerships require proper disclosure (#ad, #sponsored per FTC guidelines)
+- No depictions of consumption in public or non-licensed spaces
+- All posts/ads must include standard legal disclaimer
+- Cannot advertise in media primarily directed at persons under 21
+- Sponsorship of health or not-for-profit charity/advocacy events is permitted
+- Business directory listings and marijuana-related publications are permitted
+- Local governments may have additional advertising restrictions — verify by market
+
+## PACKAGING & LABELING (Article XIV Sec 2.4(4)(c)(d)(e); 19 CSR 100-1)
+- All packaging must include state-mandated health & safety warnings
+- Packaging SHALL NOT be made attractive to children (no cartoon characters, bright colors targeting minors, candy-like designs)
+- Child-resistant AND tamper-evident closures required on ALL products
+- Packaging must be resealable and child-resistant
+- Required label elements:
+  • Net weight of product
+  • THC content (total THC in mg, cannabidiol/CBD content)
+  • THC and cannabinoid amount in milligrams PER SERVING
+  • Number of servings per package
+  • Batch/lot number
+  • Licensed testing lab name
+  • Dispensary license number on final retail label
+  • Active and inactive ingredients
+  • Dosage amounts and instructions for use
+  • Quantity limits per sale (possession compliance)
+- No unverified, unapproved health or medical claims on packaging
+- Marijuana testing facility must certify all products before sale
+- Products must not contain contaminants injurious to health (lab tested)
+
+## EVENTS & ACTIVATIONS
+- Valid event permit required before any public activation
+- Age verification (21+) mandatory at ALL entry points — valid government-issued photo ID
+- Acceptable IDs: Missouri driver's license, MO ID card, valid/expired undamaged US passport, US military ID, valid non-MO driver's license
+- No cannabis consumption at non-licensed event venues (public consumption prohibited unless local government designates area)
+- No free product giveaways or sampling at unlicensed events (no dispensing outside licensed facility)
+- Brand ambassador compliance training required prior to event
+- All signage must include standard state health warning
+- Cannot hold events at schools, school buses, correctional facilities, or places where tobacco is prohibited
+- Local governments may allow designated public consumption areas — verify locally
+- No events targeting or accessible to persons under 21
+
+## IN-STORE & DISPENSARY COMPLIANCE (19 CSR 100-1.180)
+- All display materials must be pre-approved by compliance team
+- No promotional pricing that violates state tier regulations
+- Budtender talking points must align with approved product claims ONLY — no unverified health/medical claims
+- Agents must be trained on differences in strains, effects, and methods of use (19 CSR 100-1.080(1)(H)2)
+- No unverified health, medical, or therapeutic claims in any in-store materials
+- Product placement must comply with dispensary partnership agreements
+- Photo/video of product in-store requires prior written consent
+- Consumer age verification: valid government-issued photo ID showing 21+ required for every sale
+- Patient ID card holders must scan IDs at point of sale (required since May 3, 2023)
+- Must record every sale against patient's 30-day allotment in statewide track-and-trace system
+- Non-marijuana products must not be displayed in limited access area and must clearly not be DCR-regulated
+- Drive-through sales permitted if compliant with 19 CSR 100-1.180(2)(A)4
+- Delivery permitted if pre-approved by DCR; follows 19 CSR 100-1.180(2)(D) and 100-1.140(3)
+- Curbside pickup NOT permitted (only drive-through and delivery if approved)
+- Gift cards are permitted as long as purchases are made by qualifying patients, caregivers, or consumers
+- Minors may only enter dispensary if accompanied by a qualifying patient, caregiver, or consumer
+- Tipping budtenders is not prohibited or endorsed by DCR — facility's discretion
+
+## POSSESSION & PURCHASE LIMITS
+- Consumer (21+): Purchase up to 3 oz per transaction; possess up to 3 oz at any time
+- Patient (with ID card): Purchase up to 6 oz per 30-day period (more if physician certifies); possess up to 12 oz (60-day supply)
+- Patient with cultivation authorization: May possess up to 18 oz (90-day supply), excess above 12 oz must remain in enclosed locked facility
+- Caregiver: Separate legal limit for each patient (up to 6 patients); store separately, label with patient name
+- Out-of-state patient cards: Licensed dispensaries may accept (19 CSR 100-1.180)
+- Edibles: Possession limit based on total THC in mg on label, NOT total package weight
+
+## TAXATION
+- Medical purchases: 4% state tax (Missouri Veterans' Health and Care Fund)
+- Adult-use purchases: 6% state tax (Veterans, Health, and Community Reinvestment Fund)
+- Local governments may impose additional sales tax up to 3% on adult-use
+- All standard state and local sales/use taxes also apply
+- Tax proceeds: DHSS operations → expungement of marijuana offenses → MO Veterans Commission → MO Public Defender → local governments → grant recipients
+
+## PROHIBITED ACTIVITIES (Marketing Relevance)
+- No cannabis consumption in public places (unless locally designated)
+- No consumption while operating motor vehicles
+- No cannabis on grounds of schools, school buses, correctional facilities
+- No smoking marijuana where tobacco smoking is prohibited
+- No marketing to or targeting persons under 21 in any materials
+- Cannot claim cannabis treats/cures specific medical conditions without approval
+- Solvent-based extractions only by licensed facility (not home use, not event)
+- Cannot promote unlicensed product or activities
+
+## EMPLOYMENT & WORKPLACE
+- Employers may prohibit or restrict cannabis use in the workplace
+- Employers may discipline employees for working under the influence
+- Employers may refuse to hire/discharge employees for cannabis workplace violations
+- Article XIV does NOT require employers to accommodate cannabis use
+- All dispensary, cultivation, and manufacturing employees must be 21+ (for new hires after Feb 3, 2023)
+- Agent ID required for facility employees (fingerprints not required for new applicants since Dec 8, 2022)
+- Owners with 10%+ financial or voting interest still need fingerprint criminal background check
+
+## LICENSE TYPES & STRUCTURE
+- Comprehensive Dispensary Facility: Sells to patients, caregivers, and consumers (21+)
+- Comprehensive Cultivation Facility: Grows and supplies marijuana
+- Comprehensive Manufacturing Facility: Makes infused products
+- Marijuana Testing Facility: Independent testing and certification (cannot be owned by same entity as cultivation/manufacturing/dispensary)
+- Microbusiness Dispensary: Smaller-scale dispensary (majority-owned by eligible individuals, e.g., net worth <$250K)
+- Microbusiness Wholesale: Cultivates up to 250 flowering plants, manufactures, sells to microbusiness dispensaries only
+- Licenses valid for 3 years, renewable
+- No entity may own more than 10% of total cultivation, dispensary, or manufacturing licenses outstanding
+- No entity may own both a microbusiness AND a comprehensive/medical license simultaneously
+
+## SEED-TO-SALE TRACKING
+- Required for ALL marijuana from seed/immature plant through final consumer sale
+- Statewide track-and-trace system required
+- No marijuana may be sold or transferred except through licensed facility
+- Every dispensary sale must be recorded against patient/consumer allotment
+- All transactions must be logged; records must be available for inspection
+
+## 2026 PROPOSED RULE UPDATES (Joint Committee approved March 2026)
+- Ownership review now occurs pre-issuance (before licenses granted)
+- Framework for publicly traded companies to hold cannabis licenses
+- Pathway for microbusiness license transfers to eligible family members
+- Product recall procedures for unregulated THC products
+- Enforcement authority with fines up to $100,000
+- "Majority owned and operated" redefined for microbusiness program
+`;
+
 // ════════════════════════════════════════════════════════════════════════════
 // COMPLIANCE PANEL
 // ════════════════════════════════════════════════════════════════════════════
@@ -4411,7 +4552,16 @@ function CompliancePanel({ overview, setOverview, docs, setDocs, links, setLinks
           model: "claude-sonnet-4-20250514",
           max_tokens: 1024,
           stream: true,
-          system: `You are a cannabis compliance specialist for CÚRADOR, a Missouri cannabis brand. The user is asking about ${openCard.title} compliance specifically. Give authoritative, actionable guidance based on Missouri cannabis regulations and best practices. Keep answers clear and practical for a marketing team.\n\nCurrent ${openCard.title} compliance checklist:\n${(openCard.points || []).map((p, i) => `${i + 1}. ${p}`).join("\n")}`,
+          system: `You are a Missouri cannabis compliance specialist for CÚRADOR, a cannabis brand operating in Missouri with brands including Headchange, Bubbles, and Safebet. You have deep expertise in Missouri cannabis law sourced directly from 19 CSR 100-1 Administrative Rules, Article XIV Sections 1 & 2 of the Missouri Constitution, DCR FAQs, and the July 2023 Final Rules.
+
+The user is asking about ${openCard.title} compliance specifically. Give authoritative, actionable, and accurate guidance. Cite specific regulations when relevant (e.g., "per 19 CSR 100-1.180" or "per Article XIV Section 2"). Keep answers clear and practical for a marketing team — not a legal team. Flag anything that requires legal counsel.
+
+CURRENT ${openCard.title.toUpperCase()} CHECKLIST ON FILE:
+${(openCard.points || []).map((p, i) => `${i + 1}. ${p}`).join("\n")}
+
+---
+MISSOURI CANNABIS COMPLIANCE KNOWLEDGE BASE:
+${MO_CANNABIS_COMPLIANCE_KB}`,
           messages: newMsgs,
         }),
       });
@@ -4827,11 +4977,29 @@ function CompliancePanel({ overview, setOverview, docs, setDocs, links, setLinks
                         <div style={{ fontSize: 32, marginBottom: 10, opacity: .35 }}>🤖</div>
                         <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Ask me anything about {card.title} compliance</div>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 14 }}>
-                          {[
-                            `What are the key ${card.title.toLowerCase()} requirements?`,
-                            `What are common violations to avoid?`,
-                            `How do we stay compliant in Missouri?`,
-                          ].map(q => (
+                          {([
+                            card.title === "Packaging" ? [
+                              "What must appear on every product label?",
+                              "What packaging is banned for being attractive to minors?",
+                              "Which regulation covers labeling requirements?",
+                            ] : card.title === "Events" ? [
+                              "Can we give free samples at an event?",
+                              "What ID verification is required at activations?",
+                              "Can we host an event at a non-licensed venue?",
+                            ] : card.title === "In-Store" ? [
+                              "What health claims are allowed at point of sale?",
+                              "What ID must budtenders check before every sale?",
+                              "What are the rules around in-store display materials?",
+                            ] : card.title === "Social Media" ? [
+                              "How does Missouri regulate cannabis advertising?",
+                              "What disclosures do influencer posts need?",
+                              "What claims are prohibited on social media?",
+                            ] : [
+                              `What are the key ${card.title.toLowerCase()} requirements?`,
+                              "What are common violations to avoid?",
+                              "What does Missouri law say about this?",
+                            ]
+                          ][0].map(q => (
                             <button key={q} onClick={() => { setChatInput(q); }}
                               style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, border: `1px solid ${card.color}44`, background: card.color + "0d", color: card.color, cursor: "pointer", fontFamily: "var(--bf)", transition: "all .13s" }}
                               onMouseEnter={e => e.currentTarget.style.background = card.color + "22"}
