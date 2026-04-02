@@ -45,22 +45,6 @@ const DEFAULT_BRANDS = {
     positioning:"Flagship / Connoisseur — Missouri's recognized hash leader. Sets quality ceiling for the CÚRADOR portfolio. Never uses CRC.",
     website:"headchange710.com"
   },
-  bubbles:{
-    id:"bubbles",
-    name:"Bubbles",
-    color:"#7B68B5",
-    tagline:"Hi, Bubbs!",
-    story:"Bubbles is all about bright, juicy flavors that burst across your taste buds in waves of sweet, tangy bliss. From the first inhale to the last draw, you'll be met with mouth-watering terp profiles you'll want to keep coming back to. A flavor-forward vape brand with colorful devices and an uplifting experience that's as fun as it is flavorful. With Bubbles, there's a flavor for every mood — whether you need something energizing, balanced, mellow, or exotic. Meet your new favorite.",
-    mission:"Make every pull an experience — bold flavor, vibrant energy, and a vibe that keeps people coming back.",
-    values:["Flavor First","Vibrant & Colorful","Uplifting Energy","Mood-Matched Experience","Fun & Accessible"],
-    audience:"Casual and recreational consumers, 21–35, who choose by flavor and mood rather than strain science. New-to-cannabis and discretion-forward users. Anyone who wants their cannabis experience to feel fun, bright, and easy.",
-    tone:"Bubbly, energetic, sensory-forward. Playful without being juvenile. Speaks in flavor and feeling — 'like a sparkler for your taste buds' / 'a getaway in every hit.' Light, inviting, zero barriers.",
-    typography:"Cormorant Garamond / DM Sans",
-    secondary:"#F0EBF8",
-    products:"Atomic Burst (Sativa) — cherry, blue raspberry & lime · Blue Raz (Indica) — ripened raspberry with tangy citrus · Sweet Dreamz (Indica) — smooth fruity sweetness, mellow vibes · Tiger's Blood (Hybrid) — juicy watermelon & bright citrus · Watermelon Ice (Hybrid) — fresh juicy watermelon, cooled & refreshing · Breezy Blast (Exotic) — tropical lime, crisp & zesty",
-    positioning:"Flavor & convenience — captures discretion-focused and casual vape consumers. Non-CDT distillate contrast to SafeBet's cannabis-authentic positioning.",
-    website:"bubblesvape.com"
-  },
   safebet:{
     id:"safebet",
     name:"SafeBet",
@@ -77,6 +61,22 @@ const DEFAULT_BRANDS = {
     positioning:"Mid-tier / everyday — cannabis-authentic CDT experience at fair price. The dependable daily-driver between Bubbles (flavor/convenience) and Headchange (premium connoisseur).",
     website:"safebetofficial.com",
     instagram:"@SafeBet_Rolls"
+  },
+  bubbles:{
+    id:"bubbles",
+    name:"Bubbles",
+    color:"#7B68B5",
+    tagline:"Hi, Bubbs!",
+    story:"Bubbles is all about bright, juicy flavors that burst across your taste buds in waves of sweet, tangy bliss. From the first inhale to the last draw, you'll be met with mouth-watering terp profiles you'll want to keep coming back to. A flavor-forward vape brand with colorful devices and an uplifting experience that's as fun as it is flavorful. With Bubbles, there's a flavor for every mood — whether you need something energizing, balanced, mellow, or exotic. Meet your new favorite.",
+    mission:"Make every pull an experience — bold flavor, vibrant energy, and a vibe that keeps people coming back.",
+    values:["Flavor First","Vibrant & Colorful","Uplifting Energy","Mood-Matched Experience","Fun & Accessible"],
+    audience:"Casual and recreational consumers, 21–35, who choose by flavor and mood rather than strain science. New-to-cannabis and discretion-forward users. Anyone who wants their cannabis experience to feel fun, bright, and easy.",
+    tone:"Bubbly, energetic, sensory-forward. Playful without being juvenile. Speaks in flavor and feeling — 'like a sparkler for your taste buds' / 'a getaway in every hit.' Light, inviting, zero barriers.",
+    typography:"Cormorant Garamond / DM Sans",
+    secondary:"#F0EBF8",
+    products:"Atomic Burst (Sativa) — cherry, blue raspberry & lime · Blue Raz (Indica) — ripened raspberry with tangy citrus · Sweet Dreamz (Indica) — smooth fruity sweetness, mellow vibes · Tiger's Blood (Hybrid) — juicy watermelon & bright citrus · Watermelon Ice (Hybrid) — fresh juicy watermelon, cooled & refreshing · Breezy Blast (Exotic) — tropical lime, crisp & zesty",
+    positioning:"Flavor & convenience — captures discretion-focused and casual vape consumers. Non-CDT distillate contrast to SafeBet's cannabis-authentic positioning.",
+    website:"bubblesvape.com"
   },
 };
 
