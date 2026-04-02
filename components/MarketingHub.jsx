@@ -5615,6 +5615,8 @@ function ConceptsPanel({ concepts, activeConceptId, setActiveConceptId, onAdd, o
 /* ─── CAMPAIGN TIMELINE PANEL ─── */
 function CampaignTimelinePanel({ campaignTimeline, setCampaignTimeline, campaigns, brands }) {
   const dragRef = useRef(null);
+  const [collapsed, setCollapsed] = useState({});
+  const toggleCollapse = (id) => setCollapsed(p => ({ ...p, [id]: !p[id] }));
 
   // Build 12-month rolling window starting from current month
   const now = new Date();
@@ -5768,9 +5770,22 @@ function CampaignTimelinePanel({ campaignTimeline, setCampaignTimeline, campaign
             {/* Campaign row */}
             <div className="ctl-row" style={{ borderLeft: `3px solid ${color}` }}>
               <div className="ctl-row-label">
+                {/* Collapse toggle */}
+                <button
+                  onClick={() => toggleCollapse(entry.id)}
+                  title={collapsed[entry.id] ? "Expand sub-elements" : "Collapse sub-elements"}
+                  style={{ width: 18, height: 18, borderRadius: 4, border: "1px solid rgba(255,255,255,.1)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontSize: 9, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = color + "66"; e.currentTarget.style.color = color; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.1)"; e.currentTarget.style.color = "var(--text-muted)"; }}
+                >
+                  <span style={{ display: "inline-block", transition: "transform .18s", transform: collapsed[entry.id] ? "rotate(-90deg)" : "rotate(0deg)" }}>▾</span>
+                </button>
                 <div className="ctl-brand-dot" style={{ background: color }} />
                 <span className="ctl-row-name" title={entry.title}>{entry.title}</span>
-                <button className="ctl-add-el-btn" title="Add sub-element" onClick={() => addElement(entry.id)}>+</button>
+                {collapsed[entry.id] && (entry.elements || []).length > 0 && (
+                  <span style={{ fontSize: 9, color: "var(--text-muted)", background: "rgba(255,255,255,.06)", borderRadius: 100, padding: "1px 6px", flexShrink: 0 }}>{entry.elements.length}</span>
+                )}
+                <button className="ctl-add-el-btn" title="Add sub-element" onClick={() => { addElement(entry.id); setCollapsed(p => ({ ...p, [entry.id]: false })); }}>+</button>
               </div>
               <div className="ctl-row-cost">
                 <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 1 }}>
@@ -5798,7 +5813,7 @@ function CampaignTimelinePanel({ campaignTimeline, setCampaignTimeline, campaign
             </div>
 
             {/* Element rows */}
-            {(entry.elements || []).map(el => (
+            {!collapsed[entry.id] && (entry.elements || []).map(el => (
               <div key={el.id} className="ctl-row el-row" style={{ borderLeft: `3px solid ${color}55` }}>
                 <div className="ctl-row-label">
                   <div style={{ width: 4, height: 4, borderRadius: "50%", background: color, opacity: .5, flexShrink: 0, marginLeft: 2 }} />
