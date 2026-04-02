@@ -1075,14 +1075,15 @@ export default function MarketingHub({ initialUserName }) {
   };
   const addInit = (init) => { setInitiatives(p => [...p, init]); setShowAddInit(false); };
   const deleteInit = (id) => {
-    setInitiatives(p => {
-      const updated = p.filter(x => x.id !== id);
-      // Write to localStorage SYNCHRONOUSLY right now — don't wait for useEffect
-      const PURGE = new Set(["init-hc-sms", "init-sb-sms", "init-bub-sms"]);
-      const toSave = updated.filter(i => !PURGE.has(i.id)).map(i => ({...i, htmlConcept: null}));
-      try { localStorage.setItem("shared_ns_ns-initiatives", JSON.stringify(toSave)); } catch {}
-      return updated;
-    });
+    // Compute new list immediately using current closure value
+    const updated = initiatives.filter(x => x.id !== id);
+    // Write to localStorage RIGHT NOW in the same synchronous call stack as the click
+    // — this cannot be interrupted by a tab refresh
+    const PURGE = new Set(["init-hc-sms", "init-sb-sms", "init-bub-sms"]);
+    const toSave = updated.filter(i => !PURGE.has(i.id)).map(i => ({...i, htmlConcept: null}));
+    try { localStorage.setItem("shared_ns_ns-initiatives", JSON.stringify(toSave)); } catch {}
+    // Then tell React to update the UI
+    setInitiatives(updated);
   };
   const updateInit = (id, updates) => setInitiatives(p => p.map(x => x.id === id ? { ...x, ...updates } : x));
   const deleteCampaign = (id) => setCampaigns(p => p.filter(x => x.id !== id));
