@@ -739,6 +739,8 @@ input[type="date"].fi{color-scheme:dark;}
 
 @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 @keyframes slideIn{from{opacity:0;transform:translateX(9px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
 @keyframes pulse{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
 @keyframes revolveShift{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 .card:nth-child(1){animation-delay:0ms}.card:nth-child(2){animation-delay:55ms}.card:nth-child(3){animation-delay:110ms}.card:nth-child(4){animation-delay:165ms}.card:nth-child(5){animation-delay:220ms}.card:nth-child(6){animation-delay:275ms}
@@ -4381,7 +4383,70 @@ function CompliancePanel({ overview, setOverview, docs, setDocs, links, setLinks
   const [newCardTitle, setNewCardTitle] = useState("");
   const [newCardIcon, setNewCardIcon] = useState("📋");
   const [newCardColor, setNewCardColor] = useState("#c9a84c");
+  // Card detail panel + AI chat
+  const [openCardId, setOpenCardId] = useState(null);
+  const [cardChats, setCardChats] = useState({});
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatEndRef = useRef();
   const fileRef = useRef();
+
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [cardChats, openCardId]);
+
+  const sendComplianceChat = async () => {
+    if (!chatInput.trim() || chatLoading || !openCardId) return;
+    const openCard = (cards || []).find(c => c.id === openCardId);
+    if (!openCard) return;
+    const userMsg = { role: "user", content: chatInput.trim() };
+    const prevMsgs = cardChats[openCardId] || [];
+    const newMsgs = [...prevMsgs, userMsg];
+    setCardChats(p => ({ ...p, [openCardId]: [...newMsgs, { role: "assistant", content: "" }] }));
+    setChatInput("");
+    setChatLoading(true);
+    try {
+      const resp = await fetch("/api/claude", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          stream: true,
+          system: `You are a cannabis compliance specialist for CÚRADOR, a Missouri cannabis brand. The user is asking about ${openCard.title} compliance specifically. Give authoritative, actionable guidance based on Missouri cannabis regulations and best practices. Keep answers clear and practical for a marketing team.\n\nCurrent ${openCard.title} compliance checklist:\n${(openCard.points || []).map((p, i) => `${i + 1}. ${p}`).join("\n")}`,
+          messages: newMsgs,
+        }),
+      });
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value);
+        for (const line of chunk.split("\n")) {
+          if (line.startsWith("data: ")) {
+            try {
+              const json = JSON.parse(line.slice(6));
+              if (json.type === "content_block_delta" && json.delta?.text) {
+                fullText += json.delta.text;
+                setCardChats(p => {
+                  const msgs = [...(p[openCardId] || [])];
+                  msgs[msgs.length - 1] = { role: "assistant", content: fullText };
+                  return { ...p, [openCardId]: msgs };
+                });
+              }
+            } catch {}
+          }
+        }
+      }
+    } catch {
+      setCardChats(p => {
+        const msgs = [...(p[openCardId] || [])];
+        msgs[msgs.length - 1] = { role: "assistant", content: "Sorry, I couldn't respond right now. Please try again." };
+        return { ...p, [openCardId]: msgs };
+      });
+    }
+    setChatLoading(false);
+  };
 
   const updateCard = (id, patch) => setCards(p => p.map(c => c.id === id ? { ...c, ...patch } : c));
   const deleteCard = (id) => { if (confirm("Delete this compliance section?")) setCards(p => p.filter(c => c.id !== id)); };
@@ -4601,6 +4666,16 @@ function CompliancePanel({ overview, setOverview, docs, setDocs, links, setLinks
                     </button>
                   )}
                 </div>
+                {/* Card footer — open detail panel */}
+                {!isEditing && (
+                  <div onClick={() => { setOpenCardId(card.id); setChatInput(""); }}
+                    style={{ padding: "10px 16px", borderTop: "1px solid var(--border2)", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", transition: "background .13s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.03)"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)", letterSpacing: ".03em" }}>View Details</span>
+                    <span style={{ fontSize: 10, color: card.color, background: card.color + "1a", padding: "3px 9px", borderRadius: 20, fontWeight: 700, letterSpacing: ".04em" }}>🤖 Ask AI</span>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -4651,6 +4726,165 @@ function CompliancePanel({ overview, setOverview, docs, setDocs, links, setLinks
           </div>
         )}
       </div>
+
+      {/* ── Compliance Card Detail Panel ── */}
+      {openCardId && (() => {
+        const card = (cards || []).find(c => c.id === openCardId);
+        if (!card) return null;
+        const msgs = cardChats[openCardId] || [];
+        const isEditingDetail = editingCardId === card.id;
+        return (
+          <div className="overlay" onClick={() => setOpenCardId(null)} style={{ zIndex: 1100 }}>
+            <div onClick={e => e.stopPropagation()}
+              style={{ position: "fixed", top: 0, right: 0, bottom: 0, width: "min(900px, 95vw)", background: "var(--bg)", borderLeft: "1px solid var(--border)", display: "flex", flexDirection: "column", zIndex: 1101, animation: "slideInRight .22s ease" }}>
+
+              {/* Header */}
+              <div style={{ borderTop: `4px solid ${card.color}`, padding: "18px 24px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, background: "var(--surface)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ fontSize: 28 }}>{card.icon}</div>
+                  <div>
+                    <div style={{ fontFamily: "var(--df)", fontSize: 22, fontWeight: 300, color: "var(--text)", lineHeight: 1.1 }}>{card.title}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3, letterSpacing: ".06em", textTransform: "uppercase" }}>Compliance Checklist · AI Assistant</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  {!isEditingDetail
+                    ? <button onClick={() => setEditingCardId(card.id)}
+                        style={{ fontSize: 11, padding: "5px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--bf)" }}>✏ Edit</button>
+                    : <button onClick={() => setEditingCardId(null)}
+                        style={{ fontSize: 11, padding: "5px 12px", borderRadius: 7, border: "none", background: card.color, color: "#07070f", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 700 }}>Done</button>
+                  }
+                  <button onClick={() => setOpenCardId(null)}
+                    style={{ width: 32, height: 32, borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontSize: 18, display: "grid", placeItems: "center" }}>×</button>
+                </div>
+              </div>
+
+              {/* Body — split: left checklist, right AI chat */}
+              <div style={{ flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden" }}>
+
+                {/* LEFT — Checklist */}
+                <div style={{ overflowY: "auto", padding: "22px 24px", borderRight: "1px solid var(--border)" }}>
+                  <div style={{ fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase", color: card.color, fontWeight: 600, marginBottom: 14 }}>Compliance Requirements</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {card.points.map((pt, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                        <div style={{ width: 22, height: 22, borderRadius: 6, background: card.color + "22", border: `1px solid ${card.color}44`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, fontSize: 11, fontWeight: 700, color: card.color, marginTop: 1 }}>{i + 1}</div>
+                        {isEditingDetail ? (
+                          <div style={{ flex: 1, display: "flex", gap: 6 }}>
+                            <input value={pt} onChange={e => updatePoint(card.id, i, e.target.value)}
+                              style={{ flex: 1, padding: "6px 10px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text)", fontSize: 13, fontFamily: "var(--bf)" }} />
+                            <button onClick={() => removePoint(card.id, i)}
+                              style={{ width: 24, height: 24, borderRadius: 5, border: "1px solid rgba(224,123,106,.25)", background: "transparent", color: "rgba(224,123,106,.6)", cursor: "pointer", fontSize: 12, display: "grid", placeItems: "center", flexShrink: 0, marginTop: 3 }}>×</button>
+                          </div>
+                        ) : (
+                          <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.65, paddingTop: 2 }}>{pt}</div>
+                        )}
+                      </div>
+                    ))}
+                    {isEditingDetail && (
+                      <button onClick={() => addPoint(card.id)}
+                        style={{ marginTop: 6, padding: "8px 0", borderRadius: 7, border: `1px dashed ${card.color}44`, background: "transparent", color: card.color, cursor: "pointer", fontFamily: "var(--bf)", fontSize: 12, fontWeight: 600 }}>
+                        + Add Requirement
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Color picker in edit mode */}
+                  {isEditingDetail && (
+                    <div style={{ marginTop: 24, paddingTop: 16, borderTop: "1px solid var(--border2)" }}>
+                      <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>Accent Color</div>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                        {["#c9a84c","#8b7fc0","#4d9e8e","#5a9ed4","#e07b6a","#a0624a"].map(c => (
+                          <button key={c} onClick={() => updateCard(card.id, { color: c })}
+                            style={{ width: 22, height: 22, borderRadius: "50%", background: c, border: card.color === c ? "2px solid #fff" : "2px solid transparent", cursor: "pointer" }} />
+                        ))}
+                        <input type="color" value={card.color} onChange={e => updateCard(card.id, { color: e.target.value })}
+                          style={{ width: 26, height: 26, borderRadius: 6, border: "1px solid var(--border)", cursor: "pointer", padding: 0, background: "transparent" }} />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* RIGHT — AI Chat */}
+                <div style={{ display: "flex", flexDirection: "column", overflow: "hidden", background: "var(--surface)" }}>
+                  {/* Chat header */}
+                  <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border2)", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 8, background: card.color + "22", border: `1px solid ${card.color}44`, display: "grid", placeItems: "center", fontSize: 14 }}>🤖</div>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>AI Compliance Assistant</div>
+                      <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Ask anything about {card.title} compliance</div>
+                    </div>
+                    {msgs.length > 0 && (
+                      <button onClick={() => setCardChats(p => ({ ...p, [openCardId]: [] }))}
+                        style={{ marginLeft: "auto", fontSize: 10, padding: "3px 9px", borderRadius: 5, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", cursor: "pointer", fontFamily: "var(--bf)" }}>Clear</button>
+                    )}
+                  </div>
+
+                  {/* Messages */}
+                  <div style={{ flex: 1, overflowY: "auto", padding: "16px 18px", display: "flex", flexDirection: "column", gap: 12 }}>
+                    {msgs.length === 0 && (
+                      <div style={{ textAlign: "center", paddingTop: 32 }}>
+                        <div style={{ fontSize: 32, marginBottom: 10, opacity: .35 }}>🤖</div>
+                        <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 6 }}>Ask me anything about {card.title} compliance</div>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 14 }}>
+                          {[
+                            `What are the key ${card.title.toLowerCase()} requirements?`,
+                            `What are common violations to avoid?`,
+                            `How do we stay compliant in Missouri?`,
+                          ].map(q => (
+                            <button key={q} onClick={() => { setChatInput(q); }}
+                              style={{ fontSize: 11, padding: "6px 12px", borderRadius: 20, border: `1px solid ${card.color}44`, background: card.color + "0d", color: card.color, cursor: "pointer", fontFamily: "var(--bf)", transition: "all .13s" }}
+                              onMouseEnter={e => e.currentTarget.style.background = card.color + "22"}
+                              onMouseLeave={e => e.currentTarget.style.background = card.color + "0d"}>
+                              {q}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {msgs.map((msg, i) => (
+                      <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: msg.role === "user" ? "flex-end" : "flex-start" }}>
+                        <div style={{
+                          maxWidth: "88%", padding: "10px 13px", borderRadius: msg.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px",
+                          background: msg.role === "user" ? card.color : "var(--surface2)",
+                          color: msg.role === "user" ? "#07070f" : "var(--text)",
+                          fontSize: 13, lineHeight: 1.65,
+                          border: msg.role === "assistant" ? "1px solid var(--border)" : "none",
+                          whiteSpace: "pre-wrap",
+                        }}>
+                          {msg.content || (msg.role === "assistant" && chatLoading && i === msgs.length - 1 ? (
+                            <span style={{ display: "flex", gap: 4, alignItems: "center" }}>
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: card.color, animation: "pulse 1s infinite" }} />
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: card.color, animation: "pulse 1s .2s infinite" }} />
+                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: card.color, animation: "pulse 1s .4s infinite" }} />
+                            </span>
+                          ) : "")}
+                        </div>
+                      </div>
+                    ))}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Input */}
+                  <div style={{ padding: "12px 16px", borderTop: "1px solid var(--border2)", display: "flex", gap: 8, flexShrink: 0, background: "var(--bg)" }}>
+                    <input
+                      value={chatInput}
+                      onChange={e => setChatInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendComplianceChat()}
+                      placeholder={`Ask about ${card.title} compliance…`}
+                      style={{ flex: 1, padding: "9px 13px", borderRadius: 9, border: "1px solid var(--border)", background: "var(--surface2)", color: "var(--text)", fontSize: 13, fontFamily: "var(--bf)", outline: "none" }}
+                    />
+                    <button onClick={sendComplianceChat} disabled={!chatInput.trim() || chatLoading}
+                      style={{ width: 40, height: 40, borderRadius: 9, border: "none", background: chatInput.trim() && !chatLoading ? card.color : "rgba(255,255,255,.06)", color: chatInput.trim() && !chatLoading ? "#07070f" : "var(--text-muted)", cursor: chatInput.trim() && !chatLoading ? "pointer" : "not-allowed", fontSize: 16, display: "grid", placeItems: "center", flexShrink: 0, transition: "all .15s" }}>
+                      ↑
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Drop zone */}
       <div
