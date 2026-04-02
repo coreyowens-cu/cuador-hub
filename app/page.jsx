@@ -8,62 +8,198 @@ const AIAssistant = dynamic(() => import("../components/AIAssistant"), { ssr: fa
 
 const SITE_PASSWORD = "curador2026";
 
+// Matches colorForName in MarketingHub — same colors, same hash
+const USER_COLORS = [
+  {bg:"#e8c547",text:"#1a1400",label:"Amber"},
+  {bg:"#7ec8a4",text:"#0a1f14",label:"Sage"},
+  {bg:"#e07b6a",text:"#1f0b08",label:"Coral"},
+  {bg:"#89a8e0",text:"#080f20",label:"Slate"},
+  {bg:"#c47eb5",text:"#1a0b18",label:"Mauve"},
+  {bg:"#68c4c4",text:"#062020",label:"Teal"},
+  {bg:"#e09e5a",text:"#1f1008",label:"Ochre"},
+  {bg:"#a8c46a",text:"#111a04",label:"Fern"},
+];
+function colorForName(n) { let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.charCodeAt(i))%USER_COLORS.length; return USER_COLORS[h]; }
+function initials(n) { return n.trim().split(/\s+/).map(w=>w[0]).join("").toUpperCase().slice(0,2); }
+
+const GATE_ROLES = [
+  {id:"ceo",          title:"Founder / CEO"},
+  {id:"creative",     title:"Creative Director"},
+  {id:"content",      title:"Content Creator"},
+  {id:"coordinator",  title:"Marketing Coordinator"},
+  {id:"sales",        title:"Sales Lead"},
+  {id:"field",        title:"Field Team"},
+  {id:"agencies",     title:"Agency Partner"},
+  {id:"packaging",    title:"Packaging"},
+];
+
+const INPUT_STYLE = { width:"100%", padding:"11px 14px", borderRadius:9, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"#ede8df", fontSize:14, fontFamily:"inherit", outline:"none", boxSizing:"border-box" };
+const BTN_GOLD = { width:"100%", padding:"11px", borderRadius:9, border:"none", background:"linear-gradient(135deg,#c9a84c,#a07030)", color:"#07070f", fontFamily:"inherit", fontSize:13, fontWeight:700, letterSpacing:".06em", textTransform:"uppercase", cursor:"pointer" };
+
 function PasswordGate({ onUnlock }) {
-  const [val, setVal] = useState("");
-  const [error, setError] = useState(false);
-  const [shake, setShake] = useState(false);
-  const [step, setStep] = useState("password"); // "password" | "name"
-  const [selectedName, setSelectedName] = useState("");
+  const [val, setVal]           = useState("");
+  const [error, setError]       = useState(false);
+  const [shake, setShake]       = useState(false);
+  // steps: "password" | "select" | "create"
+  const [step, setStep]         = useState("password");
+  const [members, setMembers]   = useState([]);
+  const [picked, setPicked]     = useState("");
+  // create-new form
+  const [newName, setNewName]   = useState("");
+  const [newRole, setNewRole]   = useState("content");
 
   const attempt = () => {
     if (val.trim().toLowerCase() === SITE_PASSWORD) {
       sessionStorage.setItem("ch-auth", "1");
-      setStep("name");
+      try {
+        const raw = localStorage.getItem("shared_ns_ns-team");
+        const saved = raw ? JSON.parse(raw) : [];
+        setMembers(saved);
+        setStep(saved.length > 0 ? "select" : "create");
+      } catch {
+        setStep("create");
+      }
     } else {
-      setError(true);
-      setShake(true);
+      setError(true); setShake(true);
       setTimeout(() => setShake(false), 500);
       setTimeout(() => setError(false), 2000);
       setVal("");
     }
   };
 
-  const enterAs = () => {
-    if (!selectedName) return;
-    sessionStorage.setItem("ch-user", selectedName);
-    onUnlock(selectedName);
+  const selectAndEnter = () => {
+    if (!picked) return;
+    sessionStorage.setItem("ch-user", picked);
+    onUnlock(picked);
   };
 
+  const createAndEnter = () => {
+    const name = newName.trim();
+    if (!name) return;
+    const color = colorForName(name);
+    const member = { name, color, role: newRole, title: "", bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() };
+    // Save to shared team list immediately
+    try {
+      const raw = localStorage.getItem("shared_ns_ns-team");
+      const existing = raw ? JSON.parse(raw) : [];
+      const alreadyExists = existing.find(m => m.name.toLowerCase() === name.toLowerCase());
+      const updated = alreadyExists
+        ? existing.map(m => m.name.toLowerCase() === name.toLowerCase() ? { ...m, color, role: newRole } : m)
+        : [...existing, member];
+      localStorage.setItem("shared_ns_ns-team", JSON.stringify(updated));
+    } catch {}
+    sessionStorage.setItem("ch-user", name);
+    onUnlock(name);
+  };
+
+  const preview = newName.trim() ? colorForName(newName.trim()) : null;
+
   return (
-    <div style={{ position:"fixed",inset:0,background:"#07070f",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'DM Sans',sans-serif" }}>
-      <div style={{ marginBottom:40,textAlign:"center" }}>
-        <div style={{ fontSize:32,fontWeight:700,letterSpacing:".14em",color:"#ede8df",textTransform:"uppercase",marginBottom:6 }}>
+    <div style={{ position:"fixed", inset:0, background:"#07070f", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans',sans-serif" }}>
+      {/* Logo */}
+      <div style={{ marginBottom:36, textAlign:"center" }}>
+        <div style={{ fontSize:32, fontWeight:700, letterSpacing:".14em", color:"#ede8df", textTransform:"uppercase", marginBottom:6 }}>
           C<span style={{ color:"#3bb54a" }}>Ú</span>RADOR
         </div>
-        <div style={{ fontSize:11,letterSpacing:".22em",textTransform:"uppercase",color:"#8a87a8" }}>Marketing OS</div>
+        <div style={{ fontSize:11, letterSpacing:".22em", textTransform:"uppercase", color:"#8a87a8" }}>Marketing OS</div>
       </div>
-      <div style={{ background:"#0d0d1a",border:"1px solid rgba(255,255,255,.08)",borderRadius:16,padding:"32px 36px",width:340,boxShadow:"0 24px 64px rgba(0,0,0,.5)",animation:shake?"shake .4s ease":"none" }}>
-        {step === "password" ? (
+
+      <div style={{ background:"#0d0d1a", border:"1px solid rgba(255,255,255,.08)", borderRadius:16, padding:"32px 36px", width:360, boxShadow:"0 24px 64px rgba(0,0,0,.5)", animation:shake?"shake .4s ease":"none" }}>
+
+        {/* ── STEP 1: Password ── */}
+        {step === "password" && (
           <>
-            <div style={{ fontSize:14,color:"#ede8df",fontWeight:500,marginBottom:6 }}>Enter password to continue</div>
-            <div style={{ fontSize:12,color:"#8a87a8",marginBottom:20 }}>This site is private to the CÚRADOR team.</div>
+            <div style={{ fontSize:14, color:"#ede8df", fontWeight:600, marginBottom:4 }}>Enter password to continue</div>
+            <div style={{ fontSize:12, color:"#8a87a8", marginBottom:20 }}>This site is private to the CÚRADOR team.</div>
             <input type="password" value={val} autoFocus placeholder="Password"
               onChange={e => { setVal(e.target.value); setError(false); }}
               onKeyDown={e => e.key === "Enter" && attempt()}
-              style={{ width:"100%",padding:"11px 14px",borderRadius:9,marginBottom:10,background:"rgba(255,255,255,.04)",border:`1px solid ${error?"#e07b6a":"rgba(255,255,255,.1)"}`,color:"#ede8df",fontSize:14,fontFamily:"inherit",outline:"none",boxSizing:"border-box" }} />
-            {error && <div style={{ fontSize:11,color:"#e07b6a",marginBottom:8 }}>Incorrect password — try again.</div>}
-            <button onClick={attempt} style={{ width:"100%",padding:"11px",borderRadius:9,border:"none",background:"linear-gradient(135deg,#c9a84c,#a07030)",color:"#07070f",fontFamily:"inherit",fontSize:13,fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",cursor:"pointer" }}>Enter →</button>
+              style={{ ...INPUT_STYLE, marginBottom:10, border:`1px solid ${error?"#e07b6a":"rgba(255,255,255,.1)"}` }} />
+            {error && <div style={{ fontSize:11, color:"#e07b6a", marginBottom:8 }}>Incorrect password — try again.</div>}
+            <button onClick={attempt} style={BTN_GOLD}>Enter →</button>
           </>
-        ) : (
+        )}
+
+        {/* ── STEP 2: Select existing member ── */}
+        {step === "select" && (
           <>
-            <div style={{ fontSize:14,color:"#ede8df",fontWeight:500,marginBottom:6 }}>What's your name?</div>
-            <div style={{ fontSize:12,color:"#8a87a8",marginBottom:20 }}>Enter your name to continue.</div>
-            <input type="text" value={selectedName} onChange={e => setSelectedName(e.target.value)} autoFocus
-              placeholder="Your name"
-              onKeyDown={e => e.key === "Enter" && enterAs()}
-              style={{ width:"100%",padding:"11px 14px",borderRadius:9,marginBottom:14,background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.1)",color:"#ede8df",fontSize:14,fontFamily:"inherit",outline:"none",boxSizing:"border-box" }} />
-            <button onClick={enterAs} disabled={!selectedName.trim()}
-              style={{ width:"100%",padding:"11px",borderRadius:9,border:"none",background:selectedName.trim()?"linear-gradient(135deg,#c9a84c,#a07030)":"rgba(255,255,255,.06)",color:selectedName.trim()?"#07070f":"#8a87a8",fontFamily:"inherit",fontSize:13,fontWeight:700,letterSpacing:".06em",textTransform:"uppercase",cursor:selectedName.trim()?"pointer":"not-allowed",transition:"all .15s" }}>Continue →</button>
+            <div style={{ fontSize:14, color:"#ede8df", fontWeight:600, marginBottom:4 }}>Who are you?</div>
+            <div style={{ fontSize:12, color:"#8a87a8", marginBottom:18 }}>Select your profile or create a new one.</div>
+
+            <div style={{ display:"flex", flexDirection:"column", gap:8, marginBottom:16 }}>
+              {members.map(m => {
+                const c = m.color || colorForName(m.name);
+                const active = picked === m.name;
+                return (
+                  <button key={m.name} onClick={() => setPicked(m.name)}
+                    style={{ display:"flex", alignItems:"center", gap:12, padding:"10px 14px", borderRadius:10, border:`1px solid ${active?"#c9a84c":"rgba(255,255,255,.08)"}`, background:active?"rgba(201,168,76,.08)":"rgba(255,255,255,.03)", cursor:"pointer", transition:"all .13s", textAlign:"left" }}>
+                    <div style={{ width:36, height:36, borderRadius:"50%", background:c.bg, color:c.text, display:"grid", placeItems:"center", fontSize:13, fontWeight:700, flexShrink:0 }}>{initials(m.name)}</div>
+                    <div>
+                      <div style={{ fontSize:13, color:"#ede8df", fontWeight:600 }}>{m.name}</div>
+                      <div style={{ fontSize:11, color:"#8a87a8" }}>{GATE_ROLES.find(r=>r.id===m.role)?.title || m.role || "Team Member"}</div>
+                    </div>
+                    {active && <div style={{ marginLeft:"auto", color:"#c9a84c", fontSize:16 }}>✓</div>}
+                  </button>
+                );
+              })}
+            </div>
+
+            <button onClick={selectAndEnter} disabled={!picked}
+              style={{ ...BTN_GOLD, marginBottom:10, opacity:picked?1:.45, cursor:picked?"pointer":"not-allowed" }}>
+              Enter as {picked || "…"} →
+            </button>
+
+            <button onClick={() => { setStep("create"); setNewName(""); setNewRole("content"); }}
+              style={{ width:"100%", padding:"9px", borderRadius:9, border:"1px solid rgba(255,255,255,.1)", background:"transparent", color:"#8a87a8", fontFamily:"inherit", fontSize:12, cursor:"pointer", letterSpacing:".04em" }}>
+              + Create new profile
+            </button>
+          </>
+        )}
+
+        {/* ── STEP 3: Create new team member ── */}
+        {step === "create" && (
+          <>
+            <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:20 }}>
+              {members.length > 0 && (
+                <button onClick={() => setStep("select")} style={{ background:"none", border:"none", color:"#8a87a8", cursor:"pointer", fontSize:18, padding:0, lineHeight:1 }}>←</button>
+              )}
+              <div>
+                <div style={{ fontSize:14, color:"#ede8df", fontWeight:600 }}>Create your profile</div>
+                <div style={{ fontSize:12, color:"#8a87a8" }}>You'll appear on the team board.</div>
+              </div>
+            </div>
+
+            {/* Avatar preview */}
+            <div style={{ textAlign:"center", marginBottom:16 }}>
+              <div style={{ width:52, height:52, borderRadius:"50%", background:preview?preview.bg:"rgba(255,255,255,.08)", color:preview?preview.text:"#8a87a8", display:"grid", placeItems:"center", fontSize:preview?18:22, fontWeight:700, margin:"0 auto", border:"2px solid rgba(255,255,255,.06)", transition:"all .2s" }}>
+                {preview ? initials(newName.trim()) : "👤"}
+              </div>
+            </div>
+
+            <div style={{ marginBottom:14 }}>
+              <div style={{ fontSize:11, color:"#8a87a8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:6 }}>Your Name</div>
+              <input autoFocus value={newName} onChange={e => setNewName(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && createAndEnter()}
+                placeholder="e.g. Jordan Lee"
+                style={{ ...INPUT_STYLE }} />
+            </div>
+
+            <div style={{ marginBottom:18 }}>
+              <div style={{ fontSize:11, color:"#8a87a8", letterSpacing:".06em", textTransform:"uppercase", marginBottom:8 }}>Your Role</div>
+              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:6 }}>
+                {GATE_ROLES.map(r => (
+                  <button key={r.id} onClick={() => setNewRole(r.id)}
+                    style={{ padding:"8px 10px", borderRadius:8, border:`1px solid ${newRole===r.id?"#c9a84c":"rgba(255,255,255,.08)"}`, background:newRole===r.id?"rgba(201,168,76,.1)":"rgba(255,255,255,.02)", color:newRole===r.id?"#c9a84c":"#8a87a8", fontFamily:"inherit", fontSize:11, cursor:"pointer", textAlign:"left", fontWeight:newRole===r.id?600:400, transition:"all .12s" }}>
+                    {r.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <button onClick={createAndEnter} disabled={!newName.trim()}
+              style={{ ...BTN_GOLD, opacity:newName.trim()?1:.45, cursor:newName.trim()?"pointer":"not-allowed" }}>
+              Join Team →
+            </button>
           </>
         )}
       </div>
@@ -111,7 +247,6 @@ export default function Page() {
   useEffect(() => {
     if (!unlocked) return;
     syncState();
-    // Sync state for AI but DON'T remount MarketingHub
     window.addEventListener("hub-updated", syncState);
     return () => window.removeEventListener("hub-updated", syncState);
   }, [unlocked, syncState]);
