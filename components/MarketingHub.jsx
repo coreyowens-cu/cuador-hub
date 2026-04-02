@@ -1330,11 +1330,9 @@ export default function MarketingHub({ initialUserName }) {
                   <>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, borderBottom: "1px solid var(--border2)", paddingBottom: 16 }}>
                       <div>
-                        <div style={{ fontSize: 9, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 5, fontWeight: 600 }}>Marketing Team</div>
-                        <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)", lineHeight: 1 }}>Org Chart</div>
-                      </div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>
-                        Changes save automatically
+                        <div style={{ fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>Marketing Team</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)", lineHeight: 1, marginBottom: 6 }}>Org Chart</div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6, maxWidth: 480 }}>Your team structure at a glance. Drag and connect roles to visualize reporting lines. Changes save automatically and are visible to everyone.</div>
                       </div>
                     </div>
                     <OrgChartView teamMembers={teamMembers} currentUser={currentUser} orgRoles={orgRoles} onSelect={setSelectedMember} onRolesChange={canEdit ? setOrgRoles : null} canEdit={canEdit} />
@@ -1344,10 +1342,11 @@ export default function MarketingHub({ initialUserName }) {
                   <>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20, borderBottom: "1px solid var(--border2)", paddingBottom: 16 }}>
                       <div>
-                        <div style={{ fontSize: 9, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 5, fontWeight: 600 }}>Marketing Team</div>
-                        <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)", lineHeight: 1 }}>
+                        <div style={{ fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>Marketing Team</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)", lineHeight: 1, marginBottom: 6 }}>
                           Team Members <span style={{ fontSize: 14, color: "var(--text-muted)", fontFamily: "var(--bf)", fontWeight: 400 }}>· {teamMembers.length}</span>
                         </div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6, maxWidth: 480 }}>Everyone on the marketing team in one place. Select who you are to personalize your view and unlock editing. Each member has their own role and profile.</div>
                       </div>
                       {!currentUser && <button className="btn" onClick={() => setShowWhoModal(true)}>+ Join Team</button>}
                     </div>
@@ -1391,7 +1390,7 @@ export default function MarketingHub({ initialUserName }) {
                       The work behind<br /><em style={{ color: "var(--gold)" }}>the strategy.</em>
                     </div>
                     <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 520 }}>
-                      Each initiative is tied to a channel and can have a full concept attached — drop an HTML file to bring the vision to life.
+                      Each initiative maps to a marketing channel and drives toward a specific goal. Attach creative concepts, upload a brief, set dates, and push directly to a campaign when ready to activate. Use the <strong style={{ color: "var(--text)", fontWeight: 600 }}>→ Campaign</strong> button on any card to build a campaign and timeline entry from that initiative.
                     </div>
                   </div>
                   {canEdit && <button className="btn btn-gold" style={{ marginTop: 8, flexShrink: 0 }} onClick={() => setShowAddInit(true)}>+ Add Initiative</button>}
@@ -1540,9 +1539,9 @@ export default function MarketingHub({ initialUserName }) {
                   <>
                     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
                       <div>
-                        <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
-                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Campaigns</div>
-                        <div style={{ fontSize: 13, color: "var(--text-dim)" }}>AI-generated briefs and campaign ideas. Click any to view the full brief.</div>
+                        <div style={{ fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Campaigns</div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 520 }}>Create and manage campaign briefs. Generate a brief with AI from a concept or idea, upload an existing document, or write one from scratch. Every campaign links to the Timeline automatically.</div>
                       </div>
                       {canAddContent && <button className="btn btn-gold" style={{ marginTop: 8 }} onClick={() => setShowCampaignModal(true)}>+ New Brief</button>}
                     </div>
@@ -1553,9 +1552,9 @@ export default function MarketingHub({ initialUserName }) {
                   <>
                     <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
                       <div>
-                        <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
-                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 4 }}>Timeline</div>
-                        <div style={{ fontSize: 13, color: "var(--text-dim)" }}>Visual campaign schedule with costs and sub-elements. Drag bars to adjust dates.</div>
+                        <div style={{ fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>Campaign Pipeline</div>
+                        <div style={{ fontFamily: "var(--df)", fontSize: 36, fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Timeline</div>
+                        <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.7, maxWidth: 520 }}>Visual Gantt schedule of every active campaign. Each row tracks budget, dates, and custom sub-elements. Drag bars to reschedule. Campaigns created from Initiative cards appear here automatically.</div>
                       </div>
                       <button
                         title="Open timeline in its own window"
@@ -6232,8 +6231,10 @@ function ConceptsPanel({ concepts, activeConceptId, setActiveConceptId, onAdd, o
 
       {/* LEFT — list */}
       <div style={{ width: 230, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--surface)" }}>
-        <div style={{ padding: "14px 14px 10px", borderBottom: "1px solid var(--border2)" }}>
-          <div style={{ fontSize: 9, letterSpacing: ".16em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600, marginBottom: 10 }}>Concepts · {concepts.length}</div>
+        <div style={{ padding: "14px 14px 12px", borderBottom: "1px solid var(--border2)" }}>
+          <div style={{ fontSize: 10, letterSpacing: ".22em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600, marginBottom: 4 }}>Creative Studio</div>
+          <div style={{ fontFamily: "var(--df)", fontSize: 20, fontWeight: 300, color: "var(--text)", lineHeight: 1.1, marginBottom: 6 }}>Concepts</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 10 }}>Store briefs, HTML prototypes, and creative decks. Push to an initiative or campaign when ready.</div>
           {canEdit && <button className="btn btn-gold" style={{ width: "100%", justifyContent: "center", fontSize: 11 }} onClick={() => setShowAddModal(true)}>
             + New Concept
           </button>}
