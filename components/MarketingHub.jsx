@@ -1499,7 +1499,7 @@ export default function MarketingHub({ initialUserName }) {
                                   </div>
                                 )}
                               </div>
-                              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 5, alignItems: "flex-end", paddingLeft: 12 }}>
                                 <button onClick={() => setInitToCampaign(init)}
                                   style={{ fontSize: 11, padding: "4px 12px", borderRadius: 6, border: "1px solid rgba(201,168,76,.35)", background: "rgba(201,168,76,.09)", color: "var(--gold)", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600, letterSpacing: ".04em", transition: "all .13s" }}
                                   onMouseEnter={e => { e.currentTarget.style.background = "rgba(201,168,76,.2)"; }}
