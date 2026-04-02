@@ -23,7 +23,8 @@ function colorForName(n) { let h=0; for(let i=0;i<n.length;i++) h=(h*31+n.charCo
 function initials(n) { return n.trim().split(/\s+/).map(w=>w[0]).join("").toUpperCase().slice(0,2); }
 
 const GATE_ROLES = [
-  {id:"ceo",          title:"Founder / CEO"},
+  {id:"ceo",          title:"CEO"},
+  {id:"founder",      title:"Founder"},
   {id:"creative",     title:"Creative Director"},
   {id:"content",      title:"Content Creator"},
   {id:"coordinator",  title:"Marketing Coordinator"},
@@ -31,6 +32,7 @@ const GATE_ROLES = [
   {id:"field",        title:"Field Team"},
   {id:"agencies",     title:"Agency Partner"},
   {id:"packaging",    title:"Packaging"},
+  {id:"other",        title:"Other…"},
 ];
 
 const INPUT_STYLE = { width:"100%", padding:"11px 14px", borderRadius:9, background:"rgba(255,255,255,.04)", border:"1px solid rgba(255,255,255,.1)", color:"#ede8df", fontSize:14, fontFamily:"inherit", outline:"none", boxSizing:"border-box" };
@@ -45,8 +47,9 @@ function PasswordGate({ onUnlock }) {
   const [members, setMembers]   = useState([]);
   const [picked, setPicked]     = useState("");
   // create-new form
-  const [newName, setNewName]   = useState("");
-  const [newRole, setNewRole]   = useState("content");
+  const [newName, setNewName]     = useState("");
+  const [newRole, setNewRole]     = useState("content");
+  const [otherTitle, setOtherTitle] = useState("");
 
   const attempt = () => {
     if (val.trim().toLowerCase() === SITE_PASSWORD) {
@@ -76,8 +79,11 @@ function PasswordGate({ onUnlock }) {
   const createAndEnter = () => {
     const name = newName.trim();
     if (!name) return;
+    if (newRole === "other" && !otherTitle.trim()) return;
     const color = colorForName(name);
-    const member = { name, color, role: newRole, title: "", bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() };
+    const resolvedRole = newRole === "other" ? "other" : newRole;
+    const resolvedTitle = newRole === "other" ? otherTitle.trim() : "";
+    const member = { name, color, role: resolvedRole, title: resolvedTitle, bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() };
     // Save to shared team list immediately
     try {
       const raw = localStorage.getItem("shared_ns_ns-team");
@@ -194,10 +200,21 @@ function PasswordGate({ onUnlock }) {
                   </button>
                 ))}
               </div>
+              {newRole === "other" && (
+                <input
+                  autoFocus
+                  value={otherTitle}
+                  onChange={e => setOtherTitle(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && createAndEnter()}
+                  placeholder="Enter your title…"
+                  style={{ ...INPUT_STYLE, marginTop:8, fontSize:13 }}
+                />
+              )}
             </div>
 
-            <button onClick={createAndEnter} disabled={!newName.trim()}
-              style={{ ...BTN_GOLD, opacity:newName.trim()?1:.45, cursor:newName.trim()?"pointer":"not-allowed" }}>
+            <button onClick={createAndEnter}
+              disabled={!newName.trim() || (newRole === "other" && !otherTitle.trim())}
+              style={{ ...BTN_GOLD, opacity:(newName.trim() && (newRole !== "other" || otherTitle.trim()))?1:.45, cursor:(newName.trim() && (newRole !== "other" || otherTitle.trim()))?"pointer":"not-allowed" }}>
               Join Team →
             </button>
           </>
