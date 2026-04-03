@@ -773,7 +773,7 @@ export default function MarketingHub({ initialUserName }) {
   const [showAddInit, setShowAddInit] = useState(false);
   const [showEditStrategy, setShowEditStrategy] = useState(false);
   const [ganttHtml, setGanttHtml] = useState(() => { try { return localStorage.getItem("shared_ns_ns-gantt") || null; } catch { return null; } });
-  const [complianceCards, setComplianceCards] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-compliance-cards"); if (v) { const p = JSON.parse(v); return p.length > 0 ? p : DEFAULT_COMPLIANCE_CARDS; } return DEFAULT_COMPLIANCE_CARDS; } catch { return DEFAULT_COMPLIANCE_CARDS; } });
+  const [complianceCards, setComplianceCards] = useState(() => { try { const PRESET_IDS = new Set(["cc-packaging","cc-manufacturing","cc-events","cc-consumption","cc-instore","cc-social"]); const v = localStorage.getItem("shared_ns_ns-compliance-cards"); if (v) { const p = JSON.parse(v); return p.filter(c => !PRESET_IDS.has(c.id)); } return []; } catch { return []; } });
   const [complianceDocs, setComplianceDocs] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-compliance-docs"); return v ? JSON.parse(v) : []; } catch { return []; } });
   const [complianceLinks, setComplianceLinks] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-compliance-links"); return v ? JSON.parse(v) : []; } catch { return []; } });
   const [complianceOverview, setComplianceOverview] = useState(() => { try { return localStorage.getItem("shared_ns_ns-compliance-overview") || ""; } catch { return ""; } });
@@ -4610,68 +4610,7 @@ const MO_CANNABIS_COMPLIANCE_KB = `
 // ════════════════════════════════════════════════════════════════════════════
 // COMPLIANCE PANEL
 // ════════════════════════════════════════════════════════════════════════════
-const DEFAULT_COMPLIANCE_CARDS = [
-  {
-    id: "cc-packaging", title: "Packaging", icon: "📦", color: "#c9a84c",
-    points: [
-      "All packaging must include state-mandated health & safety warnings",
-      "Child-resistant AND tamper-evident closures required on every product",
-      "Net weight, total THC/CBD in mg, and THC per serving clearly labeled",
-      "Batch/lot number and licensed testing lab name required on every label",
-      "No imagery, branding, or design elements that could appeal to minors",
-      "Dispensary license number required on the final retail label",
-      "Active and inactive ingredients, dosage, and instructions for use required",
-      "Edibles: possession limit is based on total THC in mg — not package weight",
-      "No unverified health, medical, or therapeutic claims on any packaging",
-      "Products must pass licensed testing facility certification before sale",
-    ]
-  },
-  {
-    id: "cc-manufacturing", title: "Manufacturing", icon: "🏭", color: "#e07b6a",
-    points: [
-      "All manufactured products must be tested by a licensed testing facility before sale or marketing",
-      "No health, therapeutic, or medical benefit claims on any manufactured product",
-      "Manufacturing facilities cannot sell directly to consumers — sales only through licensed dispensaries",
-      "Microbusiness wholesale facilities may cultivate up to 250 flowering plants and manufacture, but sell ONLY to microbusiness dispensaries",
-      "Every manufactured batch must have a batch/lot number tracked in the statewide seed-to-sale system",
-      "Branding and naming on manufactured products must not appeal to minors (no cartoon characters, candy-like designs)",
-      "Co-branding or white-label arrangements require all products to still meet DCR labeling standards",
-      "Home solvent-based or combustible-gas extraction is prohibited — licensed facilities only",
-      "Patients may create home extractions without combustible gases for personal use only",
-      "All ingredients (active and inactive) must be disclosed on label — no hidden additives",
-    ]
-  },
-  {
-    id: "cc-events", title: "Events", icon: "🎪", color: "#8b7fc0",
-    points: [
-      "Valid event permit required before any public activation or brand presence",
-      "Age verification (21+) mandatory at ALL entry points — government-issued photo ID",
-      "No cannabis consumption at non-licensed event venues — public consumption is prohibited by default",
-      "No free product giveaways or sampling at unlicensed events",
-      "Brand ambassador compliance training required before any event",
-      "All event signage must include the standard state health warning",
-      "No events on school grounds, school buses, or correctional facilities",
-      "No events where tobacco smoking is prohibited",
-      "Local governments may designate public consumption areas — verify locally before activating",
-      "No events targeting or accessible to persons under 21",
-    ]
-  },
-  {
-    id: "cc-consumption", title: "Consumption", icon: "🚫", color: "#4d9e8e",
-    points: [
-      "Public consumption is prohibited unless a local government has designated the area",
-      "Consumption while driving or operating any motor vehicle is prohibited under Article XIV",
-      "No consumption on school grounds, school buses, or correctional facilities",
-      "No smoking marijuana in any location where tobacco smoking is prohibited",
-      "Local governments may choose to allow consumption in certain designated areas — check locally",
-      "Patients/consumers on probation or parole should consult their attorney or P.O. before use",
-      "Patients may extract at home — but NO combustible gases or dangerous solvents allowed",
-      "Consumer personal cultivators must keep marijuana above their 3oz limit in an enclosed, locked facility at their residence",
-      "No depictions of consumption in public spaces or non-licensed locations in any marketing material",
-      "Dispensaries must make educational materials available about risks and side effects of use",
-    ]
-  },
-];
+const DEFAULT_COMPLIANCE_CARDS = [];
 
 const COMPLIANCE_CATEGORIES = ["State License","Federal Regulation","Certificate","SOP / Policy","Insurance","Contract","Lab Result","Other"];
 
