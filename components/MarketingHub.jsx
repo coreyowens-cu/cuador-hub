@@ -2945,10 +2945,9 @@ function OrgChartView({ teamMembers, currentUser, orgRoles: initialRoles, onSele
           {roles.map(role => {
             const p = pos[role.id] || { x: 100, y: 100 };
             const mems = members(role.id);
-            const isMe = currentUser?.role === role.id;
             const filled = mems.length > 0;
             const isDragging = dragNode?.id === role.id;
-            const borderColor = isMe ? "var(--gold)" : filled ? "rgba(201,168,76,.45)" : "var(--border)";
+            const borderColor = filled ? "rgba(201,168,76,.45)" : "var(--border)";
 
             return (
               <div key={role.id} style={{
@@ -2960,7 +2959,7 @@ function OrgChartView({ teamMembers, currentUser, orgRoles: initialRoles, onSele
                 <div style={{
                     width: "100%", height: "100%", borderRadius: 10, padding: "7px 10px",
                     border: `1.5px solid ${borderColor}`,
-                    background: isMe ? "rgba(201,168,76,.07)" : filled ? "rgba(255,255,255,.03)" : "var(--surface2)",
+                    background: filled ? "rgba(255,255,255,.03)" : "var(--surface2)",
                     boxShadow: isDragging ? "0 10px 36px rgba(0,0,0,.45)" : "0 2px 8px rgba(0,0,0,.2)",
                     display: "flex", flexDirection: "column", justifyContent: "center",
                     cursor: editMode ? (isDragging ? "grabbing" : "grab") : filled ? "pointer" : "default",
@@ -2989,7 +2988,6 @@ function OrgChartView({ teamMembers, currentUser, orgRoles: initialRoles, onSele
                   ) : (
                     <>
                       <div style={{ fontSize: 11, fontWeight: 600, color: filled ? "var(--text)" : "var(--text-muted)", textAlign: "center", lineHeight: 1.3 }}>{role.title}</div>
-                      {filled && <div style={{ display: "flex", justifyContent: "center", marginTop: 4, gap: 3 }}>{mems.map(m => (<div key={m.name} style={{ width: 7, height: 7, borderRadius: "50%", background: m.color?.bg || "var(--gold)", border: "1px solid var(--surface)" }} />))}</div>}
                     </>
                   )}
                 </div>
