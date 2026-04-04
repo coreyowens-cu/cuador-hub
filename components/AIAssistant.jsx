@@ -156,7 +156,7 @@ export default function AIAssistant({ hubState, onAction, isOpen, onToggle }) {
       <button
         onClick={onToggle}
         style={{
-          position: "fixed", bottom: 28, right: 28, zIndex: 200,
+          position: "fixed", bottom: 28, left: 28, zIndex: 200,
           width: 52, height: 52, borderRadius: "50%",
           background: isOpen ? "#3e3c52" : "linear-gradient(135deg,#c9a84c,#a07030)",
           border: "none", cursor: "pointer", boxShadow: "0 4px 20px rgba(0,0,0,.4)",
@@ -170,23 +170,24 @@ export default function AIAssistant({ hubState, onAction, isOpen, onToggle }) {
 
       {/* ── Panel ── */}
       <div style={{
-        position: "fixed", bottom: 0, right: 0, zIndex: 190,
+        position: "fixed", bottom: 0, left: 0, zIndex: 190,
         width: 400, height: "100vh",
-        background: "#0d0d1a",
-        borderLeft: "1px solid rgba(255,255,255,.07)",
+        background: "rgba(10,11,20,.9)",
+        backdropFilter: "blur(24px) saturate(1.3)",
+        borderRight: "1px solid rgba(255,255,255,.06)",
         display: "flex", flexDirection: "column",
-        transform: isOpen ? "translateX(0)" : "translateX(100%)",
+        transform: isOpen ? "translateX(0)" : "translateX(-100%)",
         transition: "transform .3s cubic-bezier(.4,0,.2,1)",
-        boxShadow: "-8px 0 40px rgba(0,0,0,.4)",
-        fontFamily: "'DM Sans',system-ui,sans-serif",
+        boxShadow: "8px 0 40px rgba(0,0,0,.4)",
+        fontFamily: "'Inter',system-ui,sans-serif",
       }}>
 
         {/* Header */}
         <div style={{
           padding: "14px 18px 12px",
-          borderBottom: "1px solid rgba(255,255,255,.07)",
-          background: "rgba(7,7,15,.8)",
-          backdropFilter: "blur(18px)",
+          borderBottom: "1px solid rgba(255,255,255,.06)",
+          background: "rgba(4,5,11,.6)",
+          backdropFilter: "blur(24px) saturate(1.4)",
           flexShrink: 0,
         }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -248,7 +249,7 @@ export default function AIAssistant({ hubState, onAction, isOpen, onToggle }) {
                     border: "1px solid rgba(255,255,255,.07)",
                     background: "rgba(255,255,255,.02)", color: "#8a86a0",
                     cursor: "pointer", fontSize: 11, lineHeight: 1.4,
-                    transition: "all .13s", fontFamily: "'DM Sans',sans-serif",
+                    transition: "all .13s", fontFamily: "'Inter',sans-serif",
                   }}
                     onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(201,168,76,.25)"; e.currentTarget.style.color = "#ede8df"; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.07)"; e.currentTarget.style.color = "#8a86a0"; }}
@@ -319,7 +320,7 @@ export default function AIAssistant({ hubState, onAction, isOpen, onToggle }) {
                 background: "rgba(255,255,255,.05)",
                 border: "1px solid rgba(255,255,255,.09)",
                 borderRadius: 10, color: "#ede8df",
-                fontFamily: "'DM Sans',sans-serif", fontSize: 13, lineHeight: 1.5,
+                fontFamily: "'Inter',sans-serif", fontSize: 13, lineHeight: 1.5,
                 resize: "none", outline: "none", transition: "border-color .15s",
               }}
               onFocus={e => e.target.style.borderColor = "rgba(201,168,76,.4)"}
