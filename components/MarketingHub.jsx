@@ -845,6 +845,7 @@ export default function MarketingHub({ initialUserName }) {
   const [replyText, setReplyText] = useState("");
   const [editingNoteId, setEditingNoteId] = useState(null);
   const [editNoteText, setEditNoteText] = useState("");
+  const [confirmClearId, setConfirmClearId] = useState(null);
   const [markerMode, setMarkerMode] = useState(false);
   const [pendingTag, setPendingTag] = useState(null);
   const [currentUser, setCurrentUser] = useState(() => { try { const v = localStorage.getItem("ns_ns-user"); return v ? JSON.parse(v) : null; } catch { return null; } });
@@ -2239,14 +2240,19 @@ export default function MarketingHub({ initialUserName }) {
                         Reply {(note.replies || []).length > 0 && <span style={{ color: "var(--gold)", fontWeight: 600 }}>({note.replies.length})</span>}
                       </button>
                     )}
-                    {isAuthor && (
+                    {currentUser && (
                       <button onClick={() => { setEditingNoteId(note.id); setEditNoteText(note.text); }} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "var(--gold)"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
                         Edit
                       </button>
                     )}
-                    {isAuthor && (
-                      <button onClick={() => clearNote(note.id)} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "#e07b6a"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
+                    {currentUser && confirmClearId !== note.id && (
+                      <button onClick={() => setConfirmClearId(note.id)} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "#e07b6a"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
                         Clear
+                      </button>
+                    )}
+                    {confirmClearId === note.id && (
+                      <button onClick={() => { clearNote(note.id); setConfirmClearId(null); }} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "#e07b6a", cursor: "pointer", letterSpacing: ".04em", fontWeight: 600 }}>
+                        Confirm Clear
                       </button>
                     )}
                   </div>
