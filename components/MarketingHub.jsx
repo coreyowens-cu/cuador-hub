@@ -2400,7 +2400,7 @@ export default function MarketingHub({ initialUserName }) {
       {conceptModal && (() => { const init = initiatives.find(i => i.id === conceptModal); if (!init) return null; const html = (conceptCacheVersion >= 0 && conceptHtmlCache.current[init.id]) || init.htmlConcept; return html ? <ConceptViewerModal init={{...init, htmlConcept: html}} onClose={() => setConceptModal(null)} onUpload={() => { setConceptModal(null); setConceptUpload(init.id); }} onNote={(ctx) => { setConceptModal(null); addNoteWithContext(ctx); }} /> : null; })()}
       {conceptUpload && <ConceptHtmlUploadModal initName={initiatives.find(i => i.id === conceptUpload)?.title || ""} onClose={() => setConceptUpload(null)} onSave={(html, name) => saveConceptHtml(conceptUpload, html, name)} />}
       {showAddInit && <AddInitiativeModal pillars={strategy.pillars} brands={brands} preselectedBrand={null}
-        existing={typeof showAddInit === "string" ? initiatives.find(i => i.id === showAddInit) : null}
+        existing={typeof showAddInit === "string" ? (() => { const init = initiatives.find(i => i.id === showAddInit); return init ? { ...init, htmlConcept: conceptHtmlCache.current[init.id] || init.htmlConcept || null } : null; })() : null}
         onClose={() => setShowAddInit(false)}
         onSave={init => {
           if (typeof showAddInit === "string") {
@@ -5712,9 +5712,9 @@ function AddInitiativeModal({ pillars, brands, preselectedBrand, existing, onClo
   const briefRef = useRef();
   const ACCEPTED = [".pdf",".doc",".docx",".txt",".md",".png",".jpg",".jpeg",".webp"];
 
-  // Concept HTML state
-  const [conceptHtml, setConceptHtml] = useState(null);
-  const [conceptName, setConceptName] = useState(null);
+  // Concept HTML state — preserve existing when editing
+  const [conceptHtml, setConceptHtml] = useState(existing?.htmlConcept || null);
+  const [conceptName, setConceptName] = useState(existing?.htmlConceptName || null);
   const [conceptDragging, setConceptDragging] = useState(false);
   const conceptRef = useRef();
 
@@ -5770,15 +5770,18 @@ function AddInitiativeModal({ pillars, brands, preselectedBrand, existing, onClo
   };
 
   const handleSave = () => {
-    onSave({
+    const data = {
       ...f,
-      id: `init-${Date.now()}`,
-      fileUrl: null, fileName: briefFile?.name || null,
-      _brief: briefParsed ? { objective: briefParsed.objective, keyMessages: briefParsed.keyMessages || [], keyPoints: briefParsed.keyPoints || [] } : null,
-      _briefSource: briefFile?.name || null,
+      id: isEditing ? existing.id : `init-${Date.now()}`,
+      fileUrl: existing?.fileUrl || null,
+      fileName: briefFile?.name || existing?.fileName || null,
+      _brief: briefParsed ? { objective: briefParsed.objective, keyMessages: briefParsed.keyMessages || [], keyPoints: briefParsed.keyPoints || [] } : (existing?._brief || null),
+      _briefSource: briefFile?.name || existing?._briefSource || null,
       htmlConcept: conceptHtml || null,
-      htmlConceptName: conceptName || null,
-    });
+      htmlConceptName: conceptName || existing?.htmlConceptName || null,
+      _conceptUrl: existing?._conceptUrl || null,
+    };
+    onSave(data);
   };
 
   return (
