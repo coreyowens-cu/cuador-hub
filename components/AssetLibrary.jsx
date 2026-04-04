@@ -16,7 +16,13 @@ const DAM_ASSET_CATS = [
   { id:"event",      label:"Events",               icon:"🎪" },
   { id:"event-photo", label:"Photography",         icon:"📷", sub:true, parent:"event" },
   { id:"event-video", label:"Videos",              icon:"🎬", sub:true, parent:"event" },
-  { id:"print",      label:"Print / Posters",      icon:"⬜" },
+  { id:"print",          label:"Print Assets",           icon:"⬜" },
+  { id:"print-retail",   label:"Retail Assets",          icon:"🏪", sub:true, parent:"print" },
+  { id:"print-display",  label:"Displays",               icon:"🖼", sub:true, parent:"print" },
+  { id:"print-sticker",  label:"Stickers",               icon:"🏷", sub:true, parent:"print" },
+  { id:"print-info",     label:"Product Info Cards",      icon:"📇", sub:true, parent:"print" },
+  { id:"print-poster",   label:"Posters",                icon:"📰", sub:true, parent:"print" },
+  { id:"print-video",    label:"Video",                  icon:"🎬", sub:true, parent:"print" },
   { id:"education",  label:"Budtender Education",  icon:"◎" },
   { id:"menu",       label:"Menu Assets",          icon:"≡" },
   { id:"web",        label:"Website / Digital",    icon:"⬡" },
@@ -79,7 +85,7 @@ const DAM_ALL_TYPES = [
   {id:"photo-product",label:"Product Photography"},{id:"photo-lifestyle",label:"Lifestyle"},
   {id:"event",label:"Events"},{id:"event-photo",label:"Event Photography"},{id:"event-video",label:"Event Videos"},
   {id:"social-img",label:"Social Media Images"},{id:"social-vid",label:"Social / Video"},
-  {id:"print",label:"Print / Posters"},{id:"education",label:"Budtender Education"},
+  {id:"print",label:"Retail Assets"},{id:"print-display",label:"Displays"},{id:"print-sticker",label:"Stickers"},{id:"print-info",label:"Product Info Cards"},{id:"print-poster",label:"Posters"},{id:"print-video",label:"Video"},{id:"education",label:"Budtender Education"},
   {id:"menu",label:"Menu Assets"},{id:"web",label:"Website / Digital"},
   {id:"brief",label:"Briefs & Docs"},{id:"concept",label:"HTML Concepts"},
   {id:"merch-tee",label:"Tee"},{id:"merch-hoodie",label:"Hoodie"},
@@ -90,7 +96,8 @@ const DAM_ALL_TYPES = [
 ];
 
 const DAM_TYPE_EMOJI = {
-  logo:"🎨",photo:"🖼️","photo-product":"📷","photo-lifestyle":"🌿","social-img":"📸","social-vid":"🎬",event:"🎪","event-photo":"📷","event-video":"🎬",print:"🖨️",
+  logo:"🎨",photo:"🖼️","photo-product":"📷","photo-lifestyle":"🌿","social-img":"📸","social-vid":"🎬",event:"🎪","event-photo":"📷","event-video":"🎬",print:"🏪",
+  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",
   education:"📚",menu:"🍃",web:"🌐",brief:"📄",concept:"✦",merch:"🛍",
   "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
   "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",
@@ -141,6 +148,7 @@ export default function AssetLibrary({
   const isAdmin = currentUser?.name === "Sean";
   const [photoOpen, setPhotoOpen] = useState(false);
   const [eventOpen, setEventOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
 
   const damBrands = useCallback(() => {
     if (!hubBrands) return DAM_BRANDS_DEFAULT;
@@ -187,6 +195,7 @@ export default function AssetLibrary({
     if (id==="packaging") return base.filter(a=>ALL_PKG_IDS.has(a.type)).length;
     if (id==="photo") return base.filter(a=>a.type==="photo"||a.type.startsWith("photo-")).length;
     if (id==="event") return base.filter(a=>a.type==="event"||a.type.startsWith("event-")).length;
+    if (id==="print") return base.filter(a=>a.type==="print"||a.type.startsWith("print-")).length;
     return base.filter(a=>a.type===id).length;
   };
 
@@ -248,8 +257,17 @@ export default function AssetLibrary({
               <span className={`dam-chev ${eventOpen?"open":""}`}>▶</span>
             </button>
           );
+          if (t.id === "print") return (
+            <button key={t.id} className={`dam-sb-btn ${activeType==="print"||activeType.startsWith("print-")?"on":""}`}
+              onClick={() => { setPrintOpen(o=>!o); setActiveType("print"); }}>
+              <span className="dam-sb-ico">{t.icon}</span>
+              {t.label}
+              <span className="dam-sb-cnt">{countFor("print")||""}</span>
+              <span className={`dam-chev ${printOpen?"open":""}`}>▶</span>
+            </button>
+          );
           if (t.sub) {
-            const isOpen = t.parent === "event" ? eventOpen : photoOpen;
+            const isOpen = t.parent === "event" ? eventOpen : t.parent === "print" ? printOpen : photoOpen;
             return isOpen ? (
               <button key={t.id} className={`dam-sb-btn sub ${activeType===t.id?"on":""}`}
                 onClick={() => setActiveType(t.id)}>

@@ -55,7 +55,11 @@ function mimeToType(mimeType, name) {
     if (n.includes("logo") || n.includes("brand")) return "logo";
     if (n.includes("social") || n.includes("post") || n.includes("story")) return "social-img";
     if (n.includes("menu")) return "menu";
-    if (n.includes("poster") || n.includes("print") || n.includes("flyer")) return "print";
+    if (n.includes("display")) return "print-display";
+    if (n.includes("sticker")) return "print-sticker";
+    if (n.includes("info card") || n.includes("product card") || n.includes("info-card")) return "print-info";
+    if (n.includes("poster") || n.includes("flyer")) return "print-poster";
+    if (n.includes("print") || n.includes("retail")) return "print";
     if (n.includes("banner") || n.includes("web")) return "web";
     if (n.includes("budtender") || n.includes("edu")) return "education";
     return "photo";
@@ -122,7 +126,12 @@ const ASSET_CATS = [
   { id: "photo",      label: "Photography",         icon: "⬚" },
   { id: "social-img", label: "Social Media Images", icon: "▣" },
   { id: "social-vid", label: "Social / Video",      icon: "▶" },
-  { id: "print",      label: "Print / Posters",     icon: "⬜" },
+  { id: "print",          label: "Retail Assets",       icon: "🏪" },
+  { id: "print-display",  label: "Displays",            icon: "🖼", sub: true, parent: "print" },
+  { id: "print-sticker",  label: "Stickers",            icon: "🏷", sub: true, parent: "print" },
+  { id: "print-info",     label: "Product Info Cards",   icon: "📇", sub: true, parent: "print" },
+  { id: "print-poster",   label: "Posters",             icon: "📰", sub: true, parent: "print" },
+  { id: "print-video",    label: "Video",               icon: "🎬", sub: true, parent: "print" },
   { id: "education",  label: "Budtender Education", icon: "◎" },
   { id: "menu",       label: "Menu Assets",         icon: "≡" },
   { id: "web",        label: "Website / Digital",   icon: "⬡" },
@@ -143,7 +152,7 @@ const MERCH_CATS = [
 const ALL_TYPES = [
   { id:"logo",label:"Logos & Brand ID"},{id:"photo",label:"Photography"},
   {id:"social-img",label:"Social Media Images"},{id:"social-vid",label:"Social / Video"},
-  {id:"print",label:"Print / Posters"},{id:"education",label:"Budtender Education"},
+  {id:"print",label:"Retail Assets"},{id:"print-display",label:"Displays"},{id:"print-sticker",label:"Stickers"},{id:"print-info",label:"Product Info Cards"},{id:"print-poster",label:"Posters"},{id:"print-video",label:"Video"},{id:"education",label:"Budtender Education"},
   {id:"menu",label:"Menu Assets"},{id:"web",label:"Website / Digital"},
   {id:"brief",label:"Briefs & Docs"},{id:"concept",label:"HTML Concepts"},
   {id:"merch-tee",label:"Tee"},{id:"merch-hoodie",label:"Hoodie"},
@@ -152,7 +161,8 @@ const ALL_TYPES = [
 ];
 
 const TYPE_EMOJI = {
-  logo:"🎨",photo:"🖼️","social-img":"📸","social-vid":"🎬",print:"🖨️",
+  logo:"🎨",photo:"🖼️","social-img":"📸","social-vid":"🎬",print:"🏪",
+  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",
   education:"📚",menu:"🍃",web:"🌐",brief:"📄",concept:"✦",merch:"🛍",
   "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
   "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",
