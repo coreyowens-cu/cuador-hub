@@ -2,12 +2,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import AssetLibrary from "./AssetLibrary";
 
-// localStorage shim — makes window.storage work outside Claude artifact sandbox
+// Storage layer — shared keys go to Supabase via /api/store, local keys use localStorage
 if (typeof window !== 'undefined' && !window.storage) {
   window.storage = {
-    get: async (key) => { try { const v = localStorage.getItem(key); return v ? {value:v} : null; } catch { return null; } },
-    set: async (key, value) => { try { localStorage.setItem(key, value); return {value}; } catch { return null; } },
-    delete: async (key) => { try { localStorage.removeItem(key); } catch {} return null; },
+    get: async (key, shared) => {
+      if (shared) {
+        try {
+          const r = await fetch(`/api/store?key=${encodeURIComponent(key)}`);
+          const d = await r.json();
+          if (d.value !== null && d.value !== undefined) return { value: d.value };
+        } catch {}
+      }
+      try { const v = localStorage.getItem('shared_ns_' + key); return v ? { value: v } : null; } catch { return null; }
+    },
+    set: async (key, value, shared) => {
+      if (shared) {
+        try {
+          await fetch('/api/store', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key, value }) });
+        } catch {}
+      }
+      try { localStorage.setItem('shared_ns_' + key, value); return { value }; } catch { return null; }
+    },
+    delete: async (key) => { try { localStorage.removeItem('shared_ns_' + key); } catch {} return null; },
     list: async () => ({ keys: [] })
   };
 }
