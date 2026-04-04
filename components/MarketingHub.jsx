@@ -923,7 +923,7 @@ export default function MarketingHub({ initialUserName }) {
           setCampaignTimeline(mergedCtl);
         }
         if (u) { setCurrentUser(JSON.parse(u.value)); }
-        else setShowWhoModal(true);
+        else if (!initialUserName) setShowWhoModal(true);
         const [,,,,,,,,, cn] = await Promise.all([
           window.storage.get("ns-strategy", true),
           window.storage.get("ns-initiatives", true),
@@ -937,7 +937,7 @@ export default function MarketingHub({ initialUserName }) {
           window.storage.get("ns-concepts", true),
         ]);
         if (cn) setConcepts(JSON.parse(cn.value));
-      } catch (_) { setShowWhoModal(true); }
+      } catch (_) { if (!initialUserName) setShowWhoModal(true); }
       setReady(true);
     })();
   }, []);

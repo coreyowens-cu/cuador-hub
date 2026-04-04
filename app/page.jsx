@@ -73,6 +73,12 @@ function PasswordGate({ onUnlock }) {
   const selectAndEnter = () => {
     if (!picked) return;
     sessionStorage.setItem("ch-user", picked);
+    // Also save to localStorage so MarketingHub skips its own identity modal
+    const member = members.find(m => m.name === picked);
+    if (member) {
+      const color = member.color || colorForName(picked);
+      try { localStorage.setItem("ns_ns-user", JSON.stringify({ name: picked, color, role: member.role || "content" })); } catch {}
+    }
     onUnlock(picked);
   };
 
@@ -95,6 +101,8 @@ function PasswordGate({ onUnlock }) {
       localStorage.setItem("shared_ns_ns-team", JSON.stringify(updated));
     } catch {}
     sessionStorage.setItem("ch-user", name);
+    // Also save to localStorage so MarketingHub skips its own identity modal
+    try { localStorage.setItem("ns_ns-user", JSON.stringify({ name, color, role: resolvedRole })); } catch {}
     onUnlock(name);
   };
 
