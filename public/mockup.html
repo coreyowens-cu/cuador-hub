@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CÚRADOR OS — Glassmorphism Concept</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#05060e;
+  --glass:rgba(255,255,255,.03);
+  --glass2:rgba(255,255,255,.05);
+  --glass3:rgba(255,255,255,.08);
+  --border:rgba(255,255,255,.06);
+  --border-hover:rgba(255,255,255,.12);
+  --text:#f0ece4;
+  --text-dim:#a8a4be;
+  --text-muted:#6b6880;
+  --gold:#d4b155;
+  --gold-glow:rgba(212,177,85,.15);
+  --green:#3bb54a;
+  --radius:16px;
+  --radius-sm:10px;
+  --radius-xs:6px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Inter',system-ui,sans-serif;overflow:hidden}
+
+/* Ambient background */
+.ambient{position:fixed;inset:0;pointer-events:none;z-index:0}
+.ambient .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.35}
+.ambient .orb1{width:600px;height:600px;background:rgba(212,177,85,.08);top:-10%;left:-5%}
+.ambient .orb2{width:500px;height:500px;background:rgba(88,80,150,.06);bottom:-10%;right:-5%}
+.ambient .orb3{width:300px;height:300px;background:rgba(59,181,74,.04);top:40%;left:50%}
+
+.page{position:relative;z-index:1;display:flex;flex-direction:column;height:100vh}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;background:rgba(5,6,14,.6);backdrop-filter:blur(24px) saturate(1.5);border-bottom:1px solid var(--border);position:relative;z-index:10}
+.hdr-left{display:flex;align-items:center;gap:14px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.logo .u{color:var(--green)}
+.logo-sub{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-muted);margin-top:1px}
+.hdr-right{display:flex;align-items:center;gap:10px}
+.hdr-btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--glass);color:var(--text-dim);font-size:11px;font-weight:500;cursor:pointer;backdrop-filter:blur(8px);letter-spacing:.05em;transition:all .2s}
+.hdr-btn:hover{border-color:var(--border-hover);color:var(--text);background:var(--glass2)}
+.hdr-btn.gold{border-color:rgba(212,177,85,.25);color:var(--gold);background:var(--gold-glow)}
+.hdr-btn.gold:hover{border-color:rgba(212,177,85,.4);background:rgba(212,177,85,.2)}
+.avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#7c8ae0,#5b6abf);display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.1)}
+
+/* Layout */
+.layout{display:flex;flex:1;overflow:hidden}
+
+/* Sidebar */
+.sidebar{width:260px;padding:20px 14px;display:flex;flex-direction:column;gap:4px;background:rgba(5,6,14,.4);backdrop-filter:blur(16px);border-right:1px solid var(--border);overflow-y:auto}
+.sb-section{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-muted);padding:16px 12px 8px;font-weight:600}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;transition:all .15s;color:var(--text-dim);font-size:13px;font-weight:400;border:1px solid transparent}
+.sb-item:hover{background:var(--glass2);border-color:var(--border);color:var(--text)}
+.sb-item.active{background:var(--gold-glow);border-color:rgba(212,177,85,.2);color:var(--gold);font-weight:500}
+.sb-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sb-icon{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:9px;padding:2px 7px;border-radius:100px;background:rgba(212,177,85,.12);color:var(--gold);font-weight:600}
+
+/* Main content */
+.main{flex:1;overflow-y:auto;padding:0}
+
+/* Hero section */
+.hero{position:relative;padding:56px 48px 48px;border-bottom:1px solid var(--border);overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(212,177,85,.04) 0%,transparent 40%,rgba(88,80,150,.03) 100%);pointer-events:none}
+.hero-bar{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),rgba(212,177,85,.2))}
+.hero-eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;font-weight:500}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:300;line-height:1.1;margin-bottom:16px;letter-spacing:.02em}
+.hero-desc{font-size:14px;line-height:1.8;color:var(--text-dim);max-width:520px}
+
+/* Glass cards */
+.cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:32px 48px}
+.glass-card{background:var(--glass);backdrop-filter:blur(20px) saturate(1.3);border:1px solid var(--border);border-radius:var(--radius);padding:24px;transition:all .25s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;overflow:hidden}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:.6;transition:opacity .2s}
+.glass-card:hover{transform:translateY(-4px);border-color:var(--border-hover);box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 0 1px rgba(255,255,255,.05);background:var(--glass2)}
+.card-icon{font-size:20px;margin-bottom:14px}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:400;margin-bottom:8px;line-height:1.2}
+.card-desc{font-size:12px;line-height:1.7;color:var(--text-dim)}
+.card-meta{display:flex;align-items:center;gap:8px;margin-top:16px}
+.card-tag{font-size:9px;padding:3px 10px;border-radius:100px;background:var(--glass3);color:var(--text-dim);font-weight:500;letter-spacing:.04em;border:1px solid var(--border)}
+.card-tag.gold{background:var(--gold-glow);color:var(--gold);border-color:rgba(212,177,85,.15)}
+
+/* Brand cards */
+.brands-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:16px 48px 32px}
+.brand-card{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;transition:all .2s;cursor:pointer}
+.brand-card:hover{border-color:var(--border-hover);background:var(--glass2)}
+.brand-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:4px}
+.brand-tag{font-size:11px;color:var(--text-muted);font-style:italic}
+
+/* Section header */
+.section-hdr{display:flex;align-items:center;justify-content:space-between;padding:24px 48px 8px}
+.section-title{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-muted);font-weight:600}
+
+/* Notes panel */
+.notes{width:320px;background:rgba(5,6,14,.5);backdrop-filter:blur(24px) saturate(1.4);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:20px 16px}
+.notes-title{font-family:'Cormorant Garamond',serif;font-size:18px;margin-bottom:16px}
+.note-card{background:var(--glass);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;margin-bottom:10px}
+.note-author{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.note-avatar{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;font-size:9px;font-weight:700}
+.note-name{font-size:12px;font-weight:500}
+.note-time{font-size:10px;color:var(--text-muted);margin-left:auto}
+.note-text{font-size:12px;line-height:1.6;color:var(--text-dim)}
+.note-context{margin-top:8px}
+.note-reply{font-size:10px;color:var(--text-muted);margin-top:8px;cursor:pointer}
+.note-reply:hover{color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="ambient">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+</div>
+
+<div class="page">
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-left">
+      <div>
+        <div class="logo">C<span class="u">U</span>RADOR</div>
+        <div class="logo-sub">Marketing OS</div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <button class="hdr-btn gold">&#9998; Notes</button>
+      <button class="hdr-btn">Sign Out</button>
+      <div class="avatar">BG</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sb-section">Company</div>
+      <div class="sb-item active">
+        <span class="sb-icon">&#9670;</span> Marketing Vision
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">&#128640;</span> Initiatives
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">&#127942;</span> Campaigns
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">&#128161;</span> Concepts
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">&#128197;</span> Timeline
+      </div>
+      <div class="sb-item">
+        <span class="sb-icon">&#128101;</span> Team
+      </div>
+
+      <div class="sb-section">Brands</div>
+      <div class="sb-item">
+        <span class="sb-dot" style="background:#e05a5a"></span> Headchange
+        <span class="sb-badge">6</span>
+      </div>
+      <div class="sb-item">
+        <span class="sb-dot" style="background:#5ab8e0"></span> SafeBet
+      </div>
+      <div class="sb-item">
+        <span class="sb-dot" style="background:#e0c45a"></span> Bubbles
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="hero">
+        <div class="hero-bar"></div>
+        <div class="hero-eyebrow">Marketing & Creative Division &middot; Missouri Market &middot; 2026-2027</div>
+        <div class="hero-title">C<span style="color:var(--green)">U</span>RADOR</div>
+        <div style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--text-dim);margin-bottom:20px;letter-spacing:.08em;text-transform:uppercase">House of Brands</div>
+        <div class="hero-desc">Brand Repositioning & Go-To-Market Strategy — a scalable blueprint for Missouri and every market that follows.</div>
+      </div>
+
+      <div class="section-hdr">
+        <div class="section-title">Brand Family</div>
+      </div>
+      <div class="brands-row">
+        <div class="brand-card" style="border-top:2px solid #e05a5a">
+          <div class="brand-name" style="color:#e05a5a">Head Change</div>
+          <div class="brand-tag">Change Your Head. Change Yo...</div>
+        </div>
+        <div class="brand-card" style="border-top:2px solid #5ab8e0">
+          <div class="brand-name" style="color:#5ab8e0">Safe Bet</div>
+          <div class="brand-tag">It's a Safe Bet.</div>
+        </div>
+        <div class="brand-card" style="border-top:2px solid #e0c45a">
+          <div class="brand-name" style="color:#e0c45a">Bubbles</div>
+          <div class="brand-tag">Hi, Bubbs!</div>
+        </div>
+      </div>
+
+      <div class="section-hdr">
+        <div class="section-title">Active Initiatives</div>
+      </div>
+      <div class="cards-grid">
+        <div class="glass-card" style="--accent:#e05a5a">
+          <div class="card-icon">&#128214;</div>
+          <div class="card-title">How to Hash Guide</div>
+          <div class="card-desc">Branded 'How to Hash' educational booklet placed at point-of-sale in dispensaries.</div>
+          <div class="card-meta">
+            <span class="card-tag gold">In-Store</span>
+            <span class="card-tag">Headchange</span>
+          </div>
+        </div>
+        <div class="glass-card" style="--accent:#7c8ae0">
+          <div class="card-icon">&#127912;</div>
+          <div class="card-title">Brand Photography</div>
+          <div class="card-desc">Updated product and lifestyle photography for all three brands.</div>
+          <div class="card-meta">
+            <span class="card-tag gold">Creative</span>
+            <span class="card-tag">All Brands</span>
+          </div>
+        </div>
+        <div class="glass-card" style="--accent:#4d9e8e">
+          <div class="card-icon">&#128241;</div>
+          <div class="card-title">Social Media Strategy</div>
+          <div class="card-desc">Cross-platform content calendar and engagement strategy for Q2-Q3.</div>
+          <div class="card-meta">
+            <span class="card-tag gold">Digital</span>
+            <span class="card-tag">Ongoing</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- NOTES PANEL -->
+    <aside class="notes">
+      <div class="notes-title">Notes</div>
+      <div class="note-card">
+        <div class="note-author">
+          <div class="note-avatar" style="background:linear-gradient(135deg,#7c8ae0,#5b6abf);color:#fff">BG</div>
+          <span class="note-name">Bobby G</span>
+          <span class="note-time">2m ago</span>
+        </div>
+        <div class="note-context">
+          <span class="card-tag gold" style="font-size:9px">Initiative: How to Hash Guide</span>
+        </div>
+        <div class="note-text" style="margin-top:8px">Need to add 3 more pages to this guide</div>
+        <div class="note-reply">Reply</div>
+      </div>
+      <div class="note-card">
+        <div class="note-author">
+          <div class="note-avatar" style="background:linear-gradient(135deg,#a8c46a,#7da340);color:#111">SB</div>
+          <span class="note-name">Sean B</span>
+          <span class="note-time">15m ago</span>
+        </div>
+        <div class="note-text">Updated brand deck with new photography</div>
+        <div class="note-reply">Reply</div>
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>
