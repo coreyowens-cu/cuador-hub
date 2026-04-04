@@ -848,7 +848,7 @@ export default function MarketingHub({ initialUserName }) {
   const [markerMode, setMarkerMode] = useState(false);
   const [pendingTag, setPendingTag] = useState(null);
   const [currentUser, setCurrentUser] = useState(() => { try { const v = localStorage.getItem("ns_ns-user"); return v ? JSON.parse(v) : null; } catch { return null; } });
-  const isAdmin = currentUser?.name?.toLowerCase() === "sean";
+  const isAdmin = currentUser?.name?.toLowerCase() === "sean" || currentUser?.name?.toLowerCase() === "bobby g";
   const canEdit = isAdmin;
   const canAddContent = true; // everyone can add campaigns, concepts, notes, download
   const [showWhoModal, setShowWhoModal] = useState(() => {
