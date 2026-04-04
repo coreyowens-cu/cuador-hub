@@ -1249,7 +1249,7 @@ export default function MarketingHub({ initialUserName }) {
     <>
       <style>{css}</style>
       {showWhoModal && <WhoModal whoName={whoName} setWhoName={setWhoName} whoRole={whoRole} setWhoRole={setWhoRole} onSave={saveUser} orgRoles={orgRoles} />}
-      {selectedMember && <TeamMemberModal member={selectedMember} currentUser={currentUser} onClose={() => setSelectedMember(null)} onUpdate={updateMemberProfile} />}
+      {selectedMember && <TeamMemberModal member={selectedMember} currentUser={currentUser} onClose={() => setSelectedMember(null)} onUpdate={updateMemberProfile} onDelete={(name) => { setTeamMembers(p => p.filter(m => m.name !== name)); setSelectedMember(null); }} />}
       {showCampaignModal && <CampaignModal currentUser={currentUser} pillars={strategy.pillars} onClose={() => setShowCampaignModal(false)} onSave={(c) => {
         setCampaigns(p => [c, ...p]);
         const today = new Date().toISOString().slice(0, 10);
@@ -3766,7 +3766,7 @@ function CampaignsPanel({ campaigns, onNew, onSelect, onDelete, fullWidth }) {
 // ════════════════════════════════════════════════════════════════════════════
 // TEAM MEMBER MODAL
 // ════════════════════════════════════════════════════════════════════════════
-function TeamMemberModal({ member, currentUser, onClose, onUpdate }) {
+function TeamMemberModal({ member, currentUser, onClose, onUpdate, onDelete }) {
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(member.title || "");
   const [bio, setBio] = useState(member.bio || "");
@@ -3776,6 +3776,9 @@ function TeamMemberModal({ member, currentUser, onClose, onUpdate }) {
   const [strengthsText, setStrengthsText] = useState((member.strengths || []).join("\n"));
   const [keyPointsText, setKeyPointsText] = useState((member.keyPoints || []).join("\n"));
   const isMe = currentUser?.name?.toLowerCase() === member.name?.toLowerCase();
+  const isAdmin = currentUser?.name?.toLowerCase() === "sean" || currentUser?.name?.toLowerCase() === "bobby g";
+  const canEditProfile = isMe || isAdmin;
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const roleLabel = ORG_ROLES.find(r => r.id === member.role)?.title || member.role || "Team Member";
   const displayTitle = member.title || roleLabel;
 
@@ -3807,10 +3810,26 @@ function TeamMemberModal({ member, currentUser, onClose, onUpdate }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            {isMe && (
+            {canEditProfile && !confirmDelete && (
               <button className="edit-toggle" onClick={() => setEditing(e => !e)}>
                 {editing ? "Cancel" : "Edit Profile"}
               </button>
+            )}
+            {isAdmin && !isMe && !editing && !confirmDelete && (
+              <button onClick={() => setConfirmDelete(true)} style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid rgba(224,123,106,.3)", background: "transparent", color: "#e07b6a", fontSize: 11, cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 500 }}>
+                Delete
+              </button>
+            )}
+            {confirmDelete && (
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <span style={{ fontSize: 11, color: "#e07b6a" }}>Remove {member.name}?</span>
+                <button onClick={() => { onDelete(member.name); onClose(); }} style={{ padding: "5px 12px", borderRadius: 7, border: "none", background: "#e07b6a", color: "#fff", fontSize: 11, cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600 }}>
+                  Confirm
+                </button>
+                <button onClick={() => setConfirmDelete(false)} style={{ padding: "5px 12px", borderRadius: 7, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 11, cursor: "pointer", fontFamily: "var(--bf)" }}>
+                  Cancel
+                </button>
+              </div>
             )}
             <button className="mclose" onClick={onClose}>×</button>
           </div>
