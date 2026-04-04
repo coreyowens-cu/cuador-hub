@@ -1139,6 +1139,8 @@ export default function MarketingHub({ initialUserName }) {
       setNotes(p => [{ id: `n-${Date.now()}`, author: currentUser.name, color: currentUser.color, text: noteText.trim(), detail: "", ts: new Date().toISOString() }, ...p]);
     }
     setNoteText("");
+    // Re-enable marker mode for the next note
+    setMarkerMode(true);
   };
 
   // Marker mode: native capture-phase click handler on <main>
@@ -2311,11 +2313,10 @@ export default function MarketingHub({ initialUserName }) {
               )}
               {markerMode && !pendingTag && (
                 <div className="pending-tag" style={{ background: "rgba(255,255,255,.04)", borderColor: "rgba(255,255,255,.1)" }}>
-                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>📌 Click on the element you want to note</span>
-                  <button className="pending-tag-clear" onClick={() => setMarkerMode(false)} style={{ color: "var(--text-dim)" }}>Skip</button>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)" }}>📌 Click on an element to pin what this note is about</span>
                 </div>
               )}
-              <textarea className="note-ta" placeholder={pendingTag ? `Note about ${pendingTag.label}…` : "Add a note for the team…"} value={noteText} onChange={e => setNoteText(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) postNote(); }} onFocus={() => { if (markerMode && !pendingTag) setMarkerMode(false); }} />
+              <textarea className="note-ta" placeholder={pendingTag ? `Note about ${pendingTag.label}…` : "Add a note for the team…"} value={noteText} onChange={e => setNoteText(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) postNote(); }} onFocus={() => { if (!pendingTag) setMarkerMode(true); }} />
               <div className="note-sr">
                 <div className="note-hint">{pendingTag ? `Tagged: ${pendingTag.label}` : "⌘↵ to post"}</div>
                 <button className="note-submit" disabled={!noteText.trim()} onClick={postNote}>Post</button>
