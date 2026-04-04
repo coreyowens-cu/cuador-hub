@@ -58,7 +58,7 @@ const DEFAULT_BRANDS = {
     tone:"Confident, craft-forward, with a street-level personality. Direct and honest — 'Premium Hash. No BS.' Speaks to enthusiasts without being inaccessible. Can be playful (Flavorful AF) while staying technically credible.",
     typography:"DM Serif Display / DM Sans",
     secondary:"#F5E6C8",
-    products:"Live Rosin Concentrate — award-winning, hand-washed, terpiest dab experience · Live Sugar Concentrate — THCa diamonds in terp sauce · Live Badder Concentrate — hand-whipped, terp-rich cake batter consistency · Live Sauce Carts — liquid diamonds & sauce in a cart",
+    products:"Live Rosin Concentrate — award-winning, hand-washed, terpiest dab experience · Live Sugar Concentrate — THCa diamonds in terp sauce · Live Badder Concentrate — hand-whipped, terp-rich cake batter consistency · Live Sauce Carts — liquid diamonds & sauce in a cart · Live Rosin Cart — full-spectrum rosin in a cart · Live Resin AIO — live resin all-in-one · Live Rosin AIO — live rosin all-in-one · Mini Hash Holes — mini hash hole pre-rolls",
     positioning:"Flagship / Connoisseur — Missouri's recognized hash leader. Sets quality ceiling for the CÚRADOR portfolio. Never uses CRC.",
     website:"headchange710.com"
   },
@@ -74,7 +74,7 @@ const DEFAULT_BRANDS = {
     tone:"Straightforward, warm, unpretentious. Let the product do the talking. No hype, no jargon. 'Rolled tight, packed right, priced fair' — honest and direct. Approachable authority.",
     typography:"DM Serif Display / DM Sans",
     secondary:"#FFF4E0",
-    products:"Rolls — hand-crafted pre-rolls, top-shelf flower, perfectly ground, smooth even burn · Carts — high-purity distillate, real strain-specific cannabis terpenes (CDTs), consistent potency · FECO — full-spectrum cannabis oil, full-spectrum cannabinoids & terpenes, flexible format, rigorously tested per Missouri DCR",
+    products:"Rolls — hand-crafted pre-rolls, top-shelf flower, perfectly ground, smooth even burn · Carts — high-purity distillate, real strain-specific cannabis terpenes (CDTs), consistent potency · FECO — full-spectrum cannabis oil, full-spectrum cannabinoids & terpenes, flexible format, rigorously tested per Missouri DCR · Infused Pre Rolls — premium infused pre-rolls · Bubble Hash Infused — bubble hash infused pre-rolls · Live Resin Infused — live resin infused pre-rolls · Diamond Infused — diamond infused pre-rolls · Safe Bet 1g All in One — 1g all-in-one device · FECO Plus CBN — full-spectrum FECO with added CBN",
     positioning:"Mid-tier / everyday — cannabis-authentic CDT experience at fair price. The dependable daily-driver between Bubbles (flavor/convenience) and Headchange (premium connoisseur).",
     website:"safebetofficial.com",
     instagram:"@SafeBet_Rolls"
