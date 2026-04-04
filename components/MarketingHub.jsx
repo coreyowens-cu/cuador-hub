@@ -587,6 +587,13 @@ input[type="date"].fi{color-scheme:dark;}
 .note-del{opacity:0;font-size:10px;color:var(--text-muted);cursor:pointer;background:none;border:none;font-family:var(--bf);transition:opacity .15s,color .15s;padding:0;margin-left:4px;}
 .note-item:hover .note-del{opacity:1;}
 .note-del:hover{color:#e07b6a;}
+.note-expand-btn{opacity:0;font-size:10px;color:var(--text-muted);cursor:pointer;background:none;border:none;font-family:var(--bf);transition:opacity .15s,color .15s;padding:0 0 0 4px;}
+.note-item:hover .note-expand-btn{opacity:1;}
+.note-expand-btn:hover{color:var(--gold);}
+.note-detail{margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.03);border-left:2px solid rgba(201,168,76,.25);border-radius:0 6px 6px 0;font-size:12px;color:var(--text-dim);line-height:1.65;white-space:pre-wrap;}
+.note-detail-ta{width:100%;background:var(--surface2);border:1px solid rgba(201,168,76,.3);border-radius:7px;padding:7px 10px;color:var(--text);font-family:var(--bf);font-size:12px;line-height:1.6;resize:none;outline:none;min-height:72px;margin-top:6px;}
+.note-detail-ta:focus{border-color:rgba(201,168,76,.55);}
+.note-detail-actions{display:flex;gap:6px;margin-top:6px;justify-content:flex-end;}
 .notes-empty{padding:32px 14px;text-align:center;color:var(--text-muted);font-size:12px;line-height:1.75;}
 .notes-ia{padding:11px 14px;border-top:1px solid var(--border);flex-shrink:0;}
 .note-ta{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:8px 11px;color:var(--text);font-family:var(--bf);font-size:13px;line-height:1.6;resize:none;outline:none;transition:border-color .15s;min-height:64px;}
@@ -786,6 +793,8 @@ export default function MarketingHub({ initialUserName }) {
   const [notesOpen, setNotesOpen] = useState(false);
   const [notes, setNotes] = useState(() => { try { const v = localStorage.getItem("shared_ns_ns-notes"); return v ? JSON.parse(v) : []; } catch { return []; } });
   const [noteText, setNoteText] = useState("");
+  const [expandedNoteId, setExpandedNoteId] = useState(null);
+  const [noteDetailDraft, setNoteDetailDraft] = useState("");
   const [currentUser, setCurrentUser] = useState(() => { try { const v = localStorage.getItem("ns_ns-user"); return v ? JSON.parse(v) : null; } catch { return null; } });
   const isAdmin = currentUser?.name?.toLowerCase() === "sean";
   const canEdit = isAdmin;
@@ -965,6 +974,20 @@ export default function MarketingHub({ initialUserName }) {
   }, [ready]);
 
   useEffect(() => { if (ready) window.storage.set("ns-notes", JSON.stringify(notes), true).catch(() => {}); }, [notes, ready]);
+
+  // Poll shared notes every 15s so teammates' notes appear without a refresh
+  useEffect(() => {
+    const poll = setInterval(async () => {
+      try {
+        const n = await window.storage.get("ns-notes", true);
+        if (n) {
+          const fresh = JSON.parse(n.value);
+          setNotes(prev => JSON.stringify(prev) !== JSON.stringify(fresh) ? fresh : prev);
+        }
+      } catch {}
+    }, 15000);
+    return () => clearInterval(poll);
+  }, []);
   useEffect(() => { if (ready && ganttHtml) window.storage.set("ns-gantt", ganttHtml, true).catch(() => {}); }, [ganttHtml, ready]);
   useEffect(() => { if (ready) window.storage.set("ns-timeline", JSON.stringify(timelineItems), true).catch(() => {}); }, [timelineItems, ready]);
   useEffect(() => { if (ready) window.storage.set("ns-company", JSON.stringify(company), true).catch(() => {}); }, [company, ready]);
@@ -1010,8 +1033,13 @@ export default function MarketingHub({ initialUserName }) {
   useEffect(() => { try { localStorage.setItem("dam_folders", JSON.stringify(damFolders)); } catch {} }, [damFolders]);
   const addNote = () => {
     if (!noteText.trim() || !currentUser) return;
-    setNotes(p => [{ id: `n-${Date.now()}`, author: currentUser.name, color: currentUser.color, text: noteText.trim(), ts: new Date().toISOString() }, ...p]);
+    setNotes(p => [{ id: `n-${Date.now()}`, author: currentUser.name, color: currentUser.color, text: noteText.trim(), detail: "", ts: new Date().toISOString() }, ...p]);
     setNoteText("");
+  };
+  const updateNoteDetail = (id, detail) => {
+    setNotes(p => p.map(n => n.id === id ? { ...n, detail } : n));
+    setExpandedNoteId(null);
+    setNoteDetailDraft("");
   };
   const addNoteWithContext = (ctx) => {
     if (!ctx || !currentUser) return;
@@ -2059,13 +2087,17 @@ export default function MarketingHub({ initialUserName }) {
             </div>
             <div className="notes-list">
               {notes.length === 0 && <div className="notes-empty">No notes yet.<br />Be the first to leave one.</div>}
-              {notes.map(note => (
+              {notes.map(note => {
+                const isExpanded = expandedNoteId === note.id;
+                const isAuthor = currentUser?.name === note.author;
+                return (
                 <div key={note.id} className="note-item">
                   <div className="note-top">
                     <div className="note-marker" style={{ background: note.color.bg, color: note.color.text, width: 22, height: 22, fontSize: 9 }}>{initials(note.author)}</div>
                     <div className="note-author">{note.author}</div>
                     <div className="note-time">{relativeTime(note.ts)}</div>
-                    {currentUser?.name === note.author && <button className="note-del" onClick={() => setNotes(p => p.filter(n => n.id !== note.id))}>✕</button>}
+                    <button className="note-expand-btn" title="Add / view detail" onClick={e => { e.stopPropagation(); if (isExpanded) { setExpandedNoteId(null); } else { setExpandedNoteId(note.id); setNoteDetailDraft(note.detail || ""); } }}>{isExpanded ? "▲" : "▼"}</button>
+                    {isAuthor && <button className="note-del" onClick={e => { e.stopPropagation(); setNotes(p => p.filter(n => n.id !== note.id)); if (isExpanded) setExpandedNoteId(null); }}>✕</button>}
                   </div>
                   {(note.context || note.section || note.brand) && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 4, marginTop: 2 }}>
@@ -2074,9 +2106,28 @@ export default function MarketingHub({ initialUserName }) {
                       {note.section && !note.context?.includes(note.section) && <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: "rgba(255,255,255,.04)", color: "var(--text-muted)", letterSpacing: ".04em" }}>{note.section}</span>}
                     </div>
                   )}
-                  <div className="note-body">{note.text}</div>
+                  <div className="note-body" style={{ cursor: "pointer" }} onClick={() => { if (isExpanded) { setExpandedNoteId(null); } else { setExpandedNoteId(note.id); setNoteDetailDraft(note.detail || ""); } }}>{note.text}</div>
+                  {isExpanded && (
+                    <div style={{ paddingLeft: 28, marginTop: 8 }} onClick={e => e.stopPropagation()}>
+                      {currentUser ? (
+                        <>
+                          <textarea className="note-detail-ta" value={noteDetailDraft} onChange={e => setNoteDetailDraft(e.target.value)} placeholder="Add more detail about this note…" />
+                          <div className="note-detail-actions">
+                            <button onClick={() => { setExpandedNoteId(null); setNoteDetailDraft(""); }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 11, cursor: "pointer", fontFamily: "var(--bf)" }}>Cancel</button>
+                            <button onClick={() => updateNoteDetail(note.id, noteDetailDraft)} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "rgba(201,168,76,.15)", color: "var(--gold)", fontSize: 11, cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600 }}>Save Detail</button>
+                          </div>
+                        </>
+                      ) : note.detail ? (
+                        <div className="note-detail">{note.detail}</div>
+                      ) : (
+                        <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No additional detail.</div>
+                      )}
+                      {note.detail && currentUser && <div className="note-detail" style={{ marginTop: 8 }}><strong style={{ fontSize: 10, color: "var(--text-muted)", letterSpacing: ".06em", textTransform: "uppercase" }}>Current detail:</strong><br />{note.detail}</div>}
+                    </div>
+                  )}
                 </div>
-              ))}
+                );
+              })}
             </div>
             <div className="notes-ia">
               <textarea className="note-ta" placeholder="Add a note for the team…" value={noteText} onChange={e => setNoteText(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) addNote(); }} />
