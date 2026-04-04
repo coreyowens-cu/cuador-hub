@@ -843,6 +843,8 @@ export default function MarketingHub({ initialUserName }) {
   const [noteDetailDraft, setNoteDetailDraft] = useState("");
   const [replyingToId, setReplyingToId] = useState(null);
   const [replyText, setReplyText] = useState("");
+  const [editingNoteId, setEditingNoteId] = useState(null);
+  const [editNoteText, setEditNoteText] = useState("");
   const [markerMode, setMarkerMode] = useState(false);
   const [pendingTag, setPendingTag] = useState(null);
   const [currentUser, setCurrentUser] = useState(() => { try { const v = localStorage.getItem("ns_ns-user"); return v ? JSON.parse(v) : null; } catch { return null; } });
@@ -1096,6 +1098,17 @@ export default function MarketingHub({ initialUserName }) {
     setNotes(p => p.map(n => n.id === noteId ? { ...n, replies: [...(n.replies || []), { id: `r-${Date.now()}`, author: currentUser.name, color: currentUser.color, text: replyText.trim(), ts: new Date().toISOString() }] } : n));
     setReplyText("");
     setReplyingToId(null);
+  };
+  const saveNoteEdit = (noteId) => {
+    if (!editNoteText.trim()) return;
+    setNotes(p => p.map(n => n.id === noteId ? { ...n, text: editNoteText.trim() } : n));
+    setEditingNoteId(null);
+    setEditNoteText("");
+  };
+  const clearNote = (noteId) => {
+    setNotes(p => p.filter(n => n.id !== noteId));
+    if (editingNoteId === noteId) { setEditingNoteId(null); setEditNoteText(""); }
+    if (replyingToId === noteId) { setReplyingToId(null); setReplyText(""); }
   };
   const addNoteWithContext = (ctx) => {
     if (!ctx || !currentUser) return;
@@ -2195,7 +2208,6 @@ export default function MarketingHub({ initialUserName }) {
                     <div className="note-author">{note.author}</div>
                     <div className="note-time">{relativeTime(note.ts)}</div>
                     <button className="note-expand-btn" title="Add / view detail" onClick={e => { e.stopPropagation(); if (isExpanded) { setExpandedNoteId(null); } else { setExpandedNoteId(note.id); setNoteDetailDraft(note.detail || ""); } }}>{isExpanded ? "▲" : "▼"}</button>
-                    {isAuthor && <button className="note-del" onClick={e => { e.stopPropagation(); setNotes(p => p.filter(n => n.id !== note.id)); if (isExpanded) setExpandedNoteId(null); }}>✕</button>}
                   </div>
                   {(note.context || note.section || note.brand) && (
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 4, marginTop: 2 }}>
@@ -2204,19 +2216,41 @@ export default function MarketingHub({ initialUserName }) {
                       {note.section && !note.context?.includes(note.section) && <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 4, background: "rgba(255,255,255,.04)", color: "var(--text-muted)", letterSpacing: ".04em" }}>{note.section}</span>}
                     </div>
                   )}
-                  <div className="note-body" style={{ cursor: "pointer" }} onClick={() => { if (isExpanded) { setExpandedNoteId(null); } else { setExpandedNoteId(note.id); setNoteDetailDraft(note.detail || ""); } }}>{note.text}</div>
+                  {editingNoteId === note.id ? (
+                    <div style={{ paddingLeft: 28, marginTop: 4 }}>
+                      <textarea className="note-detail-ta" value={editNoteText} onChange={e => setEditNoteText(e.target.value)} autoFocus onKeyDown={e => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) saveNoteEdit(note.id); if (e.key === "Escape") { setEditingNoteId(null); setEditNoteText(""); } }} />
+                      <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                        <button onClick={() => { setEditingNoteId(null); setEditNoteText(""); }} style={{ padding: "3px 8px", borderRadius: 5, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 10, cursor: "pointer", fontFamily: "var(--bf)" }}>Cancel</button>
+                        <button onClick={() => saveNoteEdit(note.id)} disabled={!editNoteText.trim()} style={{ padding: "3px 8px", borderRadius: 5, border: "none", background: "rgba(201,168,76,.15)", color: "var(--gold)", fontSize: 10, cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600 }}>Save</button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="note-body" style={{ cursor: "pointer" }} onClick={() => { if (isExpanded) { setExpandedNoteId(null); } else { setExpandedNoteId(note.id); setNoteDetailDraft(note.detail || ""); } }}>{note.text}</div>
+                  )}
                   {note.detail && !isExpanded && (
                     <div style={{ paddingLeft: 28, marginTop: 4, fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5, borderLeft: "2px solid rgba(201,168,76,.2)", paddingTop: 2, paddingBottom: 2, paddingRight: 4, marginBottom: 2 }}>
                       {note.detail.length > 120 ? note.detail.slice(0, 120) + "…" : note.detail}
                     </div>
                   )}
-                  <div style={{ paddingLeft: 28, marginTop: 4, display: "flex", gap: 12, alignItems: "center" }}>
+                  {editingNoteId !== note.id && (
+                  <div style={{ paddingLeft: 28, marginTop: 4, display: "flex", gap: 10, alignItems: "center" }}>
                     {currentUser && replyingToId !== note.id && (
                       <button onClick={() => { setReplyingToId(note.id); setReplyText(""); }} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "var(--gold)"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
                         Reply {(note.replies || []).length > 0 && <span style={{ color: "var(--gold)", fontWeight: 600 }}>({note.replies.length})</span>}
                       </button>
                     )}
+                    {isAuthor && (
+                      <button onClick={() => { setEditingNoteId(note.id); setEditNoteText(note.text); }} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "var(--gold)"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
+                        Edit
+                      </button>
+                    )}
+                    {isAuthor && (
+                      <button onClick={() => clearNote(note.id)} style={{ background: "none", border: "none", padding: 0, fontFamily: "var(--bf)", fontSize: 10, color: "var(--text-muted)", cursor: "pointer", letterSpacing: ".04em" }} onMouseEnter={e => e.currentTarget.style.color = "#e07b6a"} onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
+                        Clear
+                      </button>
+                    )}
                   </div>
+                  )}
                   {isExpanded && (
                     <div style={{ paddingLeft: 28, marginTop: 8 }} onClick={e => e.stopPropagation()}>
                       {currentUser ? (
