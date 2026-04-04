@@ -29,6 +29,7 @@ const DAM_ASSET_CATS = [
   { id:"web-ads",        label:"Digital Ads",           icon:"📢", sub:true, parent:"web" },
   { id:"brief",      label:"Briefs & Docs",        icon:"▤" },
   { id:"concept",    label:"HTML Concepts",        icon:"✦" },
+  { id:"airo",       label:"Airo Assets",          icon:"💨" },
 ];
 
 const DAM_MERCH_CATS = [
@@ -100,7 +101,7 @@ const DAM_ALL_TYPES = [
   {id:"social-img",label:"Social Media Images"},{id:"social-vid",label:"Social / Video"},
   {id:"print",label:"Retail Assets"},{id:"print-display",label:"Displays"},{id:"print-sticker",label:"Stickers"},{id:"print-info",label:"Product Info Cards"},{id:"print-poster",label:"Posters"},{id:"print-video",label:"Video"},{id:"education",label:"Budtender Education"},
   {id:"menu",label:"Menu Assets"},{id:"web",label:"Website / Digital"},{id:"web-newsletter",label:"Newsletter"},{id:"web-ads",label:"Digital Ads"},
-  {id:"brief",label:"Briefs & Docs"},{id:"concept",label:"HTML Concepts"},
+  {id:"brief",label:"Briefs & Docs"},{id:"concept",label:"HTML Concepts"},{id:"airo",label:"Airo Assets"},
   {id:"merch-tee",label:"Tee"},{id:"merch-hoodie",label:"Hoodie"},
   {id:"merch-hat",label:"Hat"},{id:"merch-sticker",label:"Sticker"},
   {id:"merch-lanyard",label:"Lanyard"},{id:"merch-other",label:"Other Merch"},
@@ -110,7 +111,7 @@ const DAM_ALL_TYPES = [
 
 const DAM_TYPE_EMOJI = {
   logo:"🎨",photo:"🖼️","photo-product":"📷","photo-lifestyle":"🌿","social-img":"📸","social-vid":"🎬",event:"🎪","event-photo":"📷","event-video":"🎬",print:"🏪",
-  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",
+  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",airo:"💨",
   education:"📚",menu:"🍃",web:"🌐","web-newsletter":"📧","web-ads":"📢",brief:"📄",concept:"✦",merch:"🛍",
   "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
   "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",

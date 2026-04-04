@@ -139,6 +139,7 @@ const ASSET_CATS = [
   { id: "web-ads",        label: "Digital Ads",          icon: "📢", sub: true, parent: "web" },
   { id: "brief",      label: "Briefs & Docs",       icon: "▤" },
   { id: "concept",    label: "HTML Concepts",       icon: "✦" },
+  { id: "airo",       label: "Airo Assets",         icon: "💨" },
 ];
 
 const MERCH_CATS = [
@@ -164,7 +165,7 @@ const ALL_TYPES = [
 
 const TYPE_EMOJI = {
   logo:"🎨",photo:"🖼️","social-img":"📸","social-vid":"🎬",print:"🏪",
-  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",
+  "print-display":"🖼","print-sticker":"🏷","print-info":"📇","print-poster":"📰","print-video":"🎬",airo:"💨",
   education:"📚",menu:"🍃",web:"🌐","web-newsletter":"📧","web-ads":"📢",brief:"📄",concept:"✦",merch:"🛍",
   "merch-tee":"👕","merch-hoodie":"🧥","merch-hat":"🧢",
   "merch-sticker":"🏷","merch-lanyard":"🪪","merch-other":"✦",

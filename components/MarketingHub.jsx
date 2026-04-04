@@ -95,6 +95,23 @@ const DEFAULT_BRANDS = {
     positioning:"Flavor & convenience — captures discretion-focused and casual vape consumers. Non-CDT distillate contrast to SafeBet's cannabis-authentic positioning.",
     website:"bubblesvape.com"
   },
+  airo:{
+    id:"airo",
+    name:"Airo",
+    color:"#00B4D8",
+    tagline:"Elevate Your Experience.",
+    story:"Airo Brands is a licensed partner brand produced by CÚRADOR. Known for their proprietary AiroPro vaporizer technology, Airo delivers a premium, consistent vape experience with strain-specific live flower and live resin options. We manufacture their carts locally and carry their full line of batteries and flavors.",
+    mission:"Deliver a best-in-class vaporizer experience through proprietary hardware and premium oil.",
+    values:["Proprietary Hardware","Strain-Specific","Premium Oil","Consistent Experience"],
+    audience:"Vape-forward consumers who value hardware quality, flavor consistency, and a premium pull. Tech-savvy cannabis users, 21–40.",
+    tone:"Clean, modern, tech-forward. Premium without pretension. Let the hardware and oil speak for themselves.",
+    typography:"Inter / DM Sans",
+    secondary:"#E0F7FA",
+    products:"Airo Batteries — proprietary magnetic snap-in battery devices · Airo Carts — strain-specific live flower and live resin cartridges in all available flavors",
+    positioning:"Licensed Partner — premium vape hardware brand manufactured under CÚRADOR license. Distinct from in-house brands.",
+    website:"airobrands.com",
+    licensed: true,
+  },
 };
 
 const DEFAULT_COMPANY = {
@@ -1897,6 +1914,7 @@ export default function MarketingHub({ initialUserName }) {
                           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                             <div style={{ width: 32, height: 32, borderRadius: 9, background: b.color, flexShrink: 0, boxShadow: `0 0 14px ${b.color}55` }} />
                             <div style={{ fontFamily: "var(--df)", fontSize: 18, color: "var(--text)", fontWeight: 400 }}>{b.name}</div>
+                            {b.licensed && <span style={{ fontSize: 8, padding: "2px 7px", borderRadius: 100, background: "rgba(0,180,216,.1)", color: "#00B4D8", border: "1px solid rgba(0,180,216,.2)", letterSpacing: ".06em", textTransform: "uppercase", fontWeight: 600, marginLeft: "auto" }}>Licensed</span>}
                           </div>
                           <div style={{ fontSize: 11, fontStyle: "italic", color: b.color, marginBottom: 8 }}>{b.tagline}</div>
                           <div style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.65, marginBottom: 8 }}>{b.story.slice(0, 100)}…</div>
@@ -2773,7 +2791,7 @@ function CompanyPanel({ company, brands, activeBrand, onBrandSelect, initiatives
                 >
                   <div className="cp-brand-dot" style={{ background: b.color, boxShadow: isActive ? `0 0 8px ${b.color}66` : "none" }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div className="cp-brand-name" style={{ color: isActive ? b.color : "var(--text)" }}>{b.name}</div>
+                    <div className="cp-brand-name" style={{ color: isActive ? b.color : "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>{b.name}{b.licensed && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 100, background: "rgba(0,180,216,.1)", color: "#00B4D8", border: "1px solid rgba(0,180,216,.2)", letterSpacing: ".06em", textTransform: "uppercase", fontWeight: 600 }}>Licensed</span>}</div>
                     <div className="cp-brand-tagline">{b.tagline}</div>
                   </div>
                   {brandInits.length > 0 && (
