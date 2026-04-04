@@ -2063,7 +2063,7 @@ export default function MarketingHub({ initialUserName }) {
                   )}
                   {/* Brand-specific initiatives */}
                   {(() => {
-                    const brandInits = initiatives.filter(i => i.brandId === b.id);
+                    const brandInits = initiatives.filter(i => i.brandId === b.id || i.brandId === null);
                     return (
                       <div style={{ padding: "28px 36px", borderTop: "1px solid var(--border)" }}>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
@@ -2780,7 +2780,7 @@ function CompanyPanel({ company, brands, activeBrand, onBrandSelect, initiatives
       {brandsOpen && (
         <div style={{ paddingLeft: 10 }}>
           {brandList.map(b => {
-            const brandInits = initiatives.filter(i => i.brandId === b.id);
+            const brandInits = initiatives.filter(i => i.brandId === b.id || i.brandId === null);
             const isOpen = openBrand === b.id;
             const isActive = activeBrand === b.id;
             return (
