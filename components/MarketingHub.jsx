@@ -1116,7 +1116,7 @@ export default function MarketingHub({ initialUserName }) {
     if (pendingTag) {
       setNotes(p => [{
         id: `n-${Date.now()}`, author: currentUser.name, color: currentUser.color,
-        text: noteText.trim(), detail: pendingTag.snippet || "", ts: new Date().toISOString(),
+        text: noteText.trim(), detail: "", ts: new Date().toISOString(),
         context: pendingTag.label ? `${pendingTag.type || pendingTag.section || "Note"}: ${pendingTag.label}` : null,
         section: pendingTag.section || null, brand: pendingTag.brand || null,
       }, ...p]);
@@ -1139,10 +1139,7 @@ export default function MarketingHub({ initialUserName }) {
       e.preventDefault();
       e.stopPropagation();
       e.stopImmediatePropagation();
-      // Grab a snippet of the element's text for auto-detail
-      const rawText = (el.textContent || "").replace(/\s+/g, " ").trim();
-      const snippet = rawText.length > 200 ? rawText.slice(0, 200) + "…" : rawText;
-      const tag = { type: el.dataset.tagType, label: el.dataset.tagLabel, section: el.dataset.tagSection, brand: el.dataset.tagBrand || "", snippet };
+      const tag = { type: el.dataset.tagType, label: el.dataset.tagLabel, section: el.dataset.tagSection, brand: el.dataset.tagBrand || "" };
       setPendingTag(tag);
       setMarkerMode(false);
       setNotesOpen(true);
