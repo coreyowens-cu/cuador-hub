@@ -1328,8 +1328,8 @@ export default function MarketingHub({ initialUserName }) {
             <div className="tz-date">{tzDate("America/Chicago")}</div>
             <div className="tz-sep" />
             {[
-              { label: "CT", tz: "America/Chicago" },
               { label: "PT", tz: "America/Los_Angeles" },
+              { label: "CT", tz: "America/Chicago" },
               { label: "AT", tz: "America/Puerto_Rico" },
             ].map((z, i) => (
               <div key={z.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
