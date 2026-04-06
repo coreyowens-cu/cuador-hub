@@ -226,11 +226,13 @@ html,body{background:var(--bg);min-height:100vh;}
 .hdr-name{font-family:var(--df);font-size:17px;font-weight:500;letter-spacing:.02em;}
 .hdr-sub{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.13em;margin-top:1px;}
 .hdr-right{display:flex;gap:7px;align-items:center;}
-.tz-bar{display:flex;gap:14px;align-items:center;padding:0 8px;margin:0 6px;}
-.tz-item{display:flex;flex-direction:column;align-items:center;gap:1px;}
-.tz-label{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
-.tz-time{font-size:11px;color:var(--text-dim);font-family:var(--mf);font-weight:500;letter-spacing:.04em;}
-.tz-sep{width:1px;height:20px;background:var(--border);flex-shrink:0;}
+.tz-bar{display:flex;gap:10px;align-items:center;padding:5px 14px;margin:0 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;backdrop-filter:blur(12px);}
+.tz-date{font-size:11px;color:var(--gold);font-family:var(--mf);font-weight:600;letter-spacing:.06em;white-space:nowrap;}
+.tz-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 6px;border-radius:6px;transition:background .15s;}
+.tz-item:hover{background:rgba(255,255,255,.04);}
+.tz-label{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
+.tz-time{font-size:13px;color:var(--text);font-family:var(--mf);font-weight:500;letter-spacing:.04em;}
+.tz-sep{width:1px;height:22px;background:rgba(255,255,255,.08);flex-shrink:0;}
 
 /* BODY */
 .body-row{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px);}
@@ -1324,6 +1326,8 @@ export default function MarketingHub({ initialUserName }) {
             </div>
           </div>
           <div className="tz-bar">
+            <div className="tz-date">{tzDate("America/Chicago")}</div>
+            <div className="tz-sep" />
             {[
               { label: "CT", tz: "America/Chicago" },
               { label: "PT", tz: "America/Los_Angeles" },
