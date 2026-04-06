@@ -2061,8 +2061,8 @@ export default function MarketingHub({ initialUserName }) {
                       )}
                     </div>
                   )}
-                  {/* Brand-specific initiatives */}
-                  {(() => {
+                  {/* Brand-specific initiatives (hidden for licensed brands like Airo) */}
+                  {b.id !== "airo" && (() => {
                     const brandInits = initiatives.filter(i => i.brandId === b.id || i.brandId === null);
                     return (
                       <div style={{ padding: "28px 36px", borderTop: "1px solid var(--border)" }}>
@@ -2780,7 +2780,7 @@ function CompanyPanel({ company, brands, activeBrand, onBrandSelect, initiatives
       {brandsOpen && (
         <div style={{ paddingLeft: 10 }}>
           {brandList.map(b => {
-            const brandInits = initiatives.filter(i => i.brandId === b.id || i.brandId === null);
+            const brandInits = b.id === "airo" ? [] : initiatives.filter(i => i.brandId === b.id || i.brandId === null);
             const isOpen = openBrand === b.id;
             const isActive = activeBrand === b.id;
             return (
@@ -2795,18 +2795,18 @@ function CompanyPanel({ company, brands, activeBrand, onBrandSelect, initiatives
                     <div className="cp-brand-name" style={{ color: isActive ? b.color : "var(--text)", display: "flex", alignItems: "center", gap: 6 }}>{b.name}{b.licensed && <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 100, background: "rgba(0,180,216,.1)", color: "#00B4D8", border: "1px solid rgba(0,180,216,.2)", letterSpacing: ".06em", textTransform: "uppercase", fontWeight: 600 }}>Licensed</span>}</div>
                     <div className="cp-brand-tagline">{b.tagline}</div>
                   </div>
-                  {brandInits.length > 0 && (
+                  {b.id !== "airo" && brandInits.length > 0 && (
                     <div style={{ fontSize: 9, padding: "1px 6px", borderRadius: 100, background: b.color + "20", color: b.color, border: `1px solid ${b.color}33`, flexShrink: 0, marginRight: 4 }}>
                       {brandInits.length}
                     </div>
                   )}
-                  <button style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 4px", color: "var(--text-muted)", fontSize: 10, flexShrink: 0, transition: "transform .18s", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
+                  {b.id !== "airo" && <button style={{ background: "none", border: "none", cursor: "pointer", padding: "2px 4px", color: "var(--text-muted)", fontSize: 10, flexShrink: 0, transition: "transform .18s", transform: isOpen ? "rotate(90deg)" : "rotate(0deg)" }}
                     onClick={e => toggleBrand(e, b.id)}
                     title={isOpen ? "Collapse" : "Show initiatives"}
-                  >▶</button>
+                  >▶</button>}
                 </div>
 
-                {isOpen && (
+                {isOpen && b.id !== "airo" && (
                   <div className="cp-brand-inits">
                     {brandInits.length === 0 ? (
                       <div style={{ fontSize: 10, color: "var(--text-muted)", padding: "4px 8px", fontStyle: "italic" }}>No initiatives yet</div>
