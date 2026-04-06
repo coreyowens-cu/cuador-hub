@@ -226,6 +226,11 @@ html,body{background:var(--bg);min-height:100vh;}
 .hdr-name{font-family:var(--df);font-size:17px;font-weight:500;letter-spacing:.02em;}
 .hdr-sub{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.13em;margin-top:1px;}
 .hdr-right{display:flex;gap:7px;align-items:center;}
+.tz-bar{display:flex;gap:14px;align-items:center;padding:0 8px;margin:0 6px;}
+.tz-item{display:flex;flex-direction:column;align-items:center;gap:1px;}
+.tz-label{font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;}
+.tz-time{font-size:11px;color:var(--text-dim);font-family:var(--mf);font-weight:500;letter-spacing:.04em;}
+.tz-sep{width:1px;height:20px;background:var(--border);flex-shrink:0;}
 
 /* BODY */
 .body-row{display:flex;flex:1;overflow:hidden;height:calc(100vh - 57px);}
@@ -851,6 +856,15 @@ export default function MarketingHub({ initialUserName }) {
   const [timelineItems, setTimelineItems] = useState([]);
   const [ready, setReady] = useState(false);
 
+  // Time zones
+  const [clockTick, setClockTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setClockTick(c => c + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
+  const tzNow = (tz) => new Date().toLocaleTimeString("en-US", { timeZone: tz, hour: "numeric", minute: "2-digit", hour12: true });
+  const tzDate = (tz) => new Date().toLocaleDateString("en-US", { timeZone: tz, month: "short", day: "numeric" });
+
   // Notes
   const [notesOpen, setNotesOpen] = useState(false);
   const [notes, setNotes] = useState([]);
@@ -1308,6 +1322,21 @@ export default function MarketingHub({ initialUserName }) {
               </div>
               <div style={{ fontSize: 11, color: "#b8b4cc", textTransform: "uppercase", letterSpacing: ".18em", marginTop: 3 }}>Marketing OS</div>
             </div>
+          </div>
+          <div className="tz-bar">
+            {[
+              { label: "CT", tz: "America/Chicago" },
+              { label: "PT", tz: "America/Los_Angeles" },
+              { label: "AT", tz: "America/Puerto_Rico" },
+            ].map((z, i) => (
+              <div key={z.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                {i > 0 && <div className="tz-sep" />}
+                <div className="tz-item">
+                  <div className="tz-label">{z.label}</div>
+                  <div className="tz-time">{tzNow(z.tz)}</div>
+                </div>
+              </div>
+            ))}
           </div>
           <div className="hdr-right">
             {activeAuthors.length > 0 && (
