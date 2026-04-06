@@ -226,7 +226,7 @@ html,body{background:var(--bg);min-height:100vh;}
 .hdr-name{font-family:var(--df);font-size:17px;font-weight:500;letter-spacing:.02em;}
 .hdr-sub{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.13em;margin-top:1px;}
 .hdr-right{display:flex;gap:7px;align-items:center;}
-.tz-bar{display:flex;gap:10px;align-items:center;padding:5px 14px;margin:0 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;backdrop-filter:blur(12px);}
+.tz-bar{display:flex;gap:10px;align-items:center;padding:5px 14px;margin:0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:10px;backdrop-filter:blur(12px);}
 .tz-date{font-size:11px;color:var(--gold);font-family:var(--mf);font-weight:600;letter-spacing:.06em;white-space:nowrap;}
 .tz-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:2px 6px;border-radius:6px;transition:background .15s;}
 .tz-item:hover{background:rgba(255,255,255,.04);}
@@ -1317,15 +1317,14 @@ export default function MarketingHub({ initialUserName }) {
       <div className="page">
         {/* ── HEADER ── */}
         <header className="hdr">
-          <div className="hdr-brand">
+          <div className="hdr-brand" style={{ gap: 16 }}>
             <div>
               <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: ".12em", color: "var(--text)", lineHeight: 1, textTransform: "uppercase" }}>
                 C<span style={{ color: "#3bb54a" }}>Ú</span>RADOR
               </div>
               <div style={{ fontSize: 11, color: "#b8b4cc", textTransform: "uppercase", letterSpacing: ".18em", marginTop: 3 }}>Marketing OS</div>
             </div>
-          </div>
-          <div className="tz-bar">
+            <div className="tz-bar">
             <div className="tz-date">{tzDate("America/Chicago")}</div>
             <div className="tz-sep" />
             {[
@@ -1341,6 +1340,7 @@ export default function MarketingHub({ initialUserName }) {
                 </div>
               </div>
             ))}
+            </div>
           </div>
           <div className="hdr-right">
             {activeAuthors.length > 0 && (
