@@ -894,7 +894,13 @@ export default function MarketingHub({ initialUserName }) {
   // Auto-set user from login gate name selection
   useEffect(() => {
     if (initialUserName) {
-      const role = initialUserName?.toLowerCase() === "sean" ? "creative" : "content";
+      // Preserve existing marketing role from localStorage if same user
+      let role = "content";
+      try {
+        const existing = localStorage.getItem("ns_ns-user");
+        const parsed = existing ? JSON.parse(existing) : null;
+        if (parsed?.name === initialUserName && parsed?.role) role = parsed.role;
+      } catch {}
       const color = colorForName(initialUserName);
       const user = { name: initialUserName, color, role };
       setCurrentUser(user);
@@ -1359,7 +1365,7 @@ export default function MarketingHub({ initialUserName }) {
               ✏ Notes {notes.length > 0 && <span className="notes-count">{notes.length}</span>}
             </button>
             {currentUser && (
-              <button onClick={() => { sessionStorage.removeItem("ch-auth"); sessionStorage.removeItem("ch-user"); window.location.reload(); }}
+              <button onClick={() => { sessionStorage.removeItem("ch-auth"); sessionStorage.removeItem("ch-user"); import("next-auth/react").then(m => m.signOut({ callbackUrl: "/login" })); }}
                 style={{ padding:"5px 10px",borderRadius:100,border:"1px solid var(--border)",background:"transparent",color:"var(--text-muted)",fontSize:10,letterSpacing:".06em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--bf)",transition:"all .15s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(224,123,106,.4)"; e.currentTarget.style.color="#e07b6a"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}
