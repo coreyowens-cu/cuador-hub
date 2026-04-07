@@ -28,58 +28,75 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Auto-create user on first login
-      const existingUser = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, email))
-        .limit(1);
+      try {
+        const existingUser = await db
+          .select()
+          .from(users)
+          .where(eq(users.email, email))
+          .limit(1);
 
-      if (existingUser.length === 0) {
-        await db.insert(users).values({
-          name: (profile.name as string) ?? email.split("@")[0],
-          email,
-          googleSub: profile.sub as string,
-          role: "member",
-          active: true,
-        });
-      } else if (
-        existingUser[0] &&
-        (!existingUser[0].active || existingUser[0].deletedAt)
-      ) {
-        return false; // Block deactivated or deleted users
-      } else if (existingUser[0] && !existingUser[0].googleSub) {
-        await db
-          .update(users)
-          .set({ googleSub: profile.sub as string })
-          .where(eq(users.email, email));
+        if (existingUser.length === 0) {
+          await db.insert(users).values({
+            name: (profile.name as string) ?? email.split("@")[0],
+            email,
+            googleSub: profile.sub as string,
+            role: "member",
+            active: true,
+          });
+        } else if (
+          existingUser[0] &&
+          (!existingUser[0].active || existingUser[0].deletedAt)
+        ) {
+          return false;
+        } else if (existingUser[0] && !existingUser[0].googleSub) {
+          await db
+            .update(users)
+            .set({ googleSub: profile.sub as string })
+            .where(eq(users.email, email));
+        }
+      } catch (e) {
+        console.error("[auth] signIn DB error:", e);
+        return false;
       }
 
       return true;
     },
 
-    async session({ session }) {
-      if (!session.user?.email) return session;
-
-      const dbUser = await db
-        .select()
-        .from(users)
-        .where(eq(users.email, session.user.email))
-        .limit(1);
-
-      if (dbUser[0]) {
-        session.user.id = dbUser[0].id;
-        session.user.role = dbUser[0].role;
-        session.user.marketingRole = dbUser[0].marketingRole;
-      }
-
-      return session;
-    },
-
     async jwt({ token, profile }) {
       if (profile?.email) {
-        token.email = profile.email;
+        token.email = profile.email.toLowerCase();
       }
+
+      // Enrich token with DB user data on sign-in
+      if (token.email && !token.dbId) {
+        try {
+          const dbUser = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, token.email as string))
+            .limit(1);
+
+          if (dbUser[0]) {
+            token.dbId = dbUser[0].id;
+            token.role = dbUser[0].role;
+            token.marketingRole = dbUser[0].marketingRole;
+          }
+        } catch (e) {
+          console.error("[auth] jwt DB error:", e);
+        }
+      }
+
       return token;
+    },
+
+    async session({ session, token }) {
+      // Pull from JWT token — no DB call needed per request
+      if (token.dbId) {
+        session.user.id = token.dbId as string;
+        session.user.role = (token.role as string) ?? "member";
+        session.user.marketingRole = (token.marketingRole as string) ?? null;
+      }
+      return session;
     },
   },
   pages: {
