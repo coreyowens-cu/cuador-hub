@@ -891,6 +891,19 @@ export default function MarketingHub({ initialUserName }) {
   });
   const [whoName, setWhoName] = useState("");
   const [whoRole, setWhoRole] = useState("content");
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRole, setNewMemberRole] = useState("content");
+  const [newMemberTitle, setNewMemberTitle] = useState("");
+  const addTeamMember = () => {
+    if (!newMemberName.trim()) return;
+    const color = colorForName(newMemberName.trim());
+    setTeamMembers(prev => {
+      if (prev.find(m => m.name.toLowerCase() === newMemberName.trim().toLowerCase())) return prev;
+      return [...prev, { name: newMemberName.trim(), color, role: newMemberRole, title: newMemberTitle.trim(), bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() }];
+    });
+    setNewMemberName(""); setNewMemberRole("content"); setNewMemberTitle(""); setShowAddMember(false);
+  };
 
   // Auto-set user from login gate name selection
   useEffect(() => {
@@ -1546,8 +1559,42 @@ export default function MarketingHub({ initialUserName }) {
                         </div>
                         <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6, maxWidth: 480 }}>Everyone on the marketing team in one place. Select who you are to personalize your view and unlock editing. Each member has their own role and profile.</div>
                       </div>
-                      {!currentUser && <button className="btn" onClick={() => setShowWhoModal(true)}>+ Join Team</button>}
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {!currentUser && <button className="btn" onClick={() => setShowWhoModal(true)}>+ Join Team</button>}
+                        {isAdmin && <button className="btn btn-gold" onClick={() => setShowAddMember(true)}>+ Add Member</button>}
+                      </div>
                     </div>
+
+                    {/* Add Member Modal */}
+                    {showAddMember && (
+                      <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", backdropFilter: "blur(8px)", display: "grid", placeItems: "center", zIndex: 200 }} onClick={() => setShowAddMember(false)}>
+                        <div onClick={e => e.stopPropagation()} style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 14, padding: "28px 32px", width: 380, maxWidth: "90vw" }}>
+                          <div style={{ fontSize: 10, letterSpacing: ".18em", textTransform: "uppercase", color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>New Team Member</div>
+                          <div style={{ fontFamily: "var(--df)", fontSize: 20, fontWeight: 300, color: "var(--text)", marginBottom: 20 }}>Add to Team</div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                            <div>
+                              <label style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 4, display: "block" }}>Name</label>
+                              <input value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder="Full name" style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13, fontFamily: "var(--bf)", outline: "none" }} autoFocus />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 4, display: "block" }}>Title</label>
+                              <input value={newMemberTitle} onChange={e => setNewMemberTitle(e.target.value)} placeholder="e.g. Marketing Coordinator" style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13, fontFamily: "var(--bf)", outline: "none" }} />
+                            </div>
+                            <div>
+                              <label style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 4, display: "block" }}>Role</label>
+                              <select value={newMemberRole} onChange={e => setNewMemberRole(e.target.value)} style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)", fontSize: 13, fontFamily: "var(--bf)", outline: "none" }}>
+                                {orgRoles.map(r => <option key={r.id} value={r.id}>{r.title}</option>)}
+                              </select>
+                            </div>
+                          </div>
+                          <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+                            <button onClick={() => setShowAddMember(false)} style={{ padding: "7px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "transparent", color: "var(--text-muted)", fontSize: 12, fontFamily: "var(--bf)", cursor: "pointer" }}>Cancel</button>
+                            <button onClick={addTeamMember} disabled={!newMemberName.trim()} style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: newMemberName.trim() ? "var(--gold)" : "var(--surface2)", color: newMemberName.trim() ? "var(--bg)" : "var(--text-muted)", fontSize: 12, fontFamily: "var(--bf)", fontWeight: 600, cursor: newMemberName.trim() ? "pointer" : "default" }}>Add Member</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <MembersGridView teamMembers={teamMembers} currentUser={currentUser} orgRoles={orgRoles} onSelect={setSelectedMember} onChangeUser={() => setShowWhoModal(true)} />
                   </>
                 )}
