@@ -8347,7 +8347,7 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
   const cellBase = { padding: "6px 8px", fontSize: 12, overflow: "hidden", display: "flex", alignItems: "center", borderRight: "1px solid var(--border2)" };
   const selStyle = { background: "transparent", border: "none", color: "inherit", fontSize: 12, fontFamily: "var(--bf)", cursor: "pointer", outline: "none", width: "100%", padding: 0 };
   const inpStyle = { background: "transparent", border: "none", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const GRID = "36px 100px 1fr 120px 120px 120px 110px 110px 90px 90px 115px 85px 1fr 40px";
+  const GRID = "52px 100px 1fr 120px 120px 120px 110px 110px 90px 90px 115px 85px 1fr 40px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 57px)", overflow: "hidden" }}>
@@ -8416,8 +8416,10 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
                       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                     >
                       {/* Expand button */}
-                      <div style={{ ...cellBase, justifyContent: "center", cursor: "pointer" }} onClick={() => setSelectedReq(r)} title="Open card view">
-                        <span style={{ fontSize: 14, opacity: .4 }}>↗</span>
+                      <div style={{ ...cellBase, justifyContent: "center", cursor: "pointer", gap: 3 }} onClick={() => setSelectedReq(r)} title="Expand request"
+                        onMouseEnter={e => e.currentTarget.style.color = "var(--gold)"}
+                        onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}>
+                        <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".04em" }}>Expand</span>
                       </div>
                       {/* Brand */}
                       <div style={{ ...cellBase }}>
@@ -8789,21 +8791,37 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
                   ))}
                 </div>
               </div>
-              {/* Attached Brief */}
-              {request._briefFile && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>Brief</div>
+              {/* Brief — always show with upload + download */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>Brief</div>
+                {request._briefFile ? (
                   <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
                     <span style={{ fontSize: 18 }}>📎</span>
                     <div style={{ flex: 1, fontSize: 13, color: "var(--text)" }}>{request._briefFile}</div>
-                    {request._briefFileData && <button className="btn btn-sm" style={{ borderColor: "rgba(201,168,76,.3)", color: "var(--gold)" }} onClick={() => { const w = window.open("", "_blank"); if (w) { w.document.write(`<iframe src="${request._briefFileData}" style="width:100%;height:100%;border:none"></iframe>`); } }}>View</button>}
+                    {request._briefFileData && (
+                      <>
+                        <button className="btn btn-sm" style={{ borderColor: "rgba(201,168,76,.3)", color: "var(--gold)", fontSize: 10 }} onClick={() => { const w = window.open("", "_blank"); if (w) { w.document.write(`<iframe src="${request._briefFileData}" style="width:100%;height:100%;border:none"></iframe>`); } }}>View</button>
+                        <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => { const a = document.createElement("a"); a.href = request._briefFileData; a.download = request._briefFile; a.click(); }}>Download</button>
+                      </>
+                    )}
+                    <button className="btn btn-sm" style={{ fontSize: 10, borderColor: "rgba(224,123,106,.3)", color: "#e07b6a" }} onClick={() => onUpdate({ _briefFile: null, _briefFileData: null, _briefFileType: null })}>Remove</button>
                   </div>
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px", background: "var(--surface)", border: "1px dashed var(--border)", borderRadius: 8, cursor: "pointer" }}
+                    onClick={() => { const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.webp,.html"; inp.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const r2 = new FileReader(); r2.onload = ev => { onUpdate({ _briefFile: file.name, _briefFileData: ev.target.result, _briefFileType: file.type }); }; r2.readAsDataURL(file); }; inp.click(); }}>
+                    <span style={{ fontSize: 18, opacity: .4 }}>📎</span>
+                    <div style={{ fontSize: 12, color: "var(--text-muted)" }}>Click to attach a brief (PDF, Word, image, HTML)</div>
+                  </div>
+                )}
+              </div>
+              {/* Attached Files — always show with upload */}
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600 }}>Attached Files {request._attachedFiles?.length > 0 && `(${request._attachedFiles.length})`}</div>
+                  <button className="btn btn-sm" style={{ fontSize: 10, borderColor: "rgba(201,168,76,.3)", color: "var(--gold)" }}
+                    onClick={() => { const inp = document.createElement("input"); inp.type = "file"; inp.multiple = true; inp.accept = ".pdf,.doc,.docx,.txt,.md,.png,.jpg,.jpeg,.webp,.xls,.xlsx,.csv,.ppt,.pptx,.zip,.ai,.psd,.svg,.html"; inp.onchange = async (e) => { const files = Array.from(e.target.files); const newFiles = []; for (const file of files) { const data = await new Promise(res => { const r2 = new FileReader(); r2.onload = ev => res(ev.target.result); r2.readAsDataURL(file); }); newFiles.push({ name: file.name, type: file.type, size: file.size, data }); } onUpdate({ _attachedFiles: [...(request._attachedFiles || []), ...newFiles] }); }; inp.click(); }}>+ Add Files</button>
                 </div>
-              )}
-              {/* Attached Files */}
-              {request._attachedFiles?.length > 0 && (
-                <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>Attached Files</div>
+                {(request._attachedFiles || []).length > 0 ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                     {request._attachedFiles.map((af, i) => (
                       <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8 }}>
@@ -8811,15 +8829,24 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
                         <div style={{ flex: 1, fontSize: 12, color: "var(--text)" }}>{af.name}</div>
                         <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{(af.size / 1024).toFixed(0)} KB</span>
                         {af.data && <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => { const a = document.createElement("a"); a.href = af.data; a.download = af.name; a.click(); }}>Download</button>}
+                        <button className="btn btn-sm" style={{ fontSize: 10, borderColor: "rgba(224,123,106,.2)", color: "#e07b6a" }} onClick={() => onUpdate({ _attachedFiles: request._attachedFiles.filter((_, j) => j !== i) })}>×</button>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
-              {/* HTML Concept */}
+                ) : (
+                  <div style={{ fontSize: 12, color: "var(--text-muted)", fontStyle: "italic", padding: "8px 0" }}>No files attached.</div>
+                )}
+              </div>
+              {/* HTML Concept — with download */}
               {request._html && (
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 8 }}>HTML Concept — {request._htmlName || "Attached"}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600 }}>HTML Concept — {request._htmlName || "Attached"}</div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => { const blob = new Blob([request._html], { type: "text/html" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = (request._htmlName || "concept") + ".html"; a.click(); }}>Download</button>
+                      <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => { const blob = new Blob([request._html], { type: "text/html" }); window.open(URL.createObjectURL(blob), "_blank"); }}>Open</button>
+                    </div>
+                  </div>
                   <div style={{ height: 200, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border)", background: "#fff" }}>
                     <iframe srcDoc={request._html} style={{ width: "100%", height: "100%", border: "none" }} sandbox="allow-scripts" title="concept" />
                   </div>
