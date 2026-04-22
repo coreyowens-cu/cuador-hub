@@ -8347,7 +8347,7 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
   const cellBase = { padding: "6px 8px", fontSize: 12, overflow: "hidden", display: "flex", alignItems: "center", borderRight: "1px solid var(--border2)" };
   const selStyle = { background: "transparent", border: "none", color: "inherit", fontSize: 12, fontFamily: "var(--bf)", cursor: "pointer", outline: "none", width: "100%", padding: 0 };
   const inpStyle = { background: "transparent", border: "none", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const GRID = "52px 100px 1fr 120px 120px 120px 110px 110px 90px 90px 115px 85px 1fr 40px";
+  const GRID = "52px 100px 1fr 120px 120px 120px 120px 90px 90px 115px 85px 1fr 40px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 57px)", overflow: "hidden" }}>
@@ -8391,7 +8391,7 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
           <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", minWidth: 1100 }}>
             {/* Column headers */}
             <div style={{ display: "grid", gridTemplateColumns: GRID, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
-              {["", "Brand", "Project", "Owner", "What Needed", "Channel", "Designer", "Creative", "Due", "Live", "Status", "Priority", "Notes", "💬"].map((h, i) => (
+              {["", "Brand", "Project", "Owner", "What Needed", "Channel", "Creative", "Due", "Live", "Status", "Priority", "Notes", "💬"].map((h, i) => (
                 <div key={i} style={{ padding: "8px 8px", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)", whiteSpace: "nowrap" }}>{h}</div>
               ))}
             </div>
@@ -8432,12 +8432,9 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
                       <div style={{ ...cellBase }}>
                         <input value={r.project || ""} onChange={e => u("project", e.target.value)} style={{ ...inpStyle, fontWeight: 500 }} />
                       </div>
-                      {/* Owner — comma-separated, any name */}
+                      {/* Owner — plain text, comma-separate for multiple */}
                       <div style={{ ...cellBase }}>
-                        <input list={`owner-opts-${r.id}`} value={r.owner || ""} onChange={e => u("owner", e.target.value)} style={{ ...inpStyle, color: "#e8a87c" }} placeholder="Add names..." title="Comma-separate multiple names" />
-                        <datalist id={`owner-opts-${r.id}`}>
-                          {(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}
-                        </datalist>
+                        <input value={r.owner || ""} onChange={e => u("owner", e.target.value)} style={{ ...inpStyle, color: "#e8a87c" }} placeholder="Add names..." title="Comma-separate multiple names" />
                       </div>
                       {/* What is Needed */}
                       <div style={{ ...cellBase }}>
@@ -8447,22 +8444,11 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
                       </div>
                       {/* Channel */}
                       <div style={{ ...cellBase }}>
-                        <input list={`ch-opts-${r.id}`} value={r.channel || ""} onChange={e => u("channel", e.target.value)} style={{ ...inpStyle, color: "var(--text-muted)" }} placeholder="—" />
-                        <datalist id={`ch-opts-${r.id}`}>{CHANNELS.map(c => <option key={c} value={c} />)}</datalist>
+                        <input value={r.channel || ""} onChange={e => u("channel", e.target.value)} style={{ ...inpStyle, color: "var(--text-muted)" }} placeholder="—" />
                       </div>
-                      {/* Designer */}
+                      {/* Creative — plain text */}
                       <div style={{ ...cellBase }}>
-                        <input list={`designer-opts-${r.id}`} value={r.designer || ""} onChange={e => u("designer", e.target.value)} style={{ ...inpStyle, color: "var(--text-dim)" }} placeholder="TBD" />
-                        <datalist id={`designer-opts-${r.id}`}>
-                          {(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}
-                        </datalist>
-                      </div>
-                      {/* Creative — who executes the job */}
-                      <div style={{ ...cellBase }}>
-                        <input list={`creative-opts-${r.id}`} value={r.creative || ""} onChange={e => u("creative", e.target.value)} style={{ ...inpStyle, color: "var(--text-dim)" }} placeholder="TBD" />
-                        <datalist id={`creative-opts-${r.id}`}>
-                          {(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}
-                        </datalist>
+                        <input value={r.creative || ""} onChange={e => u("creative", e.target.value)} style={{ ...inpStyle, color: "var(--text-dim)" }} placeholder="Add names..." />
                       </div>
                       {/* Due Date */}
                       <div style={{ ...cellBase }}>
@@ -8598,17 +8584,11 @@ function DesignRequestModal({ brands, teamMembers, onClose, onSave }) {
             </div>
             <div className="frow">
               <div className="ff"><label className="fl">Project Owner</label>
-                <input className="fi" list="dr-owner-opts" placeholder="Owner name" value={f.owner} onChange={e => s("owner", e.target.value)} />
-                <datalist id="dr-owner-opts">{(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}</datalist>
+                <input className="fi" placeholder="e.g. Munchi, Sanson" value={f.owner} onChange={e => s("owner", e.target.value)} />
               </div>
-              <div className="ff"><label className="fl">Designer</label>
-                <input className="fi" list="dr-designer-opts" placeholder="Designer name" value={f.designer} onChange={e => s("designer", e.target.value)} />
-                <datalist id="dr-designer-opts">{(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}</datalist>
+              <div className="ff"><label className="fl">Creative (who executes)</label>
+                <input className="fi" placeholder="e.g. Tom, Allison Gellner" value={f.creative} onChange={e => s("creative", e.target.value)} />
               </div>
-            </div>
-            <div className="ff"><label className="fl">Creative (who executes)</label>
-              <input className="fi" list="dr-creative-opts" placeholder="e.g. Tom, Allison Gellner" value={f.creative} onChange={e => s("creative", e.target.value)} />
-              <datalist id="dr-creative-opts">{(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}</datalist>
             </div>
             <div className="frow">
               <div className="ff"><label className="fl">Due Date</label><input className="fi" type="date" value={f.dueDate} onChange={e => s("dueDate", e.target.value)} /></div>
@@ -8760,8 +8740,7 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 20px", marginBottom: 20 }}>
                 {[
                   ["Type", request.designType], ["Channel", (request.channel || "").split(" · ")[1] || request.channel],
-                  ["Owner", request.owner || "—"], ["Designer", request.designer || "TBD"],
-                  ["Creative", request.creative || "TBD"],
+                  ["Owner", request.owner || "—"], ["Creative", request.creative || "TBD"],
                   ["Due Date", request.dueDate ? new Date(request.dueDate + "T00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "—"],
                   ["Live Date", request.liveDate ? new Date(request.liveDate + "T00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "—"],
                   ["Section", request.section || "General"], ["Submitted By", request.createdBy || "—"],
@@ -8932,21 +8911,11 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
               </div>
               <div className="frow">
                 <div className="ff"><label className="fl">Owner</label>
-                  {(teamMembers || []).length > 0 ? (
-                    <select className="fsel" value={f.owner} onChange={e => s("owner", e.target.value)}>
-                      <option value="">Select...</option>
-                      {(teamMembers || []).map(m => <option key={m.name} value={m.name}>{m.name}</option>)}
-                    </select>
-                  ) : <input className="fi" value={f.owner || ""} onChange={e => s("owner", e.target.value)} />}
+                  <input className="fi" value={f.owner || ""} onChange={e => s("owner", e.target.value)} placeholder="e.g. Munchi, Sanson" />
                 </div>
-                <div className="ff"><label className="fl">Designer</label>
-                  <input className="fi" list="dd-designer-opts" value={f.designer || ""} onChange={e => s("designer", e.target.value)} placeholder="TBD" />
-                  <datalist id="dd-designer-opts">{(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}</datalist>
+                <div className="ff"><label className="fl">Creative (who executes)</label>
+                  <input className="fi" value={f.creative || ""} onChange={e => s("creative", e.target.value)} placeholder="e.g. Tom, Allison" />
                 </div>
-              </div>
-              <div className="ff"><label className="fl">Creative (who executes)</label>
-                <input className="fi" list="dd-creative-opts" value={f.creative || ""} onChange={e => s("creative", e.target.value)} placeholder="TBD" />
-                <datalist id="dd-creative-opts">{(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}</datalist>
               </div>
               <div className="frow">
                 <div className="ff"><label className="fl">Due Date</label><input className="fi" type="date" value={f.dueDate || ""} onChange={e => s("dueDate", e.target.value)} /></div>
