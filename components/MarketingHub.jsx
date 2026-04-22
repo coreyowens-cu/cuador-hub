@@ -908,26 +908,28 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
     resetNewMember(); setShowAddMember(false);
   };
 
-  // Auto-set user from login gate name selection + auto-register in team
+  // Auto-set user from login — show profile select/create if no profile chosen yet
   useEffect(() => {
     if (initialUserName) {
-      let role = "content";
+      // Check if user already picked a profile this session
       try {
         const existing = localStorage.getItem("ns_ns-user");
         const parsed = existing ? JSON.parse(existing) : null;
-        if (parsed?.name === initialUserName && parsed?.role) role = parsed.role;
+        if (parsed?.name) {
+          // Already have a profile — use it silently
+          setCurrentUser(parsed);
+          setShowWhoModal(false);
+          // Make sure they're in team list
+          setTeamMembers(prev => {
+            if (prev.find(m => m.name === parsed.name)) return prev;
+            return [...prev, { name: parsed.name, color: parsed.color || colorForName(parsed.name), role: parsed.role || "content", title: "", bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() }];
+          });
+          return;
+        }
       } catch {}
-      const color = colorForName(initialUserName);
-      const user = { name: initialUserName, color, role };
-      setCurrentUser(user);
-      try { localStorage.setItem("ns_ns-user", JSON.stringify(user)); } catch {}
-      // Auto-register in team if not already there
-      setTeamMembers(prev => {
-        const exists = prev.find(m => m.name === initialUserName);
-        if (exists) return prev;
-        return [...prev, { name: initialUserName, color, role, title: "", bio: "", strengths: [], skills: [], keyPoints: [], joinedAt: new Date().toISOString() }];
-      });
-      setShowWhoModal(false);
+      // No profile yet — pre-fill name and show the select/create modal
+      setWhoName(initialUserName);
+      setShowWhoModal(true);
     }
   }, [initialUserName]);
 
