@@ -1390,11 +1390,22 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
               ✏ Notes {notes.length > 0 && <span className="notes-count">{notes.length}</span>}
             </button>
             {currentUser && (
-              <button onClick={() => { sessionStorage.removeItem("ch-auth"); sessionStorage.removeItem("ch-user"); import("next-auth/react").then(m => m.signOut({ callbackUrl: "/login" })); }}
-                style={{ padding:"5px 10px",borderRadius:100,border:"1px solid var(--border)",background:"transparent",color:"var(--text-muted)",fontSize:10,letterSpacing:".06em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--bf)",transition:"all .15s" }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(224,123,106,.4)"; e.currentTarget.style.color="#e07b6a"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}
-                title="Sign out">Sign Out</button>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <button onClick={() => {
+                  const me = teamMembers.find(m => m.name?.toLowerCase() === currentUser.name?.toLowerCase());
+                  if (me) setSelectedMember(me);
+                  else setSelectedMember({ name: currentUser.name, color: currentUser.color || { bg: "#c9a84c", text: "#07070f" }, role: currentUser.role || "content" });
+                }}
+                  style={{ width: 30, height: 30, borderRadius: "50%", border: "1px solid var(--border)", background: currentUser.color?.bg || "var(--gold)", color: currentUser.color?.text || "#07070f", display: "grid", placeItems: "center", fontSize: 11, fontWeight: 700, cursor: "pointer", transition: "all .15s", flexShrink: 0 }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = `0 0 12px ${currentUser.color?.bg || "var(--gold)"}55`}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+                  title="Edit your profile">{initials(currentUser.name)}</button>
+                <button onClick={() => { sessionStorage.removeItem("ch-auth"); sessionStorage.removeItem("ch-user"); import("next-auth/react").then(m => m.signOut({ callbackUrl: "/login" })); }}
+                  style={{ padding:"5px 10px",borderRadius:100,border:"1px solid var(--border)",background:"transparent",color:"var(--text-muted)",fontSize:10,letterSpacing:".06em",textTransform:"uppercase",cursor:"pointer",fontFamily:"var(--bf)",transition:"all .15s" }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor="rgba(224,123,106,.4)"; e.currentTarget.style.color="#e07b6a"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor="var(--border)"; e.currentTarget.style.color="var(--text-muted)"; }}
+                  title="Sign out">Sign Out</button>
+              </div>
             )}
           </div>
         </header>
@@ -8336,12 +8347,12 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
   const cellBase = { padding: "6px 8px", fontSize: 12, overflow: "hidden", display: "flex", alignItems: "center", borderRight: "1px solid var(--border2)" };
   const selStyle = { background: "transparent", border: "none", color: "inherit", fontSize: 12, fontFamily: "var(--bf)", cursor: "pointer", outline: "none", width: "100%", padding: 0 };
   const inpStyle = { background: "transparent", border: "none", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const GRID = "36px 100px 1fr 120px 120px 120px 110px 110px 90px 90px 115px 85px 1fr";
+  const GRID = "36px 100px 1fr 120px 120px 120px 110px 110px 90px 90px 115px 85px 1fr 40px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 57px)", overflow: "hidden" }}>
       {showModal && <DesignRequestModal brands={brands} teamMembers={teamMembers} onClose={() => setShowModal(false)} onSave={addRequest} />}
-      {selectedReq && <DesignDetailModal request={selectedReq} brands={brands} teamMembers={teamMembers} onClose={() => setSelectedReq(null)} onUpdate={(updates) => { updateRequest(selectedReq.id, updates); setSelectedReq({ ...selectedReq, ...updates }); }} onDelete={() => { deleteRequest(selectedReq.id); setSelectedReq(null); }} />}
+      {selectedReq && <DesignDetailModal request={selectedReq} brands={brands} teamMembers={teamMembers} currentUser={currentUser} onClose={() => setSelectedReq(null)} onUpdate={(updates) => { updateRequest(selectedReq.id, updates); setSelectedReq({ ...selectedReq, ...updates }); }} onDelete={() => { deleteRequest(selectedReq.id); setSelectedReq(null); }} />}
 
       {/* Header */}
       <div style={{ padding: "20px 24px 0", flexShrink: 0 }}>
@@ -8380,7 +8391,7 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
           <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden", minWidth: 1100 }}>
             {/* Column headers */}
             <div style={{ display: "grid", gridTemplateColumns: GRID, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
-              {["", "Brand", "Project", "Owner", "What Needed", "Channel", "Designer", "Creative", "Due", "Live", "Status", "Priority", "Notes"].map((h, i) => (
+              {["", "Brand", "Project", "Owner", "What Needed", "Channel", "Designer", "Creative", "Due", "Live", "Status", "Priority", "Notes", "💬"].map((h, i) => (
                 <div key={i} style={{ padding: "8px 8px", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)", whiteSpace: "nowrap" }}>{h}</div>
               ))}
             </div>
@@ -8419,9 +8430,9 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
                       <div style={{ ...cellBase }}>
                         <input value={r.project || ""} onChange={e => u("project", e.target.value)} style={{ ...inpStyle, fontWeight: 500 }} />
                       </div>
-                      {/* Owner — free text + dropdown suggestions */}
+                      {/* Owner — comma-separated, any name */}
                       <div style={{ ...cellBase }}>
-                        <input list={`owner-opts-${r.id}`} value={r.owner || ""} onChange={e => u("owner", e.target.value)} style={{ ...inpStyle, color: ownerObj ? "#e8a87c" : "var(--text-dim)" }} placeholder="—" />
+                        <input list={`owner-opts-${r.id}`} value={r.owner || ""} onChange={e => u("owner", e.target.value)} style={{ ...inpStyle, color: "#e8a87c" }} placeholder="Add names..." title="Comma-separate multiple names" />
                         <datalist id={`owner-opts-${r.id}`}>
                           {(teamMembers || []).map(m => <option key={m.name} value={m.name} />)}
                         </datalist>
@@ -8475,8 +8486,15 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
                         </select>
                       </div>
                       {/* Notes */}
-                      <div style={{ ...cellBase, borderRight: "none" }}>
+                      <div style={{ ...cellBase }}>
                         <input value={r.notes || ""} onChange={e => u("notes", e.target.value)} style={{ ...inpStyle, color: "var(--text-muted)", fontSize: 11 }} placeholder="Add notes..." />
+                      </div>
+                      {/* Comments button */}
+                      <div style={{ ...cellBase, borderRight: "none", justifyContent: "center", cursor: "pointer", position: "relative" }}
+                        onClick={e => { e.stopPropagation(); setSelectedReq(selectedReq?.id === r.id ? null : { ...r, _openComments: true }); }}
+                        title="Comments">
+                        <span style={{ fontSize: 14, opacity: (r.comments?.length > 0) ? 1 : .3 }}>💬</span>
+                        {r.comments?.length > 0 && <span style={{ position: "absolute", top: 2, right: 4, fontSize: 8, background: "var(--gold)", color: "#07070f", borderRadius: 100, padding: "0 4px", fontWeight: 700 }}>{r.comments.length}</span>}
                       </div>
                     </div>
                   );
@@ -8693,12 +8711,29 @@ function DesignRequestModal({ brands, teamMembers, onClose, onSave }) {
 }
 
 // ── DESIGN DETAIL MODAL ───────────────────────────────────────────────────
-function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, onDelete }) {
+function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, onDelete, currentUser }) {
   const brandList = brands ? Object.values(brands) : [];
   const [editing, setEditing] = useState(false);
   const [f, setF] = useState({ ...request });
   const s = (k, v) => setF(p => ({ ...p, [k]: v }));
   const brandObj = brandList.find(b => b.name === request.brand);
+  const [commentText, setCommentText] = useState("");
+  const [editingComment, setEditingComment] = useState(null);
+  const [editCommentText, setEditCommentText] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
+  const comments = request.comments || [];
+  const commentsRef = useRef();
+
+  const addComment = () => {
+    if (!commentText.trim()) return;
+    const c = { id: `dc-${Date.now()}`, author: currentUser?.name || "Team", text: commentText.trim(), ts: new Date().toISOString(), replyTo: replyTo || null };
+    onUpdate({ comments: [...comments, c] });
+    setCommentText("");
+    setReplyTo(null);
+    setTimeout(() => { if (commentsRef.current) commentsRef.current.scrollTop = commentsRef.current.scrollHeight; }, 50);
+  };
+  const deleteComment = (id) => onUpdate({ comments: comments.filter(c => c.id !== id) });
+  const saveEditComment = (id) => { onUpdate({ comments: comments.map(c => c.id === id ? { ...c, text: editCommentText } : c) }); setEditingComment(null); };
 
   const handleSave = () => { onUpdate(f); setEditing(false); };
 
@@ -8790,6 +8825,62 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
                   </div>
                 </div>
               )}
+              {/* Comments */}
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600, marginBottom: 8 }}>Comments {comments.length > 0 && `(${comments.length})`}</div>
+                <div ref={commentsRef} style={{ maxHeight: 260, overflowY: "auto", marginBottom: 10, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {comments.length === 0 && <div style={{ fontSize: 12, color: "var(--text-muted)", fontStyle: "italic", padding: "8px 0" }}>No comments yet.</div>}
+                  {comments.map(c => {
+                    const isReply = c.replyTo;
+                    const parentComment = isReply ? comments.find(p => p.id === c.replyTo) : null;
+                    return (
+                      <div key={c.id} style={{ padding: "10px 12px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 8, marginLeft: isReply ? 24 : 0 }}>
+                        {isReply && parentComment && <div style={{ fontSize: 10, color: "var(--text-muted)", marginBottom: 4, fontStyle: "italic" }}>Replying to {parentComment.author}</div>}
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--gold)" }}>{c.author}</div>
+                          <div style={{ fontSize: 10, color: "var(--text-muted)" }}>{new Date(c.ts).toLocaleDateString("en-US", { month: "short", day: "numeric" })} {new Date(c.ts).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</div>
+                        </div>
+                        {editingComment === c.id ? (
+                          <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                            <input value={editCommentText} onChange={e => setEditCommentText(e.target.value)} style={{ flex: 1, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "4px 8px", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none" }}
+                              onKeyDown={e => { if (e.key === "Enter") saveEditComment(c.id); if (e.key === "Escape") setEditingComment(null); }} autoFocus />
+                            <button className="btn btn-sm" style={{ fontSize: 10, borderColor: "rgba(201,168,76,.3)", color: "var(--gold)" }} onClick={() => saveEditComment(c.id)}>Save</button>
+                            <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => setEditingComment(null)}>Cancel</button>
+                          </div>
+                        ) : (
+                          <>
+                            <div style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6 }}>{c.text}</div>
+                            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+                              <button onClick={() => { setReplyTo(c.id); }} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "var(--bf)" }}>Reply</button>
+                              {(c.author === currentUser?.name) && (
+                                <>
+                                  <button onClick={() => { setEditingComment(c.id); setEditCommentText(c.text); }} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "var(--bf)" }}>Edit</button>
+                                  <button onClick={() => deleteComment(c.id)} style={{ fontSize: 10, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "var(--bf)" }}>Delete</button>
+                                </>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {/* Add comment */}
+                <div style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+                  <div style={{ flex: 1 }}>
+                    {replyTo && (
+                      <div style={{ fontSize: 10, color: "var(--gold)", marginBottom: 4, display: "flex", alignItems: "center", gap: 6 }}>
+                        Replying to {comments.find(c => c.id === replyTo)?.author || "comment"}
+                        <button onClick={() => setReplyTo(null)} style={{ fontSize: 10, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>×</button>
+                      </div>
+                    )}
+                    <input value={commentText} onChange={e => setCommentText(e.target.value)}
+                      onKeyDown={e => { if (e.key === "Enter") addComment(); }}
+                      placeholder="Add a comment..." style={{ width: "100%", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none" }} />
+                  </div>
+                  <button className="btn btn-sm" style={{ borderColor: "rgba(201,168,76,.3)", color: "var(--gold)", marginTop: replyTo ? 18 : 0 }} onClick={addComment} disabled={!commentText.trim()}>Send</button>
+                </div>
+              </div>
             </>
           ) : (
             <>
