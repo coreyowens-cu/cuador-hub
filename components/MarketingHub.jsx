@@ -9805,7 +9805,7 @@ function WeeklyDropsTable({ drops, setDrops }) {
     setCmtText("");
   };
   const deleteDropComment = (dropId, cId) => setDrops(p => p.map(d => d.id === dropId ? { ...d, comments: (d.comments || []).filter(c => c.id !== cId) } : d));
-  const DG = "100px 180px 1fr 40px 30px";
+  const DG = "100px 160px 1fr 36px 28px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
