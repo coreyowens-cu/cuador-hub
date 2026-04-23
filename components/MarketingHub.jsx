@@ -9288,7 +9288,7 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
       {/* Right — Detail */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {selected && isContactsView ? (
-          <ContactsTable contacts={contacts} setContacts={setContacts} />
+          <ContactsTable contacts={contacts} setContacts={setContacts} currentUser={currentUser} />
         ) : selected && isTierListView ? (
           <TierListTable data={tierList} setData={setTierList} currentUser={currentUser} />
         ) : selected ? (
@@ -9372,7 +9372,7 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
 }
 
 // ── CONTACTS TABLE (Centralized Contacts) ─────────────────────────────────
-function ContactsTable({ contacts, setContacts }) {
+function ContactsTable({ contacts, setContacts, currentUser }) {
   const [collapsed, setCollapsed] = useState({});
   const [filterTier, setFilterTier] = useState("all");
   const [filterSection, setFilterSection] = useState("all");
@@ -9384,8 +9384,18 @@ function ContactsTable({ contacts, setContacts }) {
   const [showGroupBy, setShowGroupBy] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [showNewGroup, setShowNewGroup] = useState(false);
+  const [commentOpen, setCommentOpen] = useState(null);
+  const [commentText, setCommentText] = useState("");
 
   const sections = [...new Set(contacts.map(c => c.section))];
+
+  const addComment = (contactId) => {
+    if (!commentText.trim()) return;
+    const c = { id: `ccm-${Date.now()}`, author: currentUser?.name || "Team", text: commentText.trim(), ts: new Date().toISOString() };
+    setContacts(p => p.map(ct => ct.id === contactId ? { ...ct, comments: [...(ct.comments || []), c] } : ct));
+    setCommentText("");
+  };
+  const deleteComment = (contactId, cId) => setContacts(p => p.map(ct => ct.id === contactId ? { ...ct, comments: (ct.comments || []).filter(c => c.id !== cId) } : ct));
   const tiers = [...new Set(contacts.map(c => c.tier).filter(Boolean))].sort();
 
   const updateContact = (id, field, val) => setContacts(p => p.map(c => c.id === id ? { ...c, [field]: val } : c));
@@ -9426,7 +9436,7 @@ function ContactsTable({ contacts, setContacts }) {
   const SECTION_COLORS = { "Global Contacts": "#6366f1", "SWMO": "#4d9e8e", "KC": "#3b82f6", "SEMO": "#22c55e", "STL": "#c9a84c", "MidMO": "#a855f7", "COMO": "#f59e0b" };
   const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
   const is = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const CG = "1fr 130px 1fr 80px 140px 100px 110px 110px 100px 90px 1fr 30px";
+  const CG = "1fr 130px 1fr 80px 140px 100px 110px 110px 100px 90px 1fr 40px 30px";
   const tbtn = { display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", border: "none", background: "none", color: "var(--text-dim)", cursor: "pointer", fontSize: 12, fontFamily: "var(--bf)", fontWeight: 500, borderRadius: 6, transition: "all .15s", whiteSpace: "nowrap" };
 
   return (
@@ -9484,7 +9494,7 @@ function ContactsTable({ contacts, setContacts }) {
       <div style={{ flex: 1, overflow: "auto" }}>
         <div style={{ minWidth: 1200 }}>
           <div style={{ display: "grid", gridTemplateColumns: CG, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
-            {["Contact","Role","Email","Tier","Tier Tracker","Location","Account","Phone","Last Contact","Owner","Notes",""].map(h => (
+            {["Contact","Role","Email","Tier","Tier Tracker","Location","Account","Phone","Last Contact","Owner","Notes","💬",""].map(h => (
               <div key={h} style={{ padding: "8px 8px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
             ))}
           </div>
@@ -9514,6 +9524,35 @@ function ContactsTable({ contacts, setContacts }) {
                   <div style={cs}><input type="date" value={c.lastContacted||""} onChange={e => updateContact(c.id,"lastContacted",e.target.value)} style={{ ...is, fontSize: 10, color: "var(--text-muted)" }} /></div>
                   <div style={cs}><input value={c.storeOwner||""} onChange={e => updateContact(c.id,"storeOwner",e.target.value)} style={is} /></div>
                   <div style={cs}><input value={c.notes||""} onChange={e => updateContact(c.id,"notes",e.target.value)} style={is} placeholder="Notes..." /></div>
+                  {/* Comment */}
+                  <div style={{ ...cs, justifyContent: "center", cursor: "pointer", position: "relative" }}
+                    onClick={e => { e.stopPropagation(); setCommentOpen(commentOpen === c.id ? null : c.id); }}>
+                    <span style={{ fontSize: 14, opacity: (c.comments?.length > 0) ? 1 : .3 }}>💬</span>
+                    {c.comments?.length > 0 && <span style={{ position: "absolute", top: 2, right: 2, fontSize: 8, background: "var(--gold)", color: "#fff", borderRadius: 100, padding: "0 4px", fontWeight: 700 }}>{c.comments.length}</span>}
+                    {commentOpen === c.id && (
+                      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: "100%", width: 300, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 12px 40px rgba(0,0,0,.15)", zIndex: 30, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600 }}>{c.name || "Contact"}</div>
+                        <div style={{ maxHeight: 180, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+                          {(c.comments || []).length === 0 && <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No comments yet.</div>}
+                          {(c.comments || []).map(cm => (
+                            <div key={cm.id} style={{ padding: "8px 10px", background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 8 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3 }}>
+                                <span style={{ fontSize: 11, fontWeight: 600, color: "var(--gold)" }}>{cm.author}</span>
+                                <span style={{ fontSize: 9, color: "var(--text-muted)" }}>{new Date(cm.ts).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                              </div>
+                              <div style={{ fontSize: 12, color: "var(--text-dim)", lineHeight: 1.5 }}>{cm.text}</div>
+                              {cm.author === currentUser?.name && <button onClick={() => deleteComment(c.id, cm.id)} style={{ fontSize: 9, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", padding: "2px 0", fontFamily: "var(--bf)", marginTop: 2 }}>Delete</button>}
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <input value={commentText} onChange={e => setCommentText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") addComment(c.id); }} placeholder="Add comment..."
+                            style={{ flex: 1, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+                          <button className="btn btn-sm" style={{ fontSize: 10, borderColor: "rgba(184,150,58,.3)", color: "var(--gold)" }} onClick={() => addComment(c.id)}>Send</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteContact(c.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
                 </div>
               ))}
