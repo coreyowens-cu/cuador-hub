@@ -1070,8 +1070,15 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
           window.storage.get("ns-fieldteam-tree", true),
         ]);
         if (cn) setConcepts(JSON.parse(cn.value));
-        if (dr) { const parsed = JSON.parse(dr.value); setDesignRequests(parsed.length > 0 ? parsed : DEFAULT_DESIGN_REQUESTS); }
-        else setDesignRequests(DEFAULT_DESIGN_REQUESTS);
+        if (dr) {
+          const parsed = JSON.parse(dr.value);
+          // Merge: keep user-created requests, add any missing defaults
+          const existingIds = new Set(parsed.map(r => r.id));
+          const missing = DEFAULT_DESIGN_REQUESTS.filter(d => !existingIds.has(d.id));
+          setDesignRequests([...parsed, ...missing]);
+        } else {
+          setDesignRequests(DEFAULT_DESIGN_REQUESTS);
+        }
         if (ftt) setFieldTeamTree(JSON.parse(ftt.value));
       } catch (_) { if (!initialUserName) setShowWhoModal(true); }
       setReady(true);
