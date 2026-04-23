@@ -1016,6 +1016,7 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
   const [centralizedContacts, setCentralizedContacts] = useState([]);
   const [tierListData, setTierListData] = useState([]);
   const [weeklyDrops, setWeeklyDrops] = useState([]);
+  const [creditMemos, setCreditMemos] = useState([]);
 
 
   // Load
@@ -1218,6 +1219,15 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
     })();
   }, [ready]);
   useEffect(() => { if (ready && weeklyDrops.length > 0) window.storage.set("ns-weekly-drops", JSON.stringify(weeklyDrops), true).catch(() => {}); }, [weeklyDrops, ready]);
+  useEffect(() => {
+    if (!ready) return;
+    (async () => {
+      const stored = await window.storage.get("ns-credit-memos", true).catch(() => null);
+      if (stored) { setCreditMemos(JSON.parse(stored.value)); return; }
+      try { const r = await fetch("/data/creditmemos-default.json"); const d = await r.json(); setCreditMemos(d); } catch {}
+    })();
+  }, [ready]);
+  useEffect(() => { if (ready && creditMemos.length > 0) window.storage.set("ns-credit-memos", JSON.stringify(creditMemos), true).catch(() => {}); }, [creditMemos, ready]);
 
   useEffect(() => {
     const handler = () => { setLeftTab("initiatives"); setActiveBrand(null); };
@@ -2130,7 +2140,7 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
 
             {/* ── FIELD TEAM ── */}
             {leftTab === "fieldteam" && !activeBrand && (
-              <FieldTeamPortal tree={fieldTeamTree} setTree={setFieldTeamTree} contacts={centralizedContacts} setContacts={setCentralizedContacts} tierList={tierListData} setTierList={setTierListData} drops={weeklyDrops} setDrops={setWeeklyDrops} currentUser={currentUser} />
+              <FieldTeamPortal tree={fieldTeamTree} setTree={setFieldTeamTree} contacts={centralizedContacts} setContacts={setCentralizedContacts} tierList={tierListData} setTierList={setTierListData} drops={weeklyDrops} setDrops={setWeeklyDrops} creditMemos={creditMemos} setCreditMemos={setCreditMemos} currentUser={currentUser} />
             )}
 
             {/* ── COMPLIANCE ── */}
@@ -9199,7 +9209,7 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
 // ════════════════════════════════════════════════════════════════════════════
 // FIELD TEAM PORTAL
 // ════════════════════════════════════════════════════════════════════════════
-function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTierList, drops, setDrops, currentUser }) {
+function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTierList, drops, setDrops, creditMemos, setCreditMemos, currentUser }) {
   const [expanded, setExpanded] = useState(() => new Set(tree.filter(n => n.type === "folder").map(n => n.id)));
   const [selectedId, setSelectedId] = useState(null);
   const [renamingId, setRenamingId] = useState(null);
@@ -9212,6 +9222,7 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
   const isContactsView = selected?.name === "Centralized Contacts";
   const isTierListView = selected?.name === "Tier List Tracker";
   const isDropsView = selected?.name === "2026 Weekly Drops Menu";
+  const isCreditMemosView = selected?.name === "Credit Memo Requests";
 
   const addNode = (parentId, type) => {
     const siblings = getChildren(parentId);
@@ -9308,6 +9319,8 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
           <TierListTable data={tierList} setData={setTierList} currentUser={currentUser} />
         ) : selected && isDropsView ? (
           <WeeklyDropsTable drops={drops} setDrops={setDrops} />
+        ) : selected && isCreditMemosView ? (
+          <CreditMemoTable data={creditMemos} setData={setCreditMemos} currentUser={currentUser} />
         ) : selected ? (
           <>
             <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -9929,6 +9942,117 @@ function WeeklyDropsTable({ drops, setDrops }) {
               </div>
             );
           })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── CREDIT MEMO TABLE ─────────────────────────────────────────────────────
+const CM_STATUSES = ["Submitted", "Approved", "In Progress", "Completed", "Denied"];
+const CM_PRIORITIES = ["", "Low", "Medium", "High", "Urgent"];
+const CM_SECTION_COLORS = { "Awaiting Sales Approval": "#c9a84c", "Awaiting Finance Approval": "#6366f1", "Awaiting Creation": "#e07b6a", "Completed Requests": "#4d9e8e" };
+
+function CreditMemoTable({ data, setData, currentUser }) {
+  const [collapsed, setCollapsed] = useState({});
+  const [didInit, setDidInit] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [cmtOpen, setCmtOpen] = useState(null);
+  const [cmtText, setCmtText] = useState("");
+
+  useEffect(() => { if (!didInit && data.length > 0) { const all = {}; [...new Set(data.map(d => d.section))].forEach(s => { all[s] = true; }); setCollapsed(all); setDidInit(true); } }, [data, didInit]);
+
+  const updateItem = (id, field, val) => setData(p => p.map(d => d.id === id ? { ...d, [field]: val } : d));
+  const deleteItem = (id) => setData(p => p.filter(d => d.id !== id));
+  const addItem = (section) => setData(p => [...p, { id: `cm-${Date.now()}`, section, name: "", date: new Date().toISOString().slice(0, 10), customer: "", total: 0, priority: "", status: "Submitted", notes: "" }]);
+  const addComment = (itemId) => { if (!cmtText.trim()) return; setData(p => p.map(d => d.id === itemId ? { ...d, comments: [...(d.comments || []), { id: `cmc-${Date.now()}`, author: currentUser?.name || "Team", text: cmtText.trim(), ts: new Date().toISOString() }] } : d)); setCmtText(""); };
+  const deleteComment = (itemId, cId) => setData(p => p.map(d => d.id === itemId ? { ...d, comments: (d.comments || []).filter(c => c.id !== cId) } : d));
+
+  const filtered = data.filter(d => {
+    if (filterStatus !== "all" && d.status !== filterStatus) return false;
+    if (search) { const s = search.toLowerCase(); return (d.name||"").toLowerCase().includes(s) || (d.customer||"").toLowerCase().includes(s); }
+    return true;
+  });
+  const groups = {}; filtered.forEach(d => { const s = d.section || "General"; if (!groups[s]) groups[s] = []; groups[s].push(d); });
+  const sections = [...new Set(data.map(d => d.section))];
+
+  const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
+  const is = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
+  const MG = "1fr 100px 1fr 90px 80px 100px 1fr 36px 28px";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <div style={{ fontFamily: "var(--df)", fontSize: 22, fontWeight: 300, color: "var(--text)" }}>Credit Memo Requests</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{filtered.length} items / ${filtered.reduce((s, d) => s + (d.total || 0), 0).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button className="btn btn-gold" style={{ fontSize: 11, padding: "6px 14px" }} onClick={() => addItem(sections[0] || "Awaiting Sales Approval")}>+ New Request</button>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name or customer..." style={{ flex: 1, minWidth: 150, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }}>
+            <option value="all">All Statuses</option>
+            {CM_STATUSES.map(s => <option key={s}>{s}</option>)}
+          </select>
+        </div>
+      </div>
+      <div style={{ flex: 1, overflow: "auto" }}>
+        <div style={{ minWidth: 800 }}>
+          <div style={{ display: "grid", gridTemplateColumns: MG, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
+            {["Name", "Date", "Customer", "Total ($)", "Priority", "Status", "Notes", "💬", ""].map(h => (
+              <div key={h} style={{ padding: "8px 8px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
+            ))}
+          </div>
+          {Object.entries(groups).map(([section, items]) => (
+            <div key={section}>
+              <div onClick={() => setCollapsed(p => ({ ...p, [section]: !p[section] }))} style={{ padding: "10px 12px", background: "var(--surface2)", borderBottom: "1px solid var(--border)", borderLeft: `3px solid ${CM_SECTION_COLORS[section] || "var(--gold)"}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, userSelect: "none" }}>
+                <span style={{ fontSize: 10, display: "inline-block", transform: collapsed[section] ? "rotate(0deg)" : "rotate(90deg)", transition: "transform .15s" }}>▶</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: CM_SECTION_COLORS[section] || "var(--gold)" }}>{section}</span>
+                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{items.length} items / ${items.reduce((s, d) => s + (d.total || 0), 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+              </div>
+              {!collapsed[section] && items.map(d => (
+                <div key={d.id} style={{ display: "grid", gridTemplateColumns: MG, borderBottom: "1px solid var(--border2)", minHeight: 34 }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,.02)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                  <div style={cs}><input value={d.name||""} onChange={e => updateItem(d.id, "name", e.target.value)} style={{ ...is, fontWeight: 500, color: "var(--text)" }} placeholder="Name" /></div>
+                  <div style={cs}><input type="date" value={d.date||""} onChange={e => updateItem(d.id, "date", e.target.value)} style={{ ...is, fontSize: 10, color: "var(--text-muted)" }} /></div>
+                  <div style={cs}><input value={d.customer||""} onChange={e => updateItem(d.id, "customer", e.target.value)} style={is} placeholder="Customer" /></div>
+                  <div style={cs}><input type="number" step="0.01" value={d.total||""} onChange={e => updateItem(d.id, "total", parseFloat(e.target.value) || 0)} style={{ ...is, textAlign: "right" }} /></div>
+                  <div style={cs}><select value={d.priority||""} onChange={e => updateItem(d.id, "priority", e.target.value)} style={{ ...is, fontSize: 10 }}>{CM_PRIORITIES.map(p => <option key={p} value={p}>{p || "—"}</option>)}</select></div>
+                  <div style={cs}><select value={d.status||""} onChange={e => updateItem(d.id, "status", e.target.value)} style={{ ...is, fontSize: 10, fontWeight: 600, color: d.status === "Completed" ? "#4d9e8e" : d.status === "Denied" ? "#e07b6a" : "var(--text-dim)" }}>{CM_STATUSES.map(s => <option key={s}>{s}</option>)}</select></div>
+                  <div style={cs}><input value={d.notes||""} onChange={e => updateItem(d.id, "notes", e.target.value)} style={is} placeholder="Notes..." /></div>
+                  <div style={{ ...cs, justifyContent: "center", cursor: "pointer", position: "relative" }} onClick={e => { e.stopPropagation(); setCmtOpen(cmtOpen === d.id ? null : d.id); }}>
+                    <span style={{ fontSize: 16, color: (d.comments?.length > 0) ? "var(--gold)" : "#555" }}>💬</span>
+                    {d.comments?.length > 0 && <span style={{ position: "absolute", top: 2, right: 2, fontSize: 8, background: "var(--gold)", color: "#fff", borderRadius: 100, padding: "0 4px", fontWeight: 700 }}>{d.comments.length}</span>}
+                    {cmtOpen === d.id && (
+                      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: "100%", width: 280, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 12px 40px rgba(0,0,0,.15)", zIndex: 30, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                        <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600 }}>{d.name} — {d.customer}</div>
+                        <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+                          {(d.comments || []).length === 0 && <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No comments.</div>}
+                          {(d.comments || []).map(c => (
+                            <div key={c.id} style={{ padding: "6px 8px", background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 6 }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}><span style={{ fontSize: 10, fontWeight: 600, color: "var(--gold)" }}>{c.author}</span><span style={{ fontSize: 8, color: "var(--text-muted)" }}>{new Date(c.ts).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></div>
+                              <div style={{ fontSize: 11, color: "var(--text-dim)", lineHeight: 1.5 }}>{c.text}</div>
+                              {c.author === currentUser?.name && <button onClick={() => deleteComment(d.id, c.id)} style={{ fontSize: 9, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", padding: "2px 0", fontFamily: "var(--bf)" }}>Delete</button>}
+                            </div>
+                          ))}
+                        </div>
+                        <div style={{ display: "flex", gap: 6 }}>
+                          <input value={cmtText} onChange={e => setCmtText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") addComment(d.id); }} placeholder="Comment..." style={{ flex: 1, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 8px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+                          <button className="btn btn-sm" style={{ fontSize: 9, borderColor: "rgba(184,150,58,.3)", color: "var(--gold)" }} onClick={() => addComment(d.id)}>Send</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteItem(d.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
+                </div>
+              ))}
+              {!collapsed[section] && (
+                <div onClick={() => addItem(section)} style={{ padding: "6px 12px", borderBottom: "1px solid var(--border2)", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add request</div>
+              )}
+            </div>
+          ))}
         </div>
       </div>
     </div>
