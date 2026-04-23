@@ -10291,7 +10291,7 @@ function PromoCalendarTable({ data, setData, currentUser }) {
   const STATUS_CLR = { "Planning": "#6366f1", "Active": "#4d9e8e", "Ended": "#8a8a96", "Cancelled": "#e07b6a" };
   const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
   const is3 = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const PG = "1fr 90px 90px 100px 100px 100px 1fr 1fr 36px 28px";
+  const PG = "1fr 40px 100px 110px 120px 100px 100px 1fr 1fr 28px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
@@ -10343,37 +10343,36 @@ function PromoCalendarTable({ data, setData, currentUser }) {
       )}
       <div style={{ flex: 1, overflow: "auto" }}>
         <div style={{ minWidth: 900 }}>
-          <div style={{ display: "grid", gridTemplateColumns: PG, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
-            {["Promo", "Status", "Discount", "Start", "End", "Brand", "Participants", "Details", "💬", ""].map(h => (
-              <div key={h} style={{ padding: "8px 8px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
-            ))}
-          </div>
           {sortedSections.map(section => {
             const items = groups[section];
             const mColor = getMonthColor(section);
             return (
             <div key={section}>
-              <div onClick={() => setCollapsed(p => ({ ...p, [section]: !p[section] }))} style={{ padding: "10px 12px", background: "var(--surface2)", borderBottom: "1px solid var(--border)", borderLeft: `3px solid ${mColor}`, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, userSelect: "none" }}>
-                <span style={{ fontSize: 10, display: "inline-block", transform: collapsed[section] ? "rotate(0deg)" : "rotate(90deg)", transition: "transform .15s" }}>▶</span>
-                <span style={{ fontSize: 13, fontWeight: 700, color: mColor }}>{section}</span>
-                <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{items.length} promo{items.length !== 1 ? "s" : ""}</span>
+              <div onClick={() => setCollapsed(p => ({ ...p, [section]: !p[section] }))} style={{ padding: "12px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, userSelect: "none", marginTop: 16 }}>
+                <span style={{ fontSize: 10, display: "inline-block", transform: collapsed[section] ? "rotate(0deg)" : "rotate(90deg)", transition: "transform .15s", color: mColor }}>▶</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: mColor }}>{section}</span>
               </div>
-              {!collapsed[section] && items.map(d => (
-                <div key={d.id} style={{ display: "grid", gridTemplateColumns: PG, borderBottom: "1px solid var(--border2)", minHeight: 34 }}
+              {collapsed[section] && (
+                <div style={{ padding: "6px 16px 12px", fontSize: 11, color: "var(--text-muted)", borderLeft: `3px solid ${mColor}`, marginLeft: 16 }}>{items.length} promo{items.length !== 1 ? "s" : ""}</div>
+              )}
+              {!collapsed[section] && (
+                <div style={{ borderLeft: `3px solid ${mColor}`, marginLeft: 16 }}>
+                {/* Column headers per section */}
+                <div style={{ display: "grid", gridTemplateColumns: PG, borderBottom: "1px solid var(--border)", background: "var(--surface2)" }}>
+                  {["Name of the promo", "", "Status", "Discount Type", "Timeline", "Digital Assets", "Brand", "Participants", "Promo Details", ""].map((h, hi) => (
+                    <div key={hi} style={{ padding: "6px 8px", fontSize: 9, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
+                  ))}
+                </div>
+                {items.map(d => (
+                <div key={d.id} style={{ display: "grid", gridTemplateColumns: PG, borderBottom: "1px solid var(--border2)", minHeight: 38 }}
                   onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,.02)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                   <div style={cs}><input value={d.name||""} onChange={e => updateItem(d.id, "name", e.target.value)} style={{ ...is3, fontWeight: 500, color: "var(--text)" }} /></div>
-                  <div style={cs}><select value={d.status||""} onChange={e => updateItem(d.id, "status", e.target.value)} style={{ ...is3, fontSize: 10, fontWeight: 600, color: STATUS_CLR[d.status] || "var(--text-dim)" }}>{PROMO_STATUSES.map(s => <option key={s}>{s}</option>)}</select></div>
-                  <div style={cs}><input value={d.discountType||""} onChange={e => updateItem(d.id, "discountType", e.target.value)} style={is3} /></div>
-                  <div style={cs}><input type="date" value={d.startDate||""} onChange={e => updateItem(d.id, "startDate", e.target.value)} style={{ ...is3, fontSize: 10, color: "var(--text-muted)" }} /></div>
-                  <div style={cs}><input type="date" value={d.endDate||""} onChange={e => updateItem(d.id, "endDate", e.target.value)} style={{ ...is3, fontSize: 10, color: "var(--text-muted)" }} /></div>
-                  <div style={cs}><select value={d.brand||""} onChange={e => updateItem(d.id, "brand", e.target.value)} style={{ ...is3, fontSize: 10 }}>{PROMO_BRANDS.map(b => <option key={b}>{b}</option>)}</select></div>
-                  <div style={cs}><input value={d.participants||""} onChange={e => updateItem(d.id, "participants", e.target.value)} style={is3} /></div>
-                  <div style={cs}><input value={d.promoDetails||""} onChange={e => updateItem(d.id, "promoDetails", e.target.value)} style={is3} placeholder="Details..." /></div>
+                  {/* Comment bubble next to name */}
                   <div style={{ ...cs, justifyContent: "center", cursor: "pointer", position: "relative" }} onClick={e => { e.stopPropagation(); setCmtOpen(cmtOpen === d.id ? null : d.id); }}>
                     <span style={{ fontSize: 16, color: (d.comments?.length > 0) ? "var(--gold)" : "#555" }}>💬</span>
                     {d.comments?.length > 0 && <span style={{ position: "absolute", top: 2, right: 2, fontSize: 8, background: "var(--gold)", color: "#fff", borderRadius: 100, padding: "0 4px", fontWeight: 700 }}>{d.comments.length}</span>}
                     {cmtOpen === d.id && (
-                      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: "100%", width: 280, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 12px 40px rgba(0,0,0,.15)", zIndex: 30, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div onClick={e => e.stopPropagation()} style={{ position: "absolute", left: 0, top: "100%", width: 280, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 12px 40px rgba(0,0,0,.15)", zIndex: 30, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
                         <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600 }}>{d.name}</div>
                         <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
                           {(d.comments || []).length === 0 && <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No comments.</div>}
@@ -10392,12 +10391,37 @@ function PromoCalendarTable({ data, setData, currentUser }) {
                       </div>
                     )}
                   </div>
+                  {/* Status — colored badge */}
+                  <div style={cs}>
+                    <div style={{ width: "100%", padding: "4px 0", borderRadius: 4, textAlign: "center", fontSize: 10, fontWeight: 700, color: "#fff", background: STATUS_CLR[d.status] || "#888", cursor: "pointer" }} onClick={() => { const next = PROMO_STATUSES[(PROMO_STATUSES.indexOf(d.status) + 1) % PROMO_STATUSES.length]; updateItem(d.id, "status", next); }}>{d.status || "—"}</div>
+                  </div>
+                  {/* Discount Type — colored badge */}
+                  <div style={cs}>
+                    <div style={{ width: "100%", padding: "4px 0", borderRadius: 4, textAlign: "center", fontSize: 10, fontWeight: 600, color: "#fff", background: d.discountType ? "#9333ea" : "rgba(0,0,0,.1)", cursor: "text" }}>
+                      <input value={d.discountType||""} onChange={e => updateItem(d.id, "discountType", e.target.value)} style={{ background: "transparent", border: "none", color: d.discountType ? "#fff" : "var(--text-muted)", fontSize: 10, fontWeight: 600, textAlign: "center", outline: "none", width: "100%", padding: 0, fontFamily: "var(--bf)" }} placeholder="—" />
+                    </div>
+                  </div>
+                  {/* Timeline — date range pill */}
+                  <div style={cs}>
+                    {d.startDate || d.endDate ? (
+                      <div style={{ padding: "4px 8px", borderRadius: 100, background: "#22c55e", color: "#fff", fontSize: 10, fontWeight: 600, textAlign: "center", whiteSpace: "nowrap", width: "100%" }}>
+                        {d.startDate ? new Date(d.startDate+"T00:00").toLocaleDateString("en-US",{month:"short",day:"numeric"}) : "?"} - {d.endDate ? new Date(d.endDate+"T00:00").toLocaleDateString("en-US",{day:"numeric"}) : "?"}
+                      </div>
+                    ) : <span style={{ fontSize: 10, color: "var(--text-muted)", width: "100%", textAlign: "center" }}>—</span>}
+                  </div>
+                  <div style={cs}><input value={d.digitalAssets||""} onChange={e => updateItem(d.id, "digitalAssets", e.target.value)} style={is3} /></div>
+                  {/* Brand — colored badge */}
+                  <div style={cs}>
+                    <select value={d.brand||""} onChange={e => updateItem(d.id, "brand", e.target.value)} style={{ ...is3, fontSize: 10, fontWeight: 600, color: "#fff", background: d.brand === "ALL" ? "#22c55e" : BRAND_COLORS_MAP[d.brand] || "#888", borderRadius: 4, padding: "4px 4px", textAlign: "center", cursor: "pointer" }}>{PROMO_BRANDS.map(b => <option key={b}>{b}</option>)}</select>
+                  </div>
+                  <div style={cs}><input value={d.participants||""} onChange={e => updateItem(d.id, "participants", e.target.value)} style={is3} /></div>
+                  <div style={cs}><input value={d.promoDetails||""} onChange={e => updateItem(d.id, "promoDetails", e.target.value)} style={is3} placeholder="Details..." /></div>
                   <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteItem(d.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
                 </div>
               ))}
-              {!collapsed[section] && (
-                <div onClick={() => setShowAddModal(true)} style={{ padding: "6px 12px", borderBottom: "1px solid var(--border2)", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
-                  onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add promo</div>
+                <div onClick={() => setShowAddModal(true)} style={{ padding: "8px 12px", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
+                  onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add name of the promo</div>
+                </div>
               )}
             </div>
           ); })}
