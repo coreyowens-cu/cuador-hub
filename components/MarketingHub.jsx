@@ -1017,6 +1017,7 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
   const [tierListData, setTierListData] = useState([]);
   const [weeklyDrops, setWeeklyDrops] = useState([]);
   const [creditMemos, setCreditMemos] = useState([]);
+  const [salesContacts, setSalesContacts] = useState([]);
 
 
   // Load
@@ -1099,7 +1100,12 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
         } else {
           setDesignRequests(DEFAULT_DESIGN_REQUESTS);
         }
-        if (ftt) setFieldTeamTree(JSON.parse(ftt.value));
+        if (ftt) {
+          const parsed = JSON.parse(ftt.value);
+          const existingIds = new Set(parsed.map(n => n.id));
+          const missing = DEFAULT_FIELDTEAM_TREE.filter(d => !existingIds.has(d.id));
+          setFieldTeamTree([...parsed, ...missing]);
+        }
       } catch (_) { if (!initialUserName) setShowWhoModal(true); }
       setReady(true);
     })();
@@ -1228,6 +1234,15 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
     })();
   }, [ready]);
   useEffect(() => { if (ready && creditMemos.length > 0) window.storage.set("ns-credit-memos", JSON.stringify(creditMemos), true).catch(() => {}); }, [creditMemos, ready]);
+  useEffect(() => {
+    if (!ready) return;
+    (async () => {
+      const stored = await window.storage.get("ns-sales-contacts", true).catch(() => null);
+      if (stored) { setSalesContacts(JSON.parse(stored.value)); return; }
+      try { const r = await fetch("/data/salescontacts-default.json"); const d = await r.json(); setSalesContacts(d); } catch {}
+    })();
+  }, [ready]);
+  useEffect(() => { if (ready && salesContacts.length > 0) window.storage.set("ns-sales-contacts", JSON.stringify(salesContacts), true).catch(() => {}); }, [salesContacts, ready]);
 
   useEffect(() => {
     const handler = () => { setLeftTab("initiatives"); setActiveBrand(null); };
@@ -2140,7 +2155,7 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
 
             {/* ── FIELD TEAM ── */}
             {leftTab === "fieldteam" && !activeBrand && (
-              <FieldTeamPortal tree={fieldTeamTree} setTree={setFieldTeamTree} contacts={centralizedContacts} setContacts={setCentralizedContacts} tierList={tierListData} setTierList={setTierListData} drops={weeklyDrops} setDrops={setWeeklyDrops} creditMemos={creditMemos} setCreditMemos={setCreditMemos} currentUser={currentUser} />
+              <FieldTeamPortal tree={fieldTeamTree} setTree={setFieldTeamTree} contacts={centralizedContacts} setContacts={setCentralizedContacts} tierList={tierListData} setTierList={setTierListData} drops={weeklyDrops} setDrops={setWeeklyDrops} creditMemos={creditMemos} setCreditMemos={setCreditMemos} salesContacts={salesContacts} setSalesContacts={setSalesContacts} currentUser={currentUser} />
             )}
 
             {/* ── COMPLIANCE ── */}
@@ -9209,7 +9224,7 @@ function DesignDetailModal({ request, brands, teamMembers, onClose, onUpdate, on
 // ════════════════════════════════════════════════════════════════════════════
 // FIELD TEAM PORTAL
 // ════════════════════════════════════════════════════════════════════════════
-function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTierList, drops, setDrops, creditMemos, setCreditMemos, currentUser }) {
+function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTierList, drops, setDrops, creditMemos, setCreditMemos, salesContacts, setSalesContacts, currentUser }) {
   const [expanded, setExpanded] = useState(() => new Set(tree.filter(n => n.type === "folder").map(n => n.id)));
   const [selectedId, setSelectedId] = useState(null);
   const [renamingId, setRenamingId] = useState(null);
@@ -9223,6 +9238,7 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
   const isTierListView = selected?.name === "Tier List Tracker";
   const isDropsView = selected?.name === "2026 Weekly Drops Menu";
   const isCreditMemosView = selected?.name === "Credit Memo Requests";
+  const isSalesContactsView = selected?.name === "Sales Contact List";
 
   const addNode = (parentId, type) => {
     const siblings = getChildren(parentId);
@@ -9321,6 +9337,8 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
           <WeeklyDropsTable drops={drops} setDrops={setDrops} />
         ) : selected && isCreditMemosView ? (
           <CreditMemoTable data={creditMemos} setData={setCreditMemos} currentUser={currentUser} />
+        ) : selected && isSalesContactsView ? (
+          <SalesContactTable data={salesContacts} setData={setSalesContacts} currentUser={currentUser} />
         ) : selected ? (
           <>
             <div style={{ padding: "16px 24px", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -10053,6 +10071,88 @@ function CreditMemoTable({ data, setData, currentUser }) {
               )}
             </div>
           ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── SALES CONTACT TABLE ───────────────────────────────────────────────────
+const ORDER_STYLES = ["Menu", "LeafLink", "Email", "Phone", "Text", "Unknown or Inactive"];
+
+function SalesContactTable({ data, setData, currentUser }) {
+  const [search, setSearch] = useState("");
+  const [cmtOpen, setCmtOpen] = useState(null);
+  const [cmtText, setCmtText] = useState("");
+
+  const updateItem = (id, field, val) => setData(p => p.map(d => d.id === id ? { ...d, [field]: val } : d));
+  const deleteItem = (id) => setData(p => p.filter(d => d.id !== id));
+  const addItem = () => setData(p => [...p, { id: `scl-${Date.now()}`, account: "", contact: "", email: "", phone: "", orderingStyle: "Menu", notes: "" }]);
+  const addComment = (itemId) => { if (!cmtText.trim()) return; setData(p => p.map(d => d.id === itemId ? { ...d, comments: [...(d.comments || []), { id: `scc-${Date.now()}`, author: currentUser?.name || "Team", text: cmtText.trim(), ts: new Date().toISOString() }] } : d)); setCmtText(""); };
+  const deleteComment = (itemId, cId) => setData(p => p.map(d => d.id === itemId ? { ...d, comments: (d.comments || []).filter(c => c.id !== cId) } : d));
+
+  const filtered = search ? data.filter(d => { const s = search.toLowerCase(); return (d.account||"").toLowerCase().includes(s) || (d.contact||"").toLowerCase().includes(s) || (d.email||"").toLowerCase().includes(s); }) : data;
+
+  const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
+  const is2 = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
+  const SLG = "1fr 1fr 1fr 120px 110px 1fr 36px 28px";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
+      <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <div style={{ fontFamily: "var(--df)", fontSize: 22, fontWeight: 300, color: "var(--text)" }}>Sales Contact List</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{filtered.length} account{filtered.length !== 1 ? "s" : ""}</div>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <button className="btn btn-gold" style={{ fontSize: 11, padding: "6px 14px" }} onClick={addItem}>+ New Account</button>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search account, contact, email..." style={{ flex: 1, minWidth: 150, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+        </div>
+      </div>
+      <div style={{ flex: 1, overflow: "auto" }}>
+        <div style={{ minWidth: 700 }}>
+          <div style={{ display: "grid", gridTemplateColumns: SLG, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
+            {["Account", "Contact", "Email", "Phone", "Ordering", "Notes", "💬", ""].map(h => (
+              <div key={h} style={{ padding: "8px 8px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
+            ))}
+          </div>
+          {filtered.map(d => (
+            <div key={d.id} style={{ display: "grid", gridTemplateColumns: SLG, borderBottom: "1px solid var(--border2)", minHeight: 34 }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,.02)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+              <div style={cs}><input value={d.account||""} onChange={e => updateItem(d.id, "account", e.target.value)} style={{ ...is2, fontWeight: 500, color: "var(--text)" }} placeholder="Account" /></div>
+              <div style={cs}><input value={d.contact||""} onChange={e => updateItem(d.id, "contact", e.target.value)} style={is2} placeholder="Contact" /></div>
+              <div style={cs}><input value={d.email||""} onChange={e => updateItem(d.id, "email", e.target.value)} style={{ ...is2, color: "#3b82f6" }} /></div>
+              <div style={cs}><input value={d.phone||""} onChange={e => updateItem(d.id, "phone", e.target.value)} style={is2} /></div>
+              <div style={cs}><select value={d.orderingStyle||""} onChange={e => updateItem(d.id, "orderingStyle", e.target.value)} style={{ ...is2, fontSize: 10 }}>{ORDER_STYLES.map(s => <option key={s}>{s}</option>)}</select></div>
+              <div style={cs}><input value={d.notes||""} onChange={e => updateItem(d.id, "notes", e.target.value)} style={is2} placeholder="Notes..." /></div>
+              <div style={{ ...cs, justifyContent: "center", cursor: "pointer", position: "relative" }} onClick={e => { e.stopPropagation(); setCmtOpen(cmtOpen === d.id ? null : d.id); }}>
+                <span style={{ fontSize: 16, color: (d.comments?.length > 0) ? "var(--gold)" : "#555" }}>💬</span>
+                {d.comments?.length > 0 && <span style={{ position: "absolute", top: 2, right: 2, fontSize: 8, background: "var(--gold)", color: "#fff", borderRadius: 100, padding: "0 4px", fontWeight: 700 }}>{d.comments.length}</span>}
+                {cmtOpen === d.id && (
+                  <div onClick={e => e.stopPropagation()} style={{ position: "absolute", right: 0, top: "100%", width: 280, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 12, boxShadow: "0 12px 40px rgba(0,0,0,.15)", zIndex: 30, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ fontSize: 10, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600 }}>{d.account}</div>
+                    <div style={{ maxHeight: 160, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+                      {(d.comments || []).length === 0 && <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No comments.</div>}
+                      {(d.comments || []).map(c => (
+                        <div key={c.id} style={{ padding: "6px 8px", background: "var(--surface2)", border: "1px solid var(--border2)", borderRadius: 6 }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}><span style={{ fontSize: 10, fontWeight: 600, color: "var(--gold)" }}>{c.author}</span><span style={{ fontSize: 8, color: "var(--text-muted)" }}>{new Date(c.ts).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span></div>
+                          <div style={{ fontSize: 11, color: "var(--text-dim)", lineHeight: 1.5 }}>{c.text}</div>
+                          {c.author === currentUser?.name && <button onClick={() => deleteComment(d.id, c.id)} style={{ fontSize: 9, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", padding: "2px 0", fontFamily: "var(--bf)" }}>Delete</button>}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ display: "flex", gap: 6 }}>
+                      <input value={cmtText} onChange={e => setCmtText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") addComment(d.id); }} placeholder="Comment..." style={{ flex: 1, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 8px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+                      <button className="btn btn-sm" style={{ fontSize: 9, borderColor: "rgba(184,150,58,.3)", color: "var(--gold)" }} onClick={() => addComment(d.id)}>Send</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteItem(d.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
+            </div>
+          ))}
+          <div onClick={addItem} style={{ padding: "8px 12px", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
+            onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add account</div>
         </div>
       </div>
     </div>
