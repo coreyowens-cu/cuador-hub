@@ -8799,10 +8799,10 @@ function DesignPortal({ requests, setRequests, brands, teamMembers, currentUser,
             <button className="btn btn-gold" onClick={() => setShowModal(true)}>+ Submit Request</button>
           </div>
         ) : (
-          <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top left", width: `${10000 / zoom}%` }}>
-          <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+          <div style={{ transform: `scale(${zoom / 100})`, transformOrigin: "top left", width: `${10000 / zoom}%`, minWidth: "fit-content" }}>
+          <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "visible" }}>
             {/* Column headers with resize handles */}
-            <div style={{ display: "grid", gridTemplateColumns: GRID, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
+            <div style={{ display: "grid", gridTemplateColumns: GRID, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
               {["", "Brand", "Project", "Owner", "💬", "What Needed", "Channel", "Creative", "Due", "Live", "Created", "Status", "Priority", "Notes"].map((h, i) => (
                 <div key={i} style={{ padding: "8px 8px", fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)", whiteSpace: "nowrap", position: "relative", userSelect: "none" }}>
                   {h}
@@ -9732,7 +9732,7 @@ function ContactsTable({ contacts, setContacts, currentUser }) {
       )}
       <div style={{ flex: 1, overflow: "auto" }}>
         <div style={{ minWidth: 1200 }}>
-          <div style={{ display: "grid", gridTemplateColumns: CG, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: CG, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
             {["Contact","Role","Email","Tier","Tier Tracker","Location","Account","Phone","Last Contact","Owner","Notes","💬",""].map(h => (
               <div key={h} style={{ padding: "8px 8px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
             ))}
@@ -9883,7 +9883,7 @@ function TierListTable({ data, setData, currentUser }) {
       <div style={{ flex: 1, overflow: "auto" }}>
         <div style={{ minWidth: 1100 }}>
           {/* Account header */}
-          <div style={{ display: "grid", gridTemplateColumns: AG, background: "rgba(10,10,20,.6)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
+          <div style={{ display: "grid", gridTemplateColumns: AG, background: "var(--surface3)", borderBottom: "2px solid var(--border)", position: "sticky", top: 0, zIndex: 2 }}>
             {["Account", "💬", "Brands Carried", "POC Access", "Discount", "Inventory", "Assets", "In-Store", "Digital", "Promos", "Orders", "Scorecard", "Proj Q2"].map(h => (
               <div key={h} style={{ padding: "8px 6px", fontSize: 9, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
             ))}
