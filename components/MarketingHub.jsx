@@ -9687,7 +9687,7 @@ function ContactsTable({ contacts, setContacts, currentUser }) {
 
 // ── TIER LIST TABLE ───────────────────────────────────────────────────────
 function TierListTable({ data, setData, currentUser }) {
-  const [collapsed, setCollapsed] = useState({});
+  const [collapsed, setCollapsed] = useState({ "Tier 1": true, "Tier 2": true, "Tier 3": true });
   const [expandedAcct, setExpandedAcct] = useState({});
   const [filterTier, setFilterTier] = useState("all");
   const [search, setSearch] = useState("");
@@ -10678,7 +10678,7 @@ function EventsTable({ data, setData, currentUser }) {
   const [cmtOpen, setCmtOpen] = useState(null);
   const [cmtText, setCmtText] = useState("");
   const [newItem, setNewItem] = useState({ name: "", section: "Future Events", activationType: "Sesh", region: "STL", date: "", eventStatus: "Waiting for Confirmation", staffAttending: "", location: "", estAttendance: "", contactEmail: "", contactPhone: "", startTime: "", endTime: "", collaborators: "" });
-  useEffect(() => { if (!didInit && data.length > 0) { const all = {}; [...new Set(data.map(d => d.section))].forEach(s => { all[s] = true; }); setCollapsed(all); setDidInit(true); } }, [data, didInit]);
+  useEffect(() => { if (!didInit && data.length > 0) { setDidInit(true); } }, [data, didInit]);
   const updateItem = (id, field, val) => setData(p => p.map(d => d.id === id ? { ...d, [field]: val } : d));
   const deleteItem = (id) => setData(p => p.filter(d => d.id !== id));
   const addItem = () => { if (!newItem.name.trim()) return; setData(p => [...p, { ...newItem, id: `ev-${Date.now()}` }]); setCollapsed(p => ({ ...p, [newItem.section]: false })); setShowAddModal(false); setNewItem({ name: "", section: "Future Events", activationType: "Sesh", region: "STL", date: "", eventStatus: "Waiting for Confirmation", staffAttending: "", location: "", estAttendance: "", contactEmail: "", contactPhone: "", startTime: "", endTime: "", collaborators: "" }); };
