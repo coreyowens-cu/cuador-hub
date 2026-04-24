@@ -10814,139 +10814,194 @@ function EventsTable({ data, setData, currentUser }) {
   );
 }
 
-// ── FIELD MARKETING WEEKLY AGENDA V2 ──────────────────────────────────────
+// ── FIELD MARKETING WEEKLY AGENDA V3 ──────────────────────────────────────
 const AGENDA_STATUSES = ["Not Started", "In Progress", "Completed"];
 const AGENDA_ST_CLR = { "Not Started": "#8a8a96", "In Progress": "#c9a84c", "Completed": "#22c55e" };
+const TODO_URGENCY = ["Low", "Medium", "High", "Urgent"];
+const TODO_URG_CLR = { "Low": "#4d9e8e", "Medium": "#c9a84c", "High": "#e07b6a", "Urgent": "#d94848" };
 
 function FieldAgendaTable({ data, setData, currentUser }) {
   const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showAddItem, setShowAddItem] = useState(false);
-  const [newMeeting, setNewMeeting] = useState({ date: new Date().toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" }) });
-  const [newItemText, setNewItemText] = useState("");
-  const [newItemSection, setNewItemSection] = useState("Notes");
+  const [showAddMeeting, setShowAddMeeting] = useState(false);
+  const [showAddAgenda, setShowAddAgenda] = useState(false);
+  const [newMeetingDate, setNewMeetingDate] = useState(new Date().toLocaleDateString("en-US", { month: "numeric", day: "numeric", year: "numeric" }));
+  const [agendaTitle, setAgendaTitle] = useState("");
+  const [agendaSubItems, setAgendaSubItems] = useState([""]);
+  const [todoPopup, setTodoPopup] = useState(null); // { text, fromDate }
+  const [todoOwner, setTodoOwner] = useState("");
+  const [todoUrgency, setTodoUrgency] = useState("Medium");
+  const [todosOpen, setTodosOpen] = useState(true);
   const [todos, setTodos] = useState(() => { try { const v = localStorage.getItem("ns_agenda-todos"); return v ? JSON.parse(v) : []; } catch { return []; } });
 
   useEffect(() => { try { localStorage.setItem("ns_agenda-todos", JSON.stringify(todos)); } catch {} }, [todos]);
 
-  if (!data?.meetings) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading agenda...</div>;
-
+  if (!data?.meetings) return <div style={{ padding: 40, textAlign: "center", color: "var(--text-muted)" }}>Loading...</div>;
   const meetings = data.meetings || [];
-  const addMeeting = () => {
-    if (!newMeeting.date) return;
-    const m = { date: newMeeting.date, sections: [{ title: "Notes", items: [] }] };
-    setData(p => ({ ...p, meetings: [m, ...p.meetings] }));
-    setShowAddModal(false);
-    setSelectedMeeting(0);
+  const active = selectedMeeting !== null ? meetings[selectedMeeting] : null;
+
+  const addMeeting = () => { if (!newMeetingDate) return; setData(p => ({ ...p, meetings: [{ date: newMeetingDate, sections: [] }, ...p.meetings] })); setShowAddMeeting(false); setSelectedMeeting(0); };
+  const publishAgenda = () => {
+    if (!agendaTitle.trim()) return;
+    const section = { title: agendaTitle.trim(), items: agendaSubItems.filter(s => s.trim()).map(s => s.trim()) };
+    setData(p => { const ms = [...p.meetings]; ms[selectedMeeting] = { ...ms[selectedMeeting], sections: [...ms[selectedMeeting].sections, section] }; return { ...p, meetings: ms }; });
+    setAgendaTitle(""); setAgendaSubItems([""]); setShowAddAgenda(false);
   };
-  const addItemToMeeting = (mIdx, sectionTitle, text) => {
-    setData(p => {
-      const ms = [...p.meetings];
-      const m = { ...ms[mIdx], sections: ms[mIdx].sections.map(s => s.title === sectionTitle ? { ...s, items: [...s.items, text] } : s) };
-      if (!m.sections.find(s => s.title === sectionTitle)) m.sections = [...m.sections, { title: sectionTitle, items: [text] }];
-      ms[mIdx] = m;
-      return { ...p, meetings: ms };
-    });
-  };
-  const addToTodos = (text, owner) => {
-    setTodos(p => [...p, { id: `todo-${Date.now()}`, text, owner: owner || currentUser?.name || "", status: "Not Started", createdAt: new Date().toISOString() }]);
+  const addTodo = () => {
+    if (!todoPopup) return;
+    setTodos(p => [...p, { id: `todo-${Date.now()}`, text: todoPopup.text, owner: todoOwner || currentUser?.name || "", urgency: todoUrgency, status: "Not Started", fromDate: todoPopup.fromDate, createdAt: new Date().toISOString() }]);
+    setTodoPopup(null); setTodoOwner(""); setTodoUrgency("Medium");
   };
   const updateTodo = (id, field, val) => setTodos(p => p.map(t => t.id === id ? { ...t, [field]: val } : t));
   const deleteTodo = (id) => setTodos(p => p.filter(t => t.id !== id));
-
-  const active = selectedMeeting !== null ? meetings[selectedMeeting] : null;
+  const activeTodos = todos.filter(t => t.status !== "Completed");
+  const completedTodos = todos.filter(t => t.status === "Completed");
 
   return (
     <div style={{ display: "flex", height: "100%", overflow: "hidden" }}>
-      {/* Left — Meeting list */}
-      <div style={{ width: 220, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--surface)" }}>
+      {/* Todo Popup */}
+      {todoPopup && (
+        <div className="overlay" onClick={() => setTodoPopup(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
+            <div className="mhdr" style={{ borderTop: "2px solid #22c55e", borderRadius: "16px 16px 0 0" }}>
+              <div className="mtitle" style={{ fontSize: 14 }}>Add to Todos</div>
+              <button className="mclose" onClick={() => setTodoPopup(null)}>×</button>
+            </div>
+            <div style={{ padding: "16px 20px" }}>
+              <div style={{ fontSize: 13, color: "var(--text)", padding: "10px 14px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 8, marginBottom: 14, lineHeight: 1.6 }}>{todoPopup.text}</div>
+              <div className="frow">
+                <div className="ff"><label className="fl">Owner</label><input className="fi" placeholder="Who owns this?" value={todoOwner} onChange={e => setTodoOwner(e.target.value)} autoFocus /></div>
+                <div className="ff"><label className="fl">Urgency</label>
+                  <select className="fsel" value={todoUrgency} onChange={e => setTodoUrgency(e.target.value)}>{TODO_URGENCY.map(u => <option key={u}>{u}</option>)}</select>
+                </div>
+              </div>
+            </div>
+            <div className="mfoot"><button className="btn" onClick={() => setTodoPopup(null)}>Cancel</button><button className="btn btn-gold" onClick={addTodo}>Add Todo</button></div>
+          </div>
+        </div>
+      )}
+      {/* Add Agenda Modal */}
+      {showAddAgenda && (
+        <div className="overlay" onClick={() => setShowAddAgenda(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 520 }}>
+            <div className="mhdr" style={{ borderTop: "2px solid var(--gold)", borderRadius: "16px 16px 0 0" }}>
+              <div className="mtitle">New Agenda Item</div>
+              <button className="mclose" onClick={() => setShowAddAgenda(false)}>×</button>
+            </div>
+            <div style={{ padding: "18px 20px", overflowY: "auto", maxHeight: "60vh" }}>
+              <div className="ff"><label className="fl">Agenda Topic *</label><input className="fi" placeholder="e.g. Leadership Updates, Luke's Notes..." value={agendaTitle} onChange={e => setAgendaTitle(e.target.value)} autoFocus /></div>
+              <div style={{ marginTop: 12 }}>
+                <label className="fl">Sub-Items</label>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {agendaSubItems.map((item, i) => (
+                    <div key={i} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <span style={{ fontSize: 10, color: "var(--text-muted)", width: 16, textAlign: "center" }}>{i + 1}.</span>
+                      <input value={item} onChange={e => { const n = [...agendaSubItems]; n[i] = e.target.value; setAgendaSubItems(n); }}
+                        onKeyDown={e => { if (e.key === "Enter") { setAgendaSubItems(p => [...p, ""]); setTimeout(() => e.target.parentElement.nextSibling?.querySelector("input")?.focus(), 50); } }}
+                        placeholder="Sub-item note..." style={{ flex: 1, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none" }} />
+                      {agendaSubItems.length > 1 && <button onClick={() => setAgendaSubItems(p => p.filter((_, j) => j !== i))} style={{ fontSize: 14, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", opacity: .4 }}>×</button>}
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => setAgendaSubItems(p => [...p, ""])} style={{ marginTop: 8, fontSize: 11, color: "var(--gold)", background: "none", border: "1px solid rgba(184,150,58,.2)", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "var(--bf)" }}>+ Add Sub-Item</button>
+              </div>
+            </div>
+            <div className="mfoot">
+              <button className="btn" onClick={() => setShowAddAgenda(false)}>Cancel</button>
+              <button className="btn btn-gold" disabled={!agendaTitle.trim()} onClick={publishAgenda}>Publish Agenda Item</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Add Meeting Modal */}
+      {showAddMeeting && (
+        <div className="overlay" onClick={() => setShowAddMeeting(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 380 }}>
+            <div className="mhdr" style={{ borderTop: "2px solid var(--gold)", borderRadius: "16px 16px 0 0" }}><div className="mtitle">New Meeting</div><button className="mclose" onClick={() => setShowAddMeeting(false)}>×</button></div>
+            <div style={{ padding: "18px 20px" }}><div className="ff"><label className="fl">Date</label><input className="fi" placeholder="4/28/2026" value={newMeetingDate} onChange={e => setNewMeetingDate(e.target.value)} autoFocus /></div></div>
+            <div className="mfoot"><button className="btn" onClick={() => setShowAddMeeting(false)}>Cancel</button><button className="btn btn-gold" onClick={addMeeting}>Create</button></div>
+          </div>
+        </div>
+      )}
+
+      {/* Left — Meetings + Todos */}
+      <div style={{ width: 240, flexShrink: 0, borderRight: "1px solid var(--border)", display: "flex", flexDirection: "column", background: "var(--surface)" }}>
         <div style={{ padding: "14px 14px 10px", borderBottom: "1px solid var(--border2)" }}>
           <div style={{ fontSize: 10, letterSpacing: ".2em", textTransform: "uppercase", color: "var(--gold)", fontWeight: 600, marginBottom: 6 }}>Weekly Meetings</div>
-          <button className="btn btn-gold" style={{ width: "100%", fontSize: 10, justifyContent: "center" }} onClick={() => setShowAddModal(true)}>+ New Meeting</button>
+          <button className="btn btn-gold" style={{ width: "100%", fontSize: 10, justifyContent: "center" }} onClick={() => setShowAddMeeting(true)}>+ New Meeting</button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "6px" }}>
           {meetings.map((m, i) => (
-            <button key={i} onClick={() => setSelectedMeeting(i)} style={{
-              display: "block", width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${selectedMeeting === i ? "rgba(184,150,58,.3)" : "transparent"}`,
-              background: selectedMeeting === i ? "var(--gold-dim)" : "transparent", cursor: "pointer", textAlign: "left", marginBottom: 2, transition: "all .13s", fontFamily: "var(--bf)",
-            }}
-              onMouseEnter={e => { if (selectedMeeting !== i) e.currentTarget.style.background = "rgba(0,0,0,.03)"; }}
-              onMouseLeave={e => { if (selectedMeeting !== i) e.currentTarget.style.background = "transparent"; }}>
+            <button key={i} onClick={() => setSelectedMeeting(i)} style={{ display: "block", width: "100%", padding: "10px 12px", borderRadius: 8, border: `1px solid ${selectedMeeting === i ? "rgba(184,150,58,.3)" : "transparent"}`, background: selectedMeeting === i ? "var(--gold-dim)" : "transparent", cursor: "pointer", textAlign: "left", marginBottom: 2, fontFamily: "var(--bf)", transition: "all .13s" }}
+              onMouseEnter={e => { if (selectedMeeting !== i) e.currentTarget.style.background = "rgba(0,0,0,.03)"; }} onMouseLeave={e => { if (selectedMeeting !== i) e.currentTarget.style.background = "transparent"; }}>
               <div style={{ fontSize: 13, fontWeight: selectedMeeting === i ? 600 : 400, color: selectedMeeting === i ? "var(--gold)" : "var(--text)" }}>{m.date}</div>
-              <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{m.sections.reduce((s, sec) => s + sec.items.length, 0)} items</div>
+              <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{m.sections.length} topics · {m.sections.reduce((s, sec) => s + sec.items.length, 0)} items</div>
             </button>
           ))}
         </div>
-        {/* Todos section */}
-        <div style={{ borderTop: "1px solid var(--border)", padding: "10px 12px", maxHeight: "40%", overflowY: "auto" }}>
-          <div style={{ fontSize: 10, letterSpacing: ".15em", textTransform: "uppercase", color: "#22c55e", fontWeight: 600, marginBottom: 8 }}>Action Items ({todos.filter(t => t.status !== "Completed").length})</div>
-          {todos.length === 0 && <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic" }}>No todos yet</div>}
-          {todos.map(t => (
-            <div key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "4px 0", borderBottom: "1px solid var(--border2)" }}>
-              <div onClick={() => { const next = AGENDA_STATUSES[(AGENDA_STATUSES.indexOf(t.status) + 1) % AGENDA_STATUSES.length]; updateTodo(t.id, "status", next); }}
-                style={{ width: 14, height: 14, borderRadius: 3, border: `2px solid ${AGENDA_ST_CLR[t.status]}`, background: t.status === "Completed" ? "#22c55e" : "transparent", cursor: "pointer", flexShrink: 0, marginTop: 2, display: "grid", placeItems: "center" }}>
-                {t.status === "Completed" && <span style={{ fontSize: 9, color: "#fff" }}>✓</span>}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, color: t.status === "Completed" ? "var(--text-muted)" : "var(--text)", textDecoration: t.status === "Completed" ? "line-through" : "none" }}>{t.text}</div>
-                <div style={{ fontSize: 9, color: "#e8a87c" }}>{t.owner}</div>
-              </div>
-              <button onClick={() => deleteTodo(t.id)} style={{ fontSize: 10, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", opacity: .4, padding: 0 }}>×</button>
+        {/* Todos */}
+        <div style={{ borderTop: "1px solid var(--border)" }}>
+          <div onClick={() => setTodosOpen(o => !o)} style={{ padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div style={{ fontSize: 10, letterSpacing: ".15em", textTransform: "uppercase", color: "#22c55e", fontWeight: 600 }}>Todos ({activeTodos.length})</div>
+            <span style={{ fontSize: 10, color: "var(--text-muted)", transform: todosOpen ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .15s", display: "inline-block" }}>▶</span>
+          </div>
+          {todosOpen && (
+            <div style={{ padding: "0 12px 10px", maxHeight: 250, overflowY: "auto" }}>
+              {activeTodos.length === 0 && completedTodos.length === 0 && <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic", padding: "4px 0" }}>Click "+ Todo" on any item to track it here</div>}
+              {activeTodos.map(t => (
+                <div key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: 6, padding: "5px 0", borderBottom: "1px solid var(--border2)" }}>
+                  <div onClick={() => updateTodo(t.id, "status", AGENDA_STATUSES[(AGENDA_STATUSES.indexOf(t.status) + 1) % AGENDA_STATUSES.length])}
+                    style={{ width: 14, height: 14, borderRadius: 3, border: `2px solid ${AGENDA_ST_CLR[t.status]}`, background: "transparent", cursor: "pointer", flexShrink: 0, marginTop: 2 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 10, color: "var(--text)", lineHeight: 1.4 }}>{t.text}</div>
+                    <div style={{ display: "flex", gap: 6, marginTop: 2 }}>
+                      <span style={{ fontSize: 9, color: "#e8a87c" }}>{t.owner}</span>
+                      <span style={{ fontSize: 8, padding: "1px 5px", borderRadius: 3, background: TODO_URG_CLR[t.urgency] + "20", color: TODO_URG_CLR[t.urgency], fontWeight: 600 }}>{t.urgency}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => deleteTodo(t.id)} style={{ fontSize: 10, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", opacity: .3, padding: 0 }}>×</button>
+                </div>
+              ))}
+              {completedTodos.length > 0 && (
+                <div style={{ marginTop: 8 }}>
+                  <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }}>Completed</div>
+                  {completedTodos.map(t => (
+                    <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 0" }}>
+                      <div style={{ width: 14, height: 14, borderRadius: 3, background: "#22c55e", display: "grid", placeItems: "center", flexShrink: 0 }}><span style={{ fontSize: 9, color: "#fff" }}>✓</span></div>
+                      <span style={{ flex: 1, fontSize: 10, color: "var(--text-muted)", textDecoration: "line-through" }}>{t.text}</span>
+                      <button onClick={() => deleteTodo(t.id)} style={{ fontSize: 9, color: "var(--text-muted)", background: "none", border: "none", cursor: "pointer", padding: 0 }}>clear</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          ))}
+          )}
         </div>
       </div>
 
       {/* Right — Meeting detail */}
       <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px" }}>
-        {showAddModal && (
-          <div className="overlay" onClick={() => setShowAddModal(false)}>
-            <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 400 }}>
-              <div className="mhdr" style={{ borderTop: "2px solid var(--gold)", borderRadius: "16px 16px 0 0" }}>
-                <div className="mtitle">New Meeting</div>
-                <button className="mclose" onClick={() => setShowAddModal(false)}>×</button>
-              </div>
-              <div style={{ padding: "18px 20px" }}>
-                <div className="ff"><label className="fl">Date</label><input className="fi" placeholder="e.g. 4/28/2026" value={newMeeting.date} onChange={e => setNewMeeting({ date: e.target.value })} autoFocus /></div>
-              </div>
-              <div className="mfoot"><button className="btn" onClick={() => setShowAddModal(false)}>Cancel</button><button className="btn btn-gold" onClick={addMeeting}>Create</button></div>
-            </div>
-          </div>
-        )}
-
         {active ? (
           <>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
               <div>
                 <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)" }}>{active.date}</div>
                 <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Field Marketing Weekly Check-in</div>
               </div>
-              <button className="btn btn-sm" style={{ borderColor: "rgba(184,150,58,.3)", color: "var(--gold)" }} onClick={() => setShowAddItem(true)}>+ Add Item</button>
+              <button className="btn btn-gold" style={{ fontSize: 11 }} onClick={() => { setAgendaTitle(""); setAgendaSubItems([""]); setShowAddAgenda(true); }}>+ Add Agenda Item</button>
             </div>
-
-            {showAddItem && (
-              <div style={{ padding: "14px 16px", background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 10, marginBottom: 16, display: "flex", gap: 8, alignItems: "flex-end" }}>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 600, marginBottom: 4 }}>Section</div>
-                  <input value={newItemSection} onChange={e => setNewItemSection(e.target.value)} placeholder="e.g. Luke's Notes" style={{ width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 8px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", marginBottom: 6 }} />
-                  <div style={{ fontSize: 9, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: ".08em", fontWeight: 600, marginBottom: 4 }}>Item</div>
-                  <input value={newItemText} onChange={e => setNewItemText(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && newItemText.trim()) { addItemToMeeting(selectedMeeting, newItemSection, newItemText.trim()); setNewItemText(""); } }} placeholder="Type agenda item..." style={{ width: "100%", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 8px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
-                </div>
-                <button className="btn btn-sm" style={{ borderColor: "rgba(184,150,58,.3)", color: "var(--gold)", fontSize: 10 }} onClick={() => { if (newItemText.trim()) { addItemToMeeting(selectedMeeting, newItemSection, newItemText.trim()); setNewItemText(""); } }}>Add</button>
-                <button className="btn btn-sm" style={{ fontSize: 10 }} onClick={() => setShowAddItem(false)}>Done</button>
-              </div>
-            )}
-
+            {active.sections.length === 0 && <div style={{ textAlign: "center", padding: "40px", color: "var(--text-muted)", fontSize: 12 }}>No agenda items yet. Click "+ Add Agenda Item" to start.</div>}
             {active.sections.map((sec, si) => (
-              <div key={si} style={{ marginBottom: 20 }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--gold)", letterSpacing: ".06em", textTransform: "uppercase", marginBottom: 8, paddingBottom: 4, borderBottom: "1px solid var(--border2)" }}>{sec.title}</div>
+              <div key={si} style={{ marginBottom: 24, padding: "16px 18px", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 10, borderLeft: "3px solid var(--gold)" }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)", marginBottom: 10 }}>{sec.title}</div>
+                {sec.items.length === 0 && <div style={{ fontSize: 11, color: "var(--text-muted)", fontStyle: "italic" }}>No sub-items</div>}
                 {sec.items.map((item, ii) => (
-                  <div key={ii} style={{ display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 0", borderBottom: "1px solid var(--border2)" }}>
-                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold)", flexShrink: 0, marginTop: 7, opacity: .4 }} />
-                    <div style={{ flex: 1, fontSize: 13, color: "var(--text-dim)", lineHeight: 1.6 }}>{item}</div>
-                    <button onClick={() => addToTodos(item, "")} title="Add to todos" style={{ flexShrink: 0, fontSize: 10, color: "var(--text-muted)", background: "none", border: "1px solid var(--border)", borderRadius: 4, padding: "2px 6px", cursor: "pointer", fontFamily: "var(--bf)", opacity: .5 }}
-                      onMouseEnter={e => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.borderColor = "var(--gold)"; e.currentTarget.style.color = "var(--gold)"; }}
-                      onMouseLeave={e => { e.currentTarget.style.opacity = ".5"; e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}>+ Todo</button>
+                  <div key={ii} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 0", borderBottom: ii < sec.items.length - 1 ? "1px solid var(--border2)" : "none" }}>
+                    <div style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--gold)", flexShrink: 0, marginTop: 7, opacity: .5 }} />
+                    <div style={{ flex: 1, fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65 }}>{item}</div>
+                    <button onClick={() => setTodoPopup({ text: item, fromDate: active.date })} title="Add to todos"
+                      style={{ flexShrink: 0, fontSize: 9, color: "var(--text-muted)", background: "none", border: "1px solid var(--border)", borderRadius: 4, padding: "3px 8px", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600, letterSpacing: ".04em", textTransform: "uppercase", transition: "all .15s" }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = "#22c55e"; e.currentTarget.style.color = "#22c55e"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-muted)"; }}>+ Todo</button>
                   </div>
                 ))}
               </div>
@@ -10956,7 +11011,7 @@ function FieldAgendaTable({ data, setData, currentUser }) {
           <div style={{ textAlign: "center", padding: "60px 40px" }}>
             <div style={{ fontSize: 40, opacity: .3, marginBottom: 16 }}>📋</div>
             <div style={{ fontFamily: "var(--df)", fontSize: 24, fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>Field Marketing Weekly</div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>Select a meeting date or create a new one.</div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>Select a meeting or create a new one to view the agenda.</div>
           </div>
         )}
       </div>
