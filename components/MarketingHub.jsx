@@ -892,7 +892,12 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
   const tzDate = (tz) => new Date().toLocaleDateString("en-US", { timeZone: tz, month: "short", day: "numeric" });
   const [weather, setWeather] = useState({});
   useEffect(() => {
-    const cities = { "America/Los_Angeles": "Los+Angeles", "America/Chicago": "St+Louis,MO", "America/Puerto_Rico": "San+Juan" };
+    const cities = {
+      "America/Los_Angeles": "Los+Angeles",
+      "America/Chicago": "St+Louis,MO",
+      "America/New_York": "New+York",
+      "America/Puerto_Rico": "San+Juan"
+    };
     Object.entries(cities).forEach(([tz, city]) => {
       fetch(`https://wttr.in/${city}?format=j1`).then(r => r.json()).then(d => {
         const cur = d?.current_condition?.[0];
@@ -1020,7 +1025,10 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
   const [salesContacts, setSalesContacts] = useState([]);
   const [promoCalendar, setPromoCalendar] = useState([]);
   const [popupsData, setPopupsData] = useState([]);
-  const [eventsData, setEventsData] = useState([]);\n  const [csBoardData, setCsBoardData] = useState([]);
+  const [eventsData, setEventsData] = useState([]);
+  const [csBoardData, setCsBoardData] = useState([]);
+  const [packagingTracker, setPackagingTracker] = useState([]);
+  const [packagingConfirmed, setPackagingConfirmed] = useState([]);
   const [fieldAgenda, setFieldAgenda] = useState([]);
 
 
@@ -1276,8 +1284,8 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
   useEffect(() => { if (!ready) return; (async () => { const s = await window.storage.get("ns-popups-blitz", true).catch(() => null); if (s) { setPopupsData(JSON.parse(s.value)); return; } try { const r = await fetch("/data/popups-default.json"); setPopupsData(await r.json()); } catch {} })(); }, [ready]);
   useEffect(() => { if (ready && popupsData.length > 0) window.storage.set("ns-popups-blitz", JSON.stringify(popupsData), true).catch(() => {}); }, [popupsData, ready]);
   useEffect(() => { if (!ready) return; (async () => { const s = await window.storage.get("ns-events-cal", true).catch(() => null); if (s) { setEventsData(JSON.parse(s.value)); return; } try { const r = await fetch("/data/events-default.json"); setEventsData(await r.json()); } catch {} })(); }, [ready]);
-  useEffect(() => { if (ready && eventsData.length > 0) window.storage.set("ns-events-cal", JSON.stringify(eventsData), true).catch(() => {}); }, [eventsData, ready]);\
-  useEffect(() => { if (!ready) return; (async () => { const s = await window.storage.get("ns-cs-board", true).catch(() => null); if (s) { setCsBoardData(JSON.parse(s.value)); return; } try { const r = await fetch("/data/csboard-default.json"); setCsBoardData(await r.json()); } catch {} })(); }, [ready]);\
+  useEffect(() => { if (ready && eventsData.length > 0) window.storage.set("ns-events-cal", JSON.stringify(eventsData), true).catch(() => {}); }, [eventsData, ready]);
+  useEffect(() => { if (!ready) return; (async () => { const s = await window.storage.get("ns-cs-board", true).catch(() => null); if (s) { setCsBoardData(JSON.parse(s.value)); return; } try { const r = await fetch("/data/csboard-default.json"); setCsBoardData(await r.json()); } catch {} })(); }, [ready]);
   useEffect(() => { if (ready && csBoardData.length > 0) window.storage.set("ns-cs-board", JSON.stringify(csBoardData), true).catch(() => {}); }, [csBoardData, ready]);
   useEffect(() => { if (!ready) return; (async () => { const s = await window.storage.get("ns-field-agenda-v2", true).catch(() => null); if (s) { setFieldAgenda(JSON.parse(s.value)); return; } try { const r = await fetch("/data/fieldagenda-v2.json"); setFieldAgenda(await r.json()); } catch {} })(); }, [ready]);
   useEffect(() => { if (ready && fieldAgenda?.meetings) window.storage.set("ns-field-agenda-v2", JSON.stringify(fieldAgenda), true).catch(() => {}); }, [fieldAgenda, ready]);
@@ -1520,6 +1528,7 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
             {[
               { label: "PT", tz: "America/Los_Angeles" },
               { label: "CT", tz: "America/Chicago" },
+              { label: "ET", tz: "America/New_York" },
               { label: "AT", tz: "America/Puerto_Rico" },
             ].map((z, i) => (
               <div key={z.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -1685,7 +1694,13 @@ export default function MarketingHub({ initialUserName, isSessionAdmin }) {
                     {lsbOpen && <span className="lsb-lbl">Field Team</span>}
                   </button>
 
-                  {/* Team — with inline dropdown */}
+                  {/\* Packaging \*/}\
+                  <button className={`lsb-tab ${leftTab === "packaging" ? "on" : ""}`} onClick={() => { if (leftTab === "packaging") { setLeftTab("company"); } else { setLeftTab("packaging"); } setActiveBrand(null); }}>\
+                    <span className="lsb-icon">📦</span>\
+                    {lsbOpen && <span className="lsb-lbl">Packaging</span>}\
+                  </button>\
+\
+                  {/\* Team — with inline dropdown \*/}
                   <button className={`lsb-tab ${leftTab === "team" ? "on" : ""}`} onClick={() => { if (leftTab === "team") { setLeftTab("company"); } else { setLeftTab("team"); } setActiveBrand(null); }}>
                     <span className="lsb-icon">👥</span>
                     {lsbOpen && <span className="lsb-lbl">Team</span>}
@@ -9414,7 +9429,7 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
   const isPromoCalendarView = selected?.name === "Promo Calendar- Work In Progress";
   const isPopupsView = selected?.name === "Popups and Blitz Calendar";
   const isEventsView = selected?.name === "Events & Event Support";
-  const isAgendaView = selected?.name === "Field Marketing Weekly";\
+  const isAgendaView = selected?.name === "Field Marketing Weekly";
   const isCsBoardView = selected?.name === "Customer Service Board";
 
   const addNode = (parentId, type) => {
@@ -9522,8 +9537,8 @@ function FieldTeamPortal({ tree, setTree, contacts, setContacts, tierList, setTi
           <PopupsBlitzTable data={popupsData} setData={setPopupsData} currentUser={currentUser} />
         ) : selected && isEventsView ? (
           <EventsTable data={eventsData} setData={setEventsData} currentUser={currentUser} />
-        \) : selected && isCsBoardView ? (\
-          <CSBoardTable data={csBoardData} setData={setCsBoardData} currentUser={currentUser} />\
+        ) : selected && isCsBoardView ? (
+          <CSBoardTable data={csBoardData} setData={setCsBoardData} currentUser={currentUser} />
         ) : selected && isAgendaView ? (
           <FieldAgendaTable data={fieldAgenda} setData={setFieldAgenda} currentUser={currentUser} />
         ) : selected ? (
@@ -11205,6 +11220,169 @@ function CSBoardTable({ data, setData, currentUser }) {
                     ))}
                     <div onClick={() => setShowAddModal(true)} style={{ padding: "8px 12px", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
                       onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add ticket</div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PACKAGING PORTAL ──────────────────────────────────────────────────────
+const PKG_STATUSES = ["Idea", "Sampled", "Approved", "Denied"];
+const PKG_ST_CLR = { "Idea": "#3b82f6", "Sampled": "#c9a84c", "Approved": "#22c55e", "Denied": "#e07b6a" };
+const PKG_TYPES = ["Box", "Jar", "Tube", "Mylar", "Pouch", "Bag", "Cart Box", "Display", "Label", "Wrap", "Other"];
+
+function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands, currentUser }) {
+  const brandList = brands ? Object.values(brands) : [];
+  const [activeTab, setActiveTab] = useState("tracker");
+  const [filterBrand, setFilterBrand] = useState("all");
+  const [search, setSearch] = useState("");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [collapsed, setCollapsed] = useState({});
+  const [newItem, setNewItem] = useState({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea" });
+
+  const data = activeTab === "tracker" ? tracker : confirmed;
+  const setData = activeTab === "tracker" ? setTracker : setConfirmed;
+
+  const updateItem = (id, field, val) => setData(p => p.map(d => d.id === id ? { ...d, [field]: val } : d));
+  const deleteItem = (id) => setData(p => p.filter(d => d.id !== id));
+  const addItem = () => {
+    if (!newItem.sku.trim()) return;
+    setData(p => [...p, { ...newItem, id: `pkg-${Date.now()}`, comments: [], attachment: null, attachmentName: "", createdAt: new Date().toISOString(), createdBy: currentUser?.name || "Team" }]);
+    setCollapsed(p => ({ ...p, [newItem.brand]: false }));
+    setShowAddModal(false);
+    setNewItem({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea" });
+  };
+  const handleAttach = (id, file) => {
+    if (!file || file.size > 2 * 1024 * 1024) return;
+    const r = new FileReader();
+    r.onload = e => updateItem(id, "attachment", e.target.result);
+    r.readAsDataURL(file);
+    updateItem(id, "attachmentName", file.name);
+  };
+
+  const filtered = data.filter(d => {
+    if (filterBrand !== "all" && d.brand !== filterBrand) return false;
+    if (search) { const s = search.toLowerCase(); return (d.sku || "").toLowerCase().includes(s) || (d.supplier || "").toLowerCase().includes(s) || (d.packageType || "").toLowerCase().includes(s); }
+    return true;
+  });
+  const groups = {};
+  filtered.forEach(d => { const b = d.brand || "Other"; if (!groups[b]) groups[b] = []; groups[b].push(d); });
+
+  const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
+  const is8 = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
+  const PGR = "1fr 36px 100px 80px 100px 80px 100px 90px 28px";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 57px)", overflow: "hidden" }}>
+      {/* Sticky toolbar */}
+      <div style={{ padding: "12px 20px", borderBottom: "1px solid var(--border)", background: "var(--surface)", flexShrink: 0, position: "sticky", top: 0, zIndex: 10, backdropFilter: "blur(12px)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+          <div style={{ fontFamily: "var(--df)", fontSize: 28, fontWeight: 300, color: "var(--text)" }}>Packaging</div>
+          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{filtered.length} item{filtered.length !== 1 ? "s" : ""}</div>
+        </div>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <button className="btn btn-gold" style={{ fontSize: 11, padding: "6px 14px" }} onClick={() => setShowAddModal(true)}>+ Add SKU</button>
+          <div style={{ display: "flex", gap: 2, padding: 2, background: "var(--surface2)", borderRadius: 6, border: "1px solid var(--border)" }}>
+            <button onClick={() => setActiveTab("tracker")} style={{ padding: "4px 12px", fontSize: 10, borderRadius: 4, border: "none", cursor: "pointer", background: activeTab === "tracker" ? "var(--gold-dim)" : "transparent", color: activeTab === "tracker" ? "var(--gold)" : "var(--text-muted)", fontFamily: "var(--bf)", fontWeight: 600 }}>Tracker</button>
+            <button onClick={() => setActiveTab("confirmed")} style={{ padding: "4px 12px", fontSize: 10, borderRadius: 4, border: "none", cursor: "pointer", background: activeTab === "confirmed" ? "var(--gold-dim)" : "transparent", color: activeTab === "confirmed" ? "var(--gold)" : "var(--text-muted)", fontFamily: "var(--bf)", fontWeight: 600 }}>Confirmed</button>
+          </div>
+          <select value={filterBrand} onChange={e => setFilterBrand(e.target.value)} style={{ background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }}>
+            <option value="all">All Brands</option>
+            {brandList.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}
+          </select>
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search SKU, supplier..." style={{ flex: 1, minWidth: 150, background: "var(--surface2)", border: "1px solid var(--border)", borderRadius: 6, padding: "6px 10px", color: "var(--text)", fontSize: 11, fontFamily: "var(--bf)", outline: "none" }} />
+        </div>
+      </div>
+      {/* Add Modal */}
+      {showAddModal && (
+        <div className="overlay" onClick={() => setShowAddModal(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: 500 }}>
+            <div className="mhdr" style={{ borderTop: "2px solid var(--gold)", borderRadius: "16px 16px 0 0" }}>
+              <div className="mtitle">Add Packaging SKU</div>
+              <button className="mclose" onClick={() => setShowAddModal(false)}>×</button>
+            </div>
+            <div style={{ padding: "18px 20px", overflowY: "auto", maxHeight: "60vh" }}>
+              <div className="frow">
+                <div className="ff"><label className="fl">Brand</label><select className="fsel" value={newItem.brand} onChange={e => setNewItem(p => ({ ...p, brand: e.target.value }))}>{brandList.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}</select></div>
+                <div className="ff"><label className="fl">Package Type</label><select className="fsel" value={newItem.packageType} onChange={e => setNewItem(p => ({ ...p, packageType: e.target.value }))}>{PKG_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+              </div>
+              <div className="ff"><label className="fl">SKU / Product Name *</label><input className="fi" placeholder="e.g. Rosin AIO 0.5g" value={newItem.sku} onChange={e => setNewItem(p => ({ ...p, sku: e.target.value }))} autoFocus /></div>
+              <div className="frow">
+                <div className="ff"><label className="fl">Supplier</label><input className="fi" placeholder="Supplier name" value={newItem.supplier} onChange={e => setNewItem(p => ({ ...p, supplier: e.target.value }))} /></div>
+                <div className="ff"><label className="fl">Cost</label><input className="fi" placeholder="$0.00" value={newItem.cost} onChange={e => setNewItem(p => ({ ...p, cost: e.target.value }))} /></div>
+              </div>
+              <div className="frow">
+                <div className="ff"><label className="fl">Contact</label><input className="fi" placeholder="Rep name or email" value={newItem.contact} onChange={e => setNewItem(p => ({ ...p, contact: e.target.value }))} /></div>
+                <div className="ff"><label className="fl">Status</label><select className="fsel" value={newItem.status} onChange={e => setNewItem(p => ({ ...p, status: e.target.value }))}>{PKG_STATUSES.map(s => <option key={s}>{s}</option>)}</select></div>
+              </div>
+            </div>
+            <div className="mfoot"><button className="btn" onClick={() => setShowAddModal(false)}>Cancel</button><button className="btn btn-gold" disabled={!newItem.sku.trim()} onClick={addItem}>Add to {activeTab === "tracker" ? "Tracker" : "Confirmed"}</button></div>
+          </div>
+        </div>
+      )}
+      {/* Table */}
+      <div style={{ flex: 1, overflow: "auto", padding: "8px 20px" }}>
+        <div style={{ minWidth: 800 }}>
+          {Object.keys(groups).length === 0 && data.length === 0 && (
+            <div style={{ textAlign: "center", padding: "60px 40px" }}>
+              <div style={{ fontSize: 40, opacity: .3, marginBottom: 16 }}>📦</div>
+              <div style={{ fontFamily: "var(--df)", fontSize: 22, fontWeight: 300, color: "var(--text)", marginBottom: 8 }}>{activeTab === "tracker" ? "Packaging Tracker" : "Confirmed Packaging"}</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20 }}>No items yet. Add a SKU to get started.</div>
+              <button className="btn btn-gold" onClick={() => setShowAddModal(true)}>+ Add SKU</button>
+            </div>
+          )}
+          {brandList.map(brand => {
+            const items = groups[brand.name];
+            if (!items && filterBrand === "all") return null;
+            if (!items) return null;
+            const isCollapsed = collapsed[brand.name];
+            return (
+              <div key={brand.name} style={{ marginBottom: 16 }}>
+                <div onClick={() => setCollapsed(p => ({ ...p, [brand.name]: !p[brand.name] }))} style={{ padding: "12px 16px", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, userSelect: "none" }}>
+                  <span style={{ fontSize: 10, display: "inline-block", transform: isCollapsed ? "rotate(0deg)" : "rotate(90deg)", transition: "transform .15s", color: brand.color }}>▶</span>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: brand.color }} />
+                  <span style={{ fontSize: 16, fontWeight: 700, color: brand.color }}>{brand.name}</span>
+                  <span style={{ fontSize: 10, color: "var(--text-muted)" }}>{items.length} SKU{items.length !== 1 ? "s" : ""}</span>
+                </div>
+                {isCollapsed && <div style={{ padding: "4px 16px 8px", fontSize: 11, color: "var(--text-muted)", borderLeft: `3px solid ${brand.color}`, marginLeft: 16 }}>{items.length} SKU{items.length !== 1 ? "s" : ""}</div>}
+                {!isCollapsed && (
+                  <div style={{ borderLeft: `3px solid ${brand.color}`, marginLeft: 16 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: PGR, borderBottom: "1px solid var(--border)", background: "var(--surface2)" }}>
+                      {["SKU", "💬", "Pkg Type", "Supplier", "Cost", "Contact", "Status", "File", ""].map((h, hi) => (
+                        <div key={hi} style={{ padding: "6px 8px", fontSize: 9, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
+                      ))}
+                    </div>
+                    {items.map(d => (
+                      <div key={d.id} style={{ display: "grid", gridTemplateColumns: PGR, borderBottom: "1px solid var(--border2)", minHeight: 36 }}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,.02)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <div style={cs}><input value={d.sku||""} onChange={e => updateItem(d.id, "sku", e.target.value)} style={{ ...is8, fontWeight: 500, color: "var(--text)" }} /></div>
+                        <div style={{ ...cs, overflow: "visible" }}><CommentBubble item={d} title={d.sku||d.brand} currentUser={currentUser} onUpdateComments={c => updateItem(d.id, "comments", c)} /></div>
+                        <div style={cs}><select value={d.packageType||""} onChange={e => updateItem(d.id, "packageType", e.target.value)} style={{ ...is8, fontSize: 10 }}>{PKG_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
+                        <div style={cs}><input value={d.supplier||""} onChange={e => updateItem(d.id, "supplier", e.target.value)} style={is8} /></div>
+                        <div style={cs}><input value={d.cost||""} onChange={e => updateItem(d.id, "cost", e.target.value)} style={{ ...is8, textAlign: "right" }} /></div>
+                        <div style={cs}><input value={d.contact||""} onChange={e => updateItem(d.id, "contact", e.target.value)} style={is8} /></div>
+                        <div style={cs}><div style={{ width: "100%", padding: "3px 0", borderRadius: 4, textAlign: "center", fontSize: 10, fontWeight: 600, color: "#fff", background: PKG_ST_CLR[d.status] || "#888", cursor: "pointer" }} onClick={() => { const next = PKG_STATUSES[(PKG_STATUSES.indexOf(d.status) + 1) % PKG_STATUSES.length]; updateItem(d.id, "status", next); }}>{d.status || "Idea"}</div></div>
+                        <div style={cs}>
+                          {d.attachmentName ? (
+                            <div style={{ display: "flex", alignItems: "center", gap: 4, width: "100%" }}>
+                              <span style={{ fontSize: 9, color: "var(--text-dim)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{d.attachmentName}</span>
+                              {d.attachment && <button onClick={() => { const a = document.createElement("a"); a.href = d.attachment; a.download = d.attachmentName; a.click(); }} style={{ fontSize: 8, color: "var(--gold)", background: "none", border: "none", cursor: "pointer", padding: 0, fontFamily: "var(--bf)" }}>DL</button>}
+                              <button onClick={() => { updateItem(d.id, "attachment", null); updateItem(d.id, "attachmentName", ""); }} style={{ fontSize: 10, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", padding: 0 }}>×</button>
+                            </div>
+                          ) : (
+                            <button onClick={() => { const inp = document.createElement("input"); inp.type = "file"; inp.onchange = e => handleAttach(d.id, e.target.files[0]); inp.click(); }} style={{ fontSize: 9, color: "var(--text-muted)", background: "none", border: "1px solid var(--border)", borderRadius: 3, padding: "2px 6px", cursor: "pointer", fontFamily: "var(--bf)" }}>+ File</button>
+                          )}
+                        </div>
+                        <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteItem(d.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
+                      </div>
+                    ))}
+                    <div onClick={() => setShowAddModal(true)} style={{ padding: "8px 12px", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
+                      onMouseEnter={e => e.currentTarget.style.opacity = "1"} onMouseLeave={e => e.currentTarget.style.opacity = ".5"}>+ Add SKU</div>
                   </div>
                 )}
               </div>
