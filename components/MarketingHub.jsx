@@ -11248,19 +11248,23 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [collapsed, setCollapsed] = useState({});
-  const [newItem, setNewItem] = useState({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea" });
+  const [expandedRow, setExpandedRow] = useState(null);
+  const [newItem, setNewItem] = useState({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea", notes: "" });
 
   const data = activeTab === "tracker" ? tracker : confirmed;
   const setData = activeTab === "tracker" ? setTracker : setConfirmed;
 
   const updateItem = (id, field, val) => setData(p => p.map(d => d.id === id ? { ...d, [field]: val } : d));
   const deleteItem = (id) => setData(p => p.filter(d => d.id !== id));
+  const addElement = (id) => setData(p => p.map(d => d.id === id ? { ...d, elements: [...(d.elements || []), { id: `el-${Date.now()}`, name: "", type: "", supplier: "", cost: "", notes: "" }] } : d));
+  const updateElement = (itemId, elId, field, val) => setData(p => p.map(d => d.id === itemId ? { ...d, elements: (d.elements || []).map(e => e.id === elId ? { ...e, [field]: val } : e) } : d));
+  const deleteElement = (itemId, elId) => setData(p => p.map(d => d.id === itemId ? { ...d, elements: (d.elements || []).filter(e => e.id !== elId) } : d));
   const addItem = () => {
     if (!newItem.sku.trim()) return;
-    setData(p => [...p, { ...newItem, id: `pkg-${Date.now()}`, comments: [], attachment: null, attachmentName: "", createdAt: new Date().toISOString(), createdBy: currentUser?.name || "Team" }]);
+    setData(p => [...p, { ...newItem, id: `pkg-${Date.now()}`, comments: [], elements: [], attachment: null, attachmentName: "", createdAt: new Date().toISOString(), createdBy: currentUser?.name || "Team" }]);
     setCollapsed(p => ({ ...p, [newItem.brand]: false }));
     setShowAddModal(false);
-    setNewItem({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea" });
+    setNewItem({ brand: brandList[0]?.name || "Headchange", sku: "", packageType: PKG_TYPES[0], supplier: "", cost: "", contact: "", status: "Idea", notes: "" });
   };
   const handleAttach = (id, file) => {
     if (!file || file.size > 2 * 1024 * 1024) return;
@@ -11280,7 +11284,7 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
 
   const cs = { padding: "5px 8px", fontSize: 11, borderRight: "1px solid var(--border2)", display: "flex", alignItems: "center", overflow: "hidden" };
   const is8 = { background: "transparent", border: "none", color: "var(--text-dim)", fontSize: 11, fontFamily: "var(--bf)", outline: "none", width: "100%", padding: 0 };
-  const PGR = "1fr 36px 100px 80px 100px 80px 100px 90px 28px";
+  const PGR = "30px 1fr 36px 100px 80px 80px 80px 100px 80px 28px";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "calc(100vh - 57px)", overflow: "hidden" }}>
@@ -11325,6 +11329,7 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
                 <div className="ff"><label className="fl">Contact</label><input className="fi" placeholder="Rep name or email" value={newItem.contact} onChange={e => setNewItem(p => ({ ...p, contact: e.target.value }))} /></div>
                 <div className="ff"><label className="fl">Status</label><select className="fsel" value={newItem.status} onChange={e => setNewItem(p => ({ ...p, status: e.target.value }))}>{PKG_STATUSES.map(s => <option key={s}>{s}</option>)}</select></div>
               </div>
+              <div className="ff"><label className="fl">Notes</label><textarea className="fta" rows={2} placeholder="Any notes about this packaging..." value={newItem.notes} onChange={e => setNewItem(p => ({ ...p, notes: e.target.value }))} /></div>
             </div>
             <div className="mfoot"><button className="btn" onClick={() => setShowAddModal(false)}>Cancel</button><button className="btn btn-gold" disabled={!newItem.sku.trim()} onClick={addItem}>Add to {activeTab === "tracker" ? "Tracker" : "Confirmed"}</button></div>
           </div>
@@ -11358,13 +11363,17 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
                 {!isCollapsed && (
                   <div style={{ borderLeft: `3px solid ${brand.color}`, marginLeft: 16 }}>
                     <div style={{ display: "grid", gridTemplateColumns: PGR, borderBottom: "1px solid var(--border)", background: "var(--surface2)" }}>
-                      {["SKU", "💬", "Pkg Type", "Supplier", "Cost", "Contact", "Status", "File", ""].map((h, hi) => (
+                      {["", "SKU", "💬", "Pkg Type", "Supplier", "Cost", "Contact", "Status", "File", ""].map((h, hi) => (
                         <div key={hi} style={{ padding: "6px 8px", fontSize: 9, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
                       ))}
                     </div>
                     {items.map(d => (
-                      <div key={d.id} style={{ display: "grid", gridTemplateColumns: PGR, borderBottom: "1px solid var(--border2)", minHeight: 36 }}
+                      <div key={d.id}>
+                      <div style={{ display: "grid", gridTemplateColumns: PGR, borderBottom: expandedRow === d.id ? "none" : "1px solid var(--border2)", minHeight: 36 }}
                         onMouseEnter={e => e.currentTarget.style.background = "rgba(0,0,0,.02)"} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                        <div style={{ ...cs, justifyContent: "center", cursor: "pointer" }} onClick={() => setExpandedRow(expandedRow === d.id ? null : d.id)}>
+                          <span style={{ fontSize: 9, display: "inline-block", transform: expandedRow === d.id ? "rotate(90deg)" : "rotate(0deg)", transition: "transform .15s", color: "var(--text-muted)" }}>▶</span>
+                        </div>
                         <div style={cs}><input value={d.sku||""} onChange={e => updateItem(d.id, "sku", e.target.value)} style={{ ...is8, fontWeight: 500, color: "var(--text)" }} /></div>
                         <div style={{ ...cs, overflow: "visible" }}><CommentBubble item={d} title={d.sku||d.brand} currentUser={currentUser} onUpdateComments={c => updateItem(d.id, "comments", c)} /></div>
                         <div style={cs}><select value={d.packageType||""} onChange={e => updateItem(d.id, "packageType", e.target.value)} style={{ ...is8, fontSize: 10 }}>{PKG_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
@@ -11384,6 +11393,52 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
                           )}
                         </div>
                         <div style={{ ...cs, borderRight: "none", justifyContent: "center", cursor: "pointer" }} onClick={() => { if (confirm("Delete?")) deleteItem(d.id); }}><span style={{ fontSize: 12, opacity: .3, color: "#e07b6a" }}>×</span></div>
+                      </div>
+                      {/* Expanded detail */}
+                      {expandedRow === d.id && (
+                        <div style={{ padding: "12px 16px 16px 46px", borderBottom: "1px solid var(--border2)", background: "var(--surface2)" }}>
+                          {/* Notes */}
+                          <div style={{ marginBottom: 14 }}>
+                            <div style={{ fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 4 }}>Notes</div>
+                            <textarea value={d.notes||""} onChange={e => updateItem(d.id, "notes", e.target.value)} placeholder="Add packaging notes, specs, dimensions..."
+                              style={{ width: "100%", minHeight: 60, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 10px", color: "var(--text)", fontSize: 12, fontFamily: "var(--bf)", outline: "none", resize: "vertical", lineHeight: 1.6 }} />
+                          </div>
+                          {/* Elements sub-table */}
+                          <div style={{ marginBottom: 10 }}>
+                            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                              <div style={{ fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600 }}>Package Elements ({(d.elements || []).length})</div>
+                              <button onClick={() => addElement(d.id)} style={{ fontSize: 9, color: "var(--gold)", background: "none", border: "1px solid rgba(184,150,58,.2)", borderRadius: 4, padding: "3px 8px", cursor: "pointer", fontFamily: "var(--bf)", fontWeight: 600 }}>+ Add Element</button>
+                            </div>
+                            {(d.elements || []).length > 0 && (
+                              <div style={{ border: "1px solid var(--border)", borderRadius: 6, overflow: "hidden" }}>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 60px 1fr 24px", background: "var(--surface3)", borderBottom: "1px solid var(--border)" }}>
+                                  {["Element", "Type", "Supplier", "Cost", "Notes", ""].map(h => (
+                                    <div key={h} style={{ padding: "4px 8px", fontSize: 8, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: "var(--text-muted)", borderRight: "1px solid var(--border2)" }}>{h}</div>
+                                  ))}
+                                </div>
+                                {(d.elements || []).map(el => (
+                                  <div key={el.id} style={{ display: "grid", gridTemplateColumns: "1fr 80px 80px 60px 1fr 24px", borderBottom: "1px solid var(--border2)" }}>
+                                    <div style={{ padding: "4px 8px" }}><input value={el.name||""} onChange={e => updateElement(d.id, el.id, "name", e.target.value)} placeholder="e.g. Lid, Label, Insert" style={{ ...is8, fontSize: 10 }} /></div>
+                                    <div style={{ padding: "4px 8px" }}><input value={el.type||""} onChange={e => updateElement(d.id, el.id, "type", e.target.value)} style={{ ...is8, fontSize: 10 }} /></div>
+                                    <div style={{ padding: "4px 8px" }}><input value={el.supplier||""} onChange={e => updateElement(d.id, el.id, "supplier", e.target.value)} style={{ ...is8, fontSize: 10 }} /></div>
+                                    <div style={{ padding: "4px 8px" }}><input value={el.cost||""} onChange={e => updateElement(d.id, el.id, "cost", e.target.value)} style={{ ...is8, fontSize: 10 }} /></div>
+                                    <div style={{ padding: "4px 8px" }}><input value={el.notes||""} onChange={e => updateElement(d.id, el.id, "notes", e.target.value)} style={{ ...is8, fontSize: 10 }} /></div>
+                                    <div style={{ padding: "4px 8px", display: "flex", alignItems: "center", justifyContent: "center" }}><button onClick={() => deleteElement(d.id, el.id)} style={{ fontSize: 10, color: "#e07b6a", background: "none", border: "none", cursor: "pointer", opacity: .4 }}>×</button></div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {(d.elements || []).length === 0 && <div style={{ fontSize: 10, color: "var(--text-muted)", fontStyle: "italic" }}>No elements yet — add lid, label, insert, etc.</div>}
+                          </div>
+                          {/* File attachment in detail */}
+                          <div>
+                            <div style={{ fontSize: 9, letterSpacing: ".1em", textTransform: "uppercase", color: "var(--text-muted)", fontWeight: 600, marginBottom: 4 }}>Attachments</div>
+                            <button onClick={() => { const inp = document.createElement("input"); inp.type = "file"; inp.onchange = e => handleAttach(d.id, e.target.files[0]); inp.click(); }}
+                              style={{ fontSize: 10, color: "var(--gold)", background: "none", border: "1px solid rgba(184,150,58,.2)", borderRadius: 4, padding: "4px 10px", cursor: "pointer", fontFamily: "var(--bf)" }}>+ Attach File</button>
+                            {d.attachmentName && <span style={{ marginLeft: 8, fontSize: 10, color: "var(--text-dim)" }}>{d.attachmentName}</span>}
+                          </div>
+                        </div>
+                      )}
                       </div>
                     ))}
                     <div onClick={() => setShowAddModal(true)} style={{ padding: "8px 12px", cursor: "pointer", fontSize: 11, color: "var(--text-muted)", opacity: .5 }}
