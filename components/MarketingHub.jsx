@@ -11237,6 +11237,12 @@ function CSBoardTable({ data, setData, currentUser }) {
 }
 
 // ── PACKAGING PORTAL ──────────────────────────────────────────────────────
+const BRAND_PKG_SKUS = {
+  "Headchange": ["Concentrate Box","Concentrate Case","Box Sticker","Jar Wrap","Jar Lid","Jar QR","510 Cart Package","510 Cart Case","All-in-One Cart Package","All-in-One Cart Case","Live Rosin Cart","Live Resin AIO","Live Rosin AIO","Mini Hash Holes"],
+  "SafeBet": ["Pre-Roll Package","510 Cart Package","510 Cart Case","All-in-One Cart Package","All-in-One Cart Case","FECO Package","FECO Case","QR Sticker","Infused Pre Rolls","Bubble Hash Infused","Live Resin Infused","Diamond Infused","1g All in One","FECO Plus CBN","1g Blunt","1g Bubble Hash Infused Blunt"],
+  "Bubbles": ["Cart SKU 1 Package","Cart SKU 1 Case","Cart SKU 2 Package","Cart SKU 2 Case","Cart SKU 3 Package","Cart SKU 3 Case","Cart SKU 4 Package","Cart SKU 4 Case"],
+  "Airo": ["Airo Pod Package","Airo Pod Case","Airo AIO Package"],
+};
 const PKG_STATUSES = ["Idea", "Sampled", "Approved", "Denied"];
 const PKG_ST_CLR = { "Idea": "#3b82f6", "Sampled": "#c9a84c", "Approved": "#22c55e", "Denied": "#e07b6a" };
 const PKG_TYPES = ["Box", "Jar", "Tube", "Mylar", "Pouch", "Bag", "Cart Box", "Display", "Label", "Wrap", "Other"];
@@ -11320,7 +11326,18 @@ function PackagingPortal({ tracker, setTracker, confirmed, setConfirmed, brands,
                 <div className="ff"><label className="fl">Brand</label><select className="fsel" value={newItem.brand} onChange={e => setNewItem(p => ({ ...p, brand: e.target.value }))}>{brandList.map(b => <option key={b.id} value={b.name}>{b.name}</option>)}</select></div>
                 <div className="ff"><label className="fl">Package Type</label><select className="fsel" value={newItem.packageType} onChange={e => setNewItem(p => ({ ...p, packageType: e.target.value }))}>{PKG_TYPES.map(t => <option key={t}>{t}</option>)}</select></div>
               </div>
-              <div className="ff"><label className="fl">SKU / Product Name *</label><input className="fi" placeholder="e.g. Rosin AIO 0.5g" value={newItem.sku} onChange={e => setNewItem(p => ({ ...p, sku: e.target.value }))} autoFocus /></div>
+              <div className="ff"><label className="fl">SKU / Product Name *</label>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <select className="fsel" value={newItem.sku} onChange={e => setNewItem(p => ({ ...p, sku: e.target.value }))} style={{ flex: 1 }}>
+                    <option value="">Select packaging SKU...</option>
+                    {(BRAND_PKG_SKUS[newItem.brand] || []).map(s => <option key={s} value={s}>{s}</option>)}
+                    <option value="__custom">-- Custom / Other --</option>
+                  </select>
+                  {(newItem.sku === "__custom" || (!BRAND_PKG_SKUS[newItem.brand]?.includes(newItem.sku) && newItem.sku)) && (
+                    <input className="fi" placeholder="Custom SKU name" value={newItem.sku === "__custom" ? "" : newItem.sku} onChange={e => setNewItem(p => ({ ...p, sku: e.target.value }))} style={{ flex: 1 }} autoFocus />
+                  )}
+                </div>
+              </div>
               <div className="frow">
                 <div className="ff"><label className="fl">Supplier</label><input className="fi" placeholder="Supplier name" value={newItem.supplier} onChange={e => setNewItem(p => ({ ...p, supplier: e.target.value }))} /></div>
                 <div className="ff"><label className="fl">Cost</label><input className="fi" placeholder="$0.00" value={newItem.cost} onChange={e => setNewItem(p => ({ ...p, cost: e.target.value }))} /></div>
